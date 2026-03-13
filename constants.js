@@ -3,11 +3,14 @@
 // ║              These values are fixed hardware specifications              ║
 // ╚════════════════════════════════════════════════════════════════════════╝
 
-// Constants per drawer - fixed hardware specifications
-const GUIDES_PER_DRAWER = 1;                 // Slide guide sets per drawer
-const BRACKETS_PER_DRAWER = 1;               // Bracket sets per drawer
+const GUIDES_PER_DRAWER = 1;
+const BRACKETS_PER_DRAWER = 1;
+const HANDLES_PER_DOOR = 1;
+const HINGES_PER_DOOR = 5;
 
 module.exports = {
     GUIDES_PER_DRAWER,
-    BRACKETS_PER_DRAWER
+    BRACKETS_PER_DRAWER,
+    HANDLES_PER_DOOR,
+    HINGES_PER_DOOR
 };

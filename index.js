@@ -3,7 +3,7 @@
 // ╚════════════════════════════════════════════════════════════════════════╝
 
 const { calculateDimensions, calculateHardware } = require('./calculations');
-const { getWoodenBoards, getHDFBottom, getBoardsData, getBoardsSummary } = require('./boards');
+const { getWoodenBoards, getHDFBottom, getBoardsData, getBoardsSummary, getNicheBoards } = require('./boards');
 const report = require('./report');
 
 function main() {
@@ -11,12 +11,14 @@ function main() {
     const hdfBottom = getHDFBottom();
     const allBoards = getBoardsData();
     const boardsSummary = getBoardsSummary(allBoards);
+    const nicheBoards = getNicheBoards();
 
     const hardware = calculateHardware();
 
     report.printHeader();
     report.printInputParameters();
-    report.printShoppingList(hardware.totalGuides, hardware.totalBrackets, woodenBoards, hdfBottom, boardsSummary);
+    report.printShoppingList(hardware, woodenBoards, hdfBottom, boardsSummary);
+    report.printNicheFurniture(nicheBoards, hardware);
 }
 
 main();

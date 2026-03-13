@@ -79,9 +79,8 @@ function getBoardsData() {
 }
 
 /**
- * Calculate summary of boards by dimensions
- * @param {Array} boards Array of board objects
- * @returns {Object} Summary object with dimensions as keys
+ * Calculate niche furniture dimensions
+ * @returns {Object} Object containing niche shelf and blend dimensions
  */
 function getBoardsSummary(boards) {
     const summary = {};
@@ -99,9 +98,94 @@ function getBoardsSummary(boards) {
     return summary;
 }
 
+/**
+ * Generate niche shelf board data
+ * @returns {Object} Niche shelf board object with dimensions and quantity
+ */
+function getNicheShelfBoard() {
+    const { calculateNicheDimensions } = require('./calculations');
+    const nicheDims = calculateNicheDimensions();
+
+    return {
+        nr: 101,
+        name: "Półka wnęki",
+        dimensions: `${nicheDims.shelfHeight} × ${nicheDims.shelfWidth}`,
+        dimensionsTuple: [nicheDims.shelfHeight, nicheDims.shelfWidth],
+        qty: 1,
+        material: "Płyta meblowa",
+        color: "Kolor A (inny niż standard)",
+        edgeBanding: "Wszystkie obrzeża (4 strony)"
+    };
+}
+
+/**
+ * Generate niche blend (trim strip) board data
+ * @returns {Object} Niche blend board object with dimensions and quantity
+ */
+function getNicheBlendBoard() {
+    const { calculateNicheDimensions } = require('./calculations');
+    const nicheDims = calculateNicheDimensions();
+
+    return {
+        nr: 102,
+        name: "Blenda wnęki",
+        dimensions: `${nicheDims.blendHeight} × ${nicheDims.blendWidth}`,
+        dimensionsTuple: [nicheDims.blendHeight, nicheDims.blendWidth],
+        qty: 1,
+        material: "Płyta meblowa",
+        color: "Kolor A (ten sam co półka)",
+        edgeBanding: "Obrzeża na krótszych bokach (2) + jeden długszy bok"
+    };
+}
+
+/**
+ * Generate side panel board for left or right side of niche
+ * @param {string} side 'left' or 'right'
+ * @returns {Object} Side panel board object
+ */
+function getNicheSidePanel(side) {
+    const { calculateNicheDimensions } = require('./calculations');
+    const parameters = require('./parameters');
+    const nicheDims = calculateNicheDimensions();
+
+    const isFullyCovered = side === 'left'
+        ? parameters.isLeftSideFullyCovered
+        : parameters.isRightSideFullyCovered;
+
+    const width = isFullyCovered ? nicheDims.sidePanelFullWidth : nicheDims.sidePanelPartialWidth;
+    const name = side === 'left' ? "Bok lewy wnęki" : "Bok prawy wnęki";
+
+    return {
+        nr: side === 'left' ? 103 : 104,
+        name: name,
+        dimensions: `${nicheDims.sidePanelHeight} × ${width}`,
+        dimensionsTuple: [nicheDims.sidePanelHeight, width],
+        qty: 1,
+        material: "Płyta meblowa",
+        edgeBanding: "Jedno obrzeże na dłuższym boku"
+    };
+}
+
+/**
+ * Generate niche boards array
+ * @returns {Array} Array containing shelf, blend and side panels
+ */
+function getNicheBoards() {
+    return [
+        getNicheShelfBoard(),
+        getNicheBlendBoard(),
+        getNicheSidePanel('left'),
+        getNicheSidePanel('right')
+    ];
+}
+
 module.exports = {
     getWoodenBoards,
     getHDFBottom,
     getBoardsData,
-    getBoardsSummary
+    getBoardsSummary,
+    getNicheShelfBoard,
+    getNicheBlendBoard,
+    getNicheSidePanel,
+    getNicheBoards
 };
