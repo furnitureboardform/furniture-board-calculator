@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Mebli</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
+        header { background: #1a1a2e; color: #fff; padding: 24px 40px; }
+        header h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: 0.5px; }
+        header p { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+        main { max-width: 700px; margin: 40px auto; padding: 0 20px 60px; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .card { background: #fff; border-radius: 10px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .field { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .field label { font-size: 0.95rem; color: #444; flex: 1; }
+        .field input[type="number"] { width: 120px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; text-align: right; transition: border-color 0.2s; }
+        .field input[type="number"]:focus { outline: none; border-color: #4f8ef7; }
+        .btn { width: 100%; padding: 14px; background: #1a1a2e; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
+        .btn:hover { background: #2d2d5e; }
+        .btn-outline { background: transparent; color: #1a1a2e; border: 2px solid #1a1a2e; margin-bottom: 12px; }
+        .btn-outline:hover { background: #f0f2f5; }
+        .steps-indicator { display: flex; gap: 8px; margin-bottom: 28px; }
+        .steps-indicator span { flex: 1; height: 4px; background: #ddd; border-radius: 2px; transition: background 0.3s; }
+        .steps-indicator span.done { background: #1a1a2e; }
+        .step-label { font-size: 0.75rem; color: #aaa; margin-bottom: 6px; }
+        .report { background: #1a1a2e; color: #e8eaf6; border-radius: 10px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .report h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #7986cb; margin-bottom: 18px; border-bottom: 1px solid #2d2d5e; padding-bottom: 10px; }
+        .report pre { font-family: 'Consolas', 'Courier New', monospace; font-size: 0.875rem; white-space: pre-wrap; line-height: 1.6; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Kalkulator Mebli</h1>
+    <p>Konfiguruj parametry krok po kroku</p>
+</header>
+<main>
+    {{REPORT_SECTION}}
+
+    <div id="form-section"{{FORM_HIDDEN}}>
+        <div class="steps-indicator">
+            <span id="ind-1" class="done"></span>
+            <span id="ind-2"></span>
+            <span id="ind-3"></span>
+        </div>
+
+        <form method="POST" action="/" id="main-form">
+
+            <div class="step active" id="step-1">
+                <div class="step-label">Krok 1 z 3</div>
+                <div class="card">
+                    <h2>Wymiary wnęki</h2>
+                    <div class="field">
+                        <label>Szerokość wnęki (mm)</label>
+                        <input type="number" name="nicheWidthMm" id="nicheWidthMm" value="{{NICHE_WIDTH}}" min="1" required>
+                    </div>
+                    <div class="field">
+                        <label>Wysokość wnęki (mm)</label>
+                        <input type="number" name="nicheHeightMm" id="nicheHeightMm" value="{{NICHE_HEIGHT}}" min="1" required>
+                    </div>
+                </div>
+                <button type="button" class="btn" onclick="goToStep(2)">Dalej →</button>
+            </div>
+
+            <div class="step" id="step-2">
+                <div class="step-label">Krok 2 z 3</div>
+                <div class="card">
+                    <h2>Liczba boxów</h2>
+                    <div class="field">
+                        <label>Ile boxów ma być w szafie?</label>
+                        <input type="number" name="numberOfBoxes" id="numberOfBoxes" value="{{NUMBER_OF_BOXES}}" min="1" max="20" required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline" onclick="goToStep(1)">← Wróć</button>
+                <button type="button" class="btn" onclick="goToStep(3)">Dalej →</button>
+            </div>
+
+            <div class="step" id="step-3">
+                <div class="step-label">Krok 3 z 3</div>
+                <div class="card">
+                    <h2>Szerokości boxów</h2>
+                    <div id="boxes-container"></div>
+                </div>
+                <button type="button" class="btn btn-outline" onclick="goToStep(2)">← Wróć</button>
+                <button type="submit" class="btn">Generuj</button>
+            </div>
+
+        </form>
+    </div>
+</main>
+<script>
+    const savedWidths   = {{SAVED_WIDTHS}};
+    const savedShelves  = {{SAVED_SHELVES}};
+    const savedRods     = {{SAVED_RODS}};
+    const savedDrawers  = {{SAVED_DRAWERS}};
+
+    function goToStep(n) {
+        if (n === 3) buildBoxInputs();
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step-' + n).classList.add('active');
+        document.querySelectorAll('.steps-indicator span').forEach((el, i) => {
+            el.classList.toggle('done', i < n);
+        });
+        window.scrollTo(0, 0);
+    }
+
+    function buildBoxInputs() {
+        const count = parseInt(document.getElementById('numberOfBoxes').value) || 1;
+        const container = document.getElementById('boxes-container');
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const w  = savedWidths[i]  !== undefined ? savedWidths[i]  : 964;
+            const sh = savedShelves[i] !== undefined ? savedShelves[i] : 2;
+            const ro = savedRods[i]    !== undefined ? savedRods[i]    : 0;
+            const dr = savedDrawers[i] !== undefined ? savedDrawers[i] : 2;
+
+            const section = document.createElement('div');
+            section.style.cssText = 'margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #eee;';
+            section.innerHTML =
+                '<div style="font-size:0.85rem;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Box ' + (i + 1) + '</div>' +
+                field('Szerokość (mm)',  'boxWidth_'   + i, w,  1) +
+                field('Liczba półek',   'boxShelves_' + i, sh, 0) +
+                field('Liczba drążków', 'boxRods_'    + i, ro, 0) +
+                field('Liczba szuflad', 'boxDrawers_' + i, dr, 0);
+            container.appendChild(section);
+        }
+    }
+
+    function field(label, name, value, min) {
+        return '<div class="field"><label>' + label + '</label>' +
+            '<input type="number" name="' + name + '" value="' + value + '" min="' + min + '" required></div>';
+    }
+
+    function showForm() {
+        document.getElementById('form-section').style.display = '';
+        document.querySelector('.report').style.display = 'none';
+        document.querySelector('.btn-outline[onclick="showForm()"]').style.display = 'none';
+        goToStep(1);
+    }
+</script>
+</body>
+</html>
