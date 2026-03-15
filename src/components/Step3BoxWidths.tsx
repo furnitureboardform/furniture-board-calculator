@@ -1,13 +1,11 @@
 import type { BoxForm } from '../lib/types';
 
 export interface Step3BoxWidthsProps {
-  numberOfBoxes: number;
   boxes: BoxForm[];
   splitEqually: boolean;
   onSplitEquallyChange: (checked: boolean) => void;
   onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean) => void;
   onGoToStep: (step: number) => void;
-  onSubmit: () => void;
   validationMessage: string | null;
   validationValid: boolean;
   shelvesPreview: string | null;
@@ -15,13 +13,11 @@ export interface Step3BoxWidthsProps {
 }
 
 export default function Step3BoxWidths({
-  numberOfBoxes,
   boxes,
   splitEqually,
   onSplitEquallyChange,
   onBoxChange,
   onGoToStep,
-  onSubmit,
   validationMessage,
   validationValid,
   shelvesPreview,
@@ -29,7 +25,7 @@ export default function Step3BoxWidths({
 }: Step3BoxWidthsProps) {
   return (
     <div className={`step ${active ? 'active' : ''}`}>
-      <div className="step-label">Krok 3 z 3</div>
+      <div className="step-label">Krok 3 z 4</div>
       <div className="card">
         <h2>Szerokości boxów</h2>
         <div className="checkbox-row">
@@ -106,8 +102,8 @@ export default function Step3BoxWidths({
       <button type="button" className="btn btn-outline" onClick={() => onGoToStep(2)}>
         ← Wróć
       </button>
-      <button type="submit" className="btn" onClick={onSubmit}>
-        Generuj
+      <button type="button" className="btn" onClick={() => onGoToStep(4)} disabled={!validationValid}>
+        Dalej →
       </button>
     </div>
   );

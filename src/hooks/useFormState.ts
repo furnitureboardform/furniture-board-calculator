@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import type { BoxForm, NicheFieldName } from '../lib/types';
+import type { BoxForm, NicheFieldName, BoardFinish } from '../lib/types';
 import {
   SIDE_PANEL_THICKNESS_MM,
   OUTER_MASKING_SIDE_MM,
@@ -39,6 +39,7 @@ export function useFormState() {
   const [outerMaskingRight, setOuterMaskingRight] = useState(true);
   const [outerMaskingLeftFullCover, setOuterMaskingLeftFullCover] = useState(false);
   const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
+  const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'kolor', optionId: 'U156' });
 
   useEffect(() => {
     localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(splitEqually));
@@ -251,5 +252,7 @@ export function useFormState() {
     onHasTopBottomNichesChange,
     onNumberOfBoxesChange,
     onBoxChange,
+    boardFinish,
+    setBoardFinish,
   };
 }

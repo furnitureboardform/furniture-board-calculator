@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { ElementsData, HardwareSummary, ParametersData } from '../lib/report';
+import type { BoardFinish } from '../lib/types';
+import { ALL_FINISH_OPTIONS } from '../lib/finishOptions';
 
 type ReportTab = 'parameters' | 'elements' | 'summary' | 'costs';
 
@@ -39,6 +41,7 @@ export interface ReportViewProps {
   summaryText: string;
   elementsData: ElementsData | null;
   hardwareSummary: HardwareSummary | null;
+  boardFinish: BoardFinish;
   onBackToConfig: () => void;
 }
 
@@ -176,7 +179,7 @@ function BoardsSection({ title, colorClass, boards }: { title: string; colorClas
   );
 }
 
-export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, onBackToConfig }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, onBackToConfig }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
 
   const kolorBoards = useMemo(
@@ -527,7 +530,9 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const szaryPieces = calcBoardPieces(szaryBoards);
             const kolorPieces = calcBoardPieces(kolorBoards);
             const szaryBoardCost = szaryPieces * COST_PER_SZARY_PIECE_PLN;
-            const kolorBoardCost = kolorPieces * COST_PER_KOLOR_PIECE_PLN;
+            const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
+            const kolorPricePerSheet = (selectedFinish?.pricePerSheetPln ?? COST_PER_KOLOR_PIECE_PLN * 2) / 2;
+            const kolorBoardCost = kolorPieces * kolorPricePerSheet;
             const cuttingLengthM = Math.round((calcCuttingLengthM(szaryBoards) + calcCuttingLengthM(kolorBoards)) * 100) / 100;
             const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
             const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
@@ -557,7 +562,9 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                   </table>
                 </div>
                 <div className="boards-summary-section">
-                  <div className="boards-summary-section__header boards-summary-section__header--kolor">Płyty kolor (2800 × 1045 mm)</div>
+                  <div className="boards-summary-section__header boards-summary-section__header--kolor">
+                    Płyty kolor — {selectedFinish?.label ?? 'nieokreślony'} (2800 × 1045 mm)
+                  </div>
                   <table className="boards-summary-table">
                     <thead>
                       <tr>
@@ -571,8 +578,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                       <tr>
                         <td>Płyta kolor</td>
                         <td>{kolorPieces} szt.</td>
-                        <td>{COST_PER_KOLOR_PIECE_PLN} zł</td>
-                        <td>{kolorBoardCost} zł</td>
+                        <td>{kolorPricePerSheet.toFixed(2)} zł</td>
+                        <td>{kolorBoardCost.toFixed(2)} zł</td>
                       </tr>
                     </tbody>
                   </table>

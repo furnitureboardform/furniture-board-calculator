@@ -1,3 +1,10 @@
+export type FinishType = 'kolor' | 'okleina';
+
+export interface BoardFinish {
+  type: FinishType;
+  optionId: string;
+}
+
 /**
  * Parametry wejściowe do obliczeń (raport, prowadnice, płyty, drzwi, półki).
  */

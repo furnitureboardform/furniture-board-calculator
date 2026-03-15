@@ -3,6 +3,8 @@ import Header from './components/Header';
 import Step1Niche from './components/Step1Niche';
 import Step2Boxes from './components/Step2Boxes';
 import Step3BoxWidths from './components/Step3BoxWidths';
+import { Step4BoardColor } from './components/Step4BoardColor';
+import { ALL_FINISH_OPTIONS } from './lib/finishOptions';
 import ReportView from './components/ReportView';
 import { runReport } from './lib';
 import { useFormState, useBoxValidation, usePreviews } from './hooks';
@@ -68,7 +70,22 @@ export default function App() {
       outerMaskingRightFullCover: form.outerMaskingRightFullCover,
     });
     const { parametersData, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
-    setReportParametersData(parametersData);
+    const selectedFinish = ALL_FINISH_OPTIONS.get(form.boardFinish.optionId);
+    const enrichedParametersData = {
+      ...parametersData,
+      groups: [
+        ...parametersData.groups,
+        {
+          title: 'Wykończenie drzwi',
+          rows: [
+            { label: 'Typ', value: form.boardFinish.type === 'kolor' ? 'Kolor' : 'Okleina drewniana' },
+            { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
+            { label: 'Cena arkusza', value: selectedFinish ? `${selectedFinish.pricePerSheetPln.toFixed(2)} zł` : '—' },
+          ],
+        },
+      ],
+    };
+    setReportParametersData(enrichedParametersData);
     setReportText(mainText);
     setReportSummaryText(summaryText);
     setReportElementsData(elementsData);
@@ -92,6 +109,7 @@ export default function App() {
             summaryText={reportSummaryText}
             elementsData={reportElementsData}
             hardwareSummary={reportHardwareSummary}
+            boardFinish={form.boardFinish}
             onBackToConfig={handleBackToConfig}
           />
         </main>
@@ -107,6 +125,7 @@ export default function App() {
           <span className={form.step >= 1 ? 'done' : ''} />
           <span className={form.step >= 2 ? 'done' : ''} />
           <span className={form.step >= 3 ? 'done' : ''} />
+          <span className={form.step >= 4 ? 'done' : ''} />
         </div>
         <Step1Niche
           active={form.step === 1}
@@ -145,16 +164,21 @@ export default function App() {
         />
         <Step3BoxWidths
           active={form.step === 3}
-          numberOfBoxes={form.numberOfBoxes}
           boxes={form.boxes}
           splitEqually={form.splitEqually}
           onSplitEquallyChange={form.setSplitEqually}
           onBoxChange={form.onBoxChange}
           onGoToStep={form.setStep}
-          onSubmit={handleSubmit}
           validationMessage={validation.validationMessage}
           validationValid={validation.validationValid}
           shelvesPreview={shelvesPreview}
+        />
+        <Step4BoardColor
+          active={form.step === 4}
+          finish={form.boardFinish}
+          onFinishChange={form.setBoardFinish}
+          onGoToStep={form.setStep}
+          onSubmit={handleSubmit}
         />
       </main>
     </>
