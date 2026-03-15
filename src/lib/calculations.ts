@@ -12,6 +12,7 @@ import type {
   ShelfByBox,
 } from './types';
 
+
 export function getEffectiveWardrobeDimensions(
   parameters: Parameters
 ): EffectiveWardrobeDimensions {
@@ -93,19 +94,21 @@ export function calculateDoorRequirements(parameters: Parameters): DoorRequireme
   const boxWidths =
     parameters.boxWidths && parameters.boxWidths.length > 0
       ? parameters.boxWidths.slice(0, parameters.numberOfBoxes)
-      : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm);
+      : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm) as number[];
+  const boxDoubleDoors = parameters.boxDoubleDoors ?? [];
   const doorHeightMm =
     wardrobe.effectiveHeightMm - topClearanceMm - bottomClearanceMm;
   const doors: DoorInfo[] = boxWidths.map((boxInteriorWidthMm, index) => {
-    const sideType = index < parameters.numberOfLeftDoors ? 'left' : 'right';
+    const doubleDoor = boxDoubleDoors[index] ?? false;
+    const fullWidthMm =
+      boxInteriorWidthMm +
+      2 * sidePanelThicknessMm -
+      leftClearanceMm -
+      rightClearanceMm;
     return {
       boxNumber: index + 1,
-      sideType,
-      widthMm:
-        boxInteriorWidthMm +
-        2 * sidePanelThicknessMm -
-        leftClearanceMm -
-        rightClearanceMm,
+      doubleDoor,
+      widthMm: doubleDoor ? Math.floor(fullWidthMm / 2) : fullWidthMm,
       heightMm: doorHeightMm,
     };
   });

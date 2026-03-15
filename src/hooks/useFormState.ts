@@ -204,16 +204,12 @@ export function useFormState() {
   );
 
   const onBoxChange = useCallback(
-    (index: number, field: keyof BoxForm, value: number | string) => {
+    (index: number, field: keyof BoxForm, value: number | string | boolean) => {
       setBoxes((prev) => {
         const next = [...prev];
         const current = next[index];
         if (!current) return prev;
-        if (field === 'doorType') {
-          next[index] = { ...current, doorType: value as 'left' | 'right' };
-        } else {
-          next[index] = { ...current, [field]: value as number };
-        }
+        next[index] = { ...current, [field]: value };
         return next;
       });
     },

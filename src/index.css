@@ -164,13 +164,22 @@ main {
 .checkbox-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 14px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #4a90d9;
 }
 
 .checkbox-row label {
   font-size: 0.95rem;
   color: #444;
+  cursor: pointer;
 }
 
 .checkbox-row--sub {
@@ -388,8 +397,122 @@ main {
   padding-left: 0;
 }
 
+.element-card__color {
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.element-card__color--kolor {
+  color: #ffd54f;
+  background: rgba(255, 213, 79, 0.12);
+}
+
+.element-card__color--szary {
+  color: #b0bec5;
+  background: rgba(176, 190, 197, 0.12);
+}
+
+.element-card__badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: rgba(144, 202, 249, 0.2);
+  border: 1px solid rgba(144, 202, 249, 0.4);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: #90caf9;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
 .element-card__divider {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin: 4px 0;
+}
+
+/* ── Summary tab ── */
+
+.summary-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.summary-tab__hardware {
+  color: #aaa;
+  font-size: 0.82rem;
+  margin: 0;
+  padding: 0;
+}
+
+.boards-summary-section {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.boards-summary-section__header {
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.boards-summary-section__header--kolor {
+  background: rgba(255, 213, 79, 0.12);
+  color: #ffd54f;
+  border-bottom: 1px solid rgba(255, 213, 79, 0.2);
+}
+
+.boards-summary-section__header--szary {
+  background: rgba(176, 190, 197, 0.1);
+  color: #b0bec5;
+  border-bottom: 1px solid rgba(176, 190, 197, 0.15);
+}
+
+.boards-summary-section__header--hdf {
+  background: rgba(129, 199, 132, 0.1);
+  color: #81c784;
+  border-bottom: 1px solid rgba(129, 199, 132, 0.15);
+}
+
+.boards-summary-section__header--dodatki {
+  background: rgba(144, 202, 249, 0.1);
+  color: #90caf9;
+  border-bottom: 1px solid rgba(144, 202, 249, 0.15);
+}
+
+.boards-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.boards-summary-table th {
+  padding: 8px 16px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.boards-summary-table td {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.boards-summary-table tr:last-child td {
+  border-bottom: none;
+}
+
+.boards-summary-table tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
 }

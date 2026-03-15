@@ -15,7 +15,7 @@ export const SPLIT_EQUALLY_STORAGE_KEY = 'splitEquallyEnabled';
 
 export const defaultBox = (): BoxForm => ({
   width: 964,
-  doorType: 'left',
+  doubleDoor: false,
   shelves: 2,
   rods: 0,
   drawers: 2,

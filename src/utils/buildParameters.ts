@@ -23,32 +23,21 @@ export interface FormStateForParameters {
 
 /** Buduje obiekt Parameters do raportu z aktualnego stanu formularza. */
 export function buildParameters(state: FormStateForParameters): Parameters {
-  const sortedBoxes = [...state.boxes].sort((a, b) =>
-    a.doorType === 'left' && b.doorType === 'right'
-      ? -1
-      : a.doorType === 'right' && b.doorType === 'left'
-        ? 1
-        : 0
-  );
-  const numberOfDrawers = sortedBoxes.reduce(
-    (s, b) => s + (b.drawers || 0),
-    0
-  );
-  const numberOfLeftDoors = sortedBoxes.filter((b) => b.doorType === 'left')
-    .length;
-  const numberOfRightDoors = sortedBoxes.filter(
-    (b) => b.doorType === 'right'
-  ).length;
-  const boxWidthMm = sortedBoxes[0]?.width ?? 964;
+  const boxes = state.boxes;
+  const numberOfDrawers = boxes.reduce((s, b) => s + (b.drawers || 0), 0);
+  const boxWidthMm = boxes[0]?.width ?? 964;
 
   return {
     numberOfDrawers,
     numberOfBoxes: state.numberOfBoxes,
-    boxWidths: sortedBoxes.map((b) => b.width),
-    boxShelves: sortedBoxes.map((b) => b.shelves ?? 0),
-    boxRods: sortedBoxes.map((b) => b.rods ?? 0),
-    boxDrawers: sortedBoxes.map((b) => b.drawers ?? 0),
+    boxWidths: boxes.map((b) => b.width),
+    boxShelves: boxes.map((b) => b.shelves ?? 0),
+    boxRods: boxes.map((b) => b.rods ?? 0),
+    boxDrawers: boxes.map((b) => b.drawers ?? 0),
+    boxDoubleDoors: boxes.map((b) => b.doubleDoor),
     boxWidthMm,
+    numberOfLeftDoors: 0,
+    numberOfRightDoors: 0,
     cabinetDepthMm: state.cabinetDepthMm,
     nicheWidthMm: state.nicheWidthMm,
     nicheHeightMm: state.nicheHeightMm,
@@ -61,8 +50,6 @@ export function buildParameters(state: FormStateForParameters): Parameters {
     rightNicheHeightMm: state.rightNicheHeightMm,
     topNicheWidthMm: state.topNicheWidthMm,
     bottomNicheWidthMm: state.bottomNicheWidthMm,
-    numberOfLeftDoors,
-    numberOfRightDoors,
     doorClearancePerSideMm: 2,
     isLeftSideFullyCovered: false,
     isRightSideFullyCovered: false,

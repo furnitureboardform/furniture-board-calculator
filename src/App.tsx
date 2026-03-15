@@ -14,6 +14,7 @@ export default function App() {
   const [reportText, setReportText] = useState('');
   const [reportSummaryText, setReportSummaryText] = useState('');
   const [reportElementsData, setReportElementsData] = useState<import('./lib/report').ElementsData | null>(null);
+  const [reportHardwareSummary, setReportHardwareSummary] = useState<import('./lib/report').HardwareSummary | null>(null);
 
   const form = useFormState();
 
@@ -66,11 +67,12 @@ export default function App() {
       outerMaskingLeftFullCover: form.outerMaskingLeftFullCover,
       outerMaskingRightFullCover: form.outerMaskingRightFullCover,
     });
-    const { parametersText, mainText, summaryText, elementsData } = runReport(parameters);
+    const { parametersText, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
     setReportParametersText(parametersText);
     setReportText(mainText);
     setReportSummaryText(summaryText);
     setReportElementsData(elementsData);
+    setReportHardwareSummary(hardwareSummary);
     setShowReport(true);
     window.scrollTo(0, 0);
   }
@@ -89,6 +91,7 @@ export default function App() {
             reportText={reportText}
             summaryText={reportSummaryText}
             elementsData={reportElementsData}
+            hardwareSummary={reportHardwareSummary}
             onBackToConfig={handleBackToConfig}
           />
         </main>

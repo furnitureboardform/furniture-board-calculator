@@ -23,6 +23,7 @@ export interface Parameters {
   bottomNicheWidthMm: number;
   numberOfLeftDoors: number;
   numberOfRightDoors: number;
+  boxDoubleDoors: boolean[];
   doorClearancePerSideMm: number;
   isLeftSideFullyCovered: boolean;
   isRightSideFullyCovered: boolean;
@@ -118,7 +119,7 @@ export type DoorSideType = 'left' | 'right';
 /** Jedne drzwi (wymiary, typ). */
 export interface DoorInfo {
   boxNumber: number;
-  sideType: DoorSideType;
+  doubleDoor: boolean;
   widthMm: number;
   heightMm: number;
 }
@@ -157,7 +158,7 @@ export interface ShelvesRequirements {
 /** Jedna pozycja formularza boxu (UI). */
 export interface BoxForm {
   width: number;
-  doorType: DoorSideType;
+  doubleDoor: boolean;
   shelves: number;
   rods: number;
   drawers: number;

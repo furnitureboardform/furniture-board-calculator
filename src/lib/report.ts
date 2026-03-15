@@ -11,8 +11,10 @@ import type {
 
 export interface BoxElement {
   boxNumber: number;
-  door?: { side: 'lewe' | 'prawe'; heightMm: number; widthMm: number; hinges: number };
+  door?: { doubleDoor: boolean; heightMm: number; widthMm: number; hinges: number };
   shelves?: { quantity: number; widthMm: number; depthMm: number };
+  rods?: number;
+  hdf?: { widthMm: number; heightMm: number };
   panels?: { sideHeightMm: number; topBottomWidthMm: number; depthMm: number };
 }
 
@@ -40,11 +42,18 @@ export interface ElementsData {
   maskings: MaskingsElement | null;
 }
 
+export interface HardwareSummary {
+  totalGuides: number;
+  totalBrackets: number;
+  totalHandles: number;
+}
+
 export interface ReportResult {
   parametersText: string;
   mainText: string;
   summaryText: string;
   elementsData: ElementsData;
+  hardwareSummary: HardwareSummary;
 }
 
 /**
@@ -92,8 +101,9 @@ export function buildReport(
     `   ├─ Odjęcie na boxy (po ${perBoxDeductionMm} mm): ${parameters.numberOfBoxes * perBoxDeductionMm} mm`
   );
   parametersLines.push(`   ├─ Dostępna szerokość wnętrz boxów: ${availableInteriorWidthForBoxesMm} mm`);
-  parametersLines.push(`   ├─ Drzwi lewe: ${parameters.numberOfLeftDoors}`);
-  parametersLines.push(`   └─ Drzwi prawe: ${parameters.numberOfRightDoors}`);
+  const doubleDoorCount = (parameters.boxDoubleDoors ?? []).filter(Boolean).length;
+  parametersLines.push(`   ├─ Boxy z podwójnymi drzwiami: ${doubleDoorCount}`);
+  parametersLines.push(`   └─ Boxy z pojedynczymi drzwiami: ${parameters.numberOfBoxes - doubleDoorCount}`);
 
   lines.push('📦 PŁYTY MEBLOWE KORPUS SZARY');
   lines.push('─'.repeat(80));
@@ -112,19 +122,7 @@ export function buildReport(
       ? parameters.boxWidths.slice(0, parameters.numberOfBoxes)
       : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm) as number[];
 
-  summaryLines.push('🔧 PROWADNICE I SPRZĘGŁA');
-  summaryLines.push('─'.repeat(80));
-  summaryLines.push(`   • Prowadnice przesuwne (1 zestaw na szuflądę): ${hardware.totalGuides} szt.`);
-  summaryLines.push(`   • Sprzęgła (1 zestaw na szuflądę): ${hardware.totalBrackets} szt.`);
-  summaryLines.push(`   • Uchwyty (1 na drzwi): ${hardware.totalHandles} szt.`);
-  summaryLines.push(`   • Zawiasy (5 na drzwi × ${hardware.totalDoors} drzwi): ${hardware.totalHinges} szt.`);
-  summaryLines.push('');
-
-  summaryLines.push('📦 PŁYTA HDF');
-  summaryLines.push('─'.repeat(80));
-  const hdfQty = hdfBottom.qtyPerDrawer * parameters.numberOfDrawers;
-  summaryLines.push(`   • ${hdfBottom.dimensions} mm: ${hdfQty} szt.`);
-  summaryLines.push('');
+  const _hdfQty = hdfBottom.qtyPerDrawer * parameters.numberOfDrawers;
 
   lines.push('📦 PŁYTY MEBLOWE OBICIE KOLOR');
   lines.push('═'.repeat(80));
@@ -138,9 +136,11 @@ export function buildReport(
     lines.push('  ' + '─'.repeat(78));
 
     if (door) {
-      const sideLabel = door.sideType === 'left' ? 'lewe' : 'prawe';
-      const hinges = Math.max(2, Math.ceil(door.heightMm / 520));
-      lines.push(`   • Drzwi ${sideLabel}: ${door.heightMm} × ${door.widthMm} mm - Wszystkie obrzeża (4 strony), zawiasy: ${hinges} szt.`);
+      const doorLabel = door.doubleDoor ? 'podwójne' : 'pojedyncze';
+      const doorCount = door.doubleDoor ? '2 szt.' : '1 szt.';
+      const hinglesPerPanel = Math.max(2, Math.ceil(door.heightMm / 520));
+      const hinges = door.doubleDoor ? hinglesPerPanel * 2 : hinglesPerPanel;
+      lines.push(`   • Drzwi ${doorLabel} (${doorCount}): ${door.heightMm} × ${door.widthMm} mm - Wszystkie obrzeża (4 strony), zawiasy: ${hinges} szt.`);
     }
 
     if (shelf && shelf.quantity > 0) {
@@ -192,16 +192,24 @@ export function buildReport(
         boxNumber: boxNum,
         door: door
           ? {
-              side: door.sideType === 'left' ? 'lewe' : 'prawe',
+              doubleDoor: door.doubleDoor,
               heightMm: door.heightMm,
               widthMm: door.widthMm,
-              hinges: Math.max(2, Math.ceil(door.heightMm / 520)),
+              hinges: (() => {
+                const perPanel = Math.max(2, Math.ceil(door.heightMm / 520));
+                return door.doubleDoor ? perPanel * 2 : perPanel;
+              })(),
             }
           : undefined,
         shelves:
           shelf && shelf.quantity > 0
             ? { quantity: shelf.quantity, widthMm: shelf.widthMm, depthMm: shelf.depthMm }
             : undefined,
+        rods: (parameters.boxRods?.[i] ?? 0) > 0 ? (parameters.boxRods![i]) : undefined,
+        hdf: {
+          widthMm: (boxWidthsForPanels[i] ?? parameters.boxWidthMm) + 32,
+          heightMm: doorRequirements.doorHeightMm,
+        },
         panels: {
           sideHeightMm,
           topBottomWidthMm: boxWidthsForPanels[i] ?? parameters.boxWidthMm,
@@ -234,5 +242,10 @@ export function buildReport(
     mainText: lines.join('\n'),
     summaryText: summaryLines.join('\n'),
     elementsData,
+    hardwareSummary: {
+      totalGuides: hardware.totalGuides,
+      totalBrackets: hardware.totalBrackets,
+      totalHandles: hardware.totalHandles,
+    },
   };
 }

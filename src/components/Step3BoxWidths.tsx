@@ -5,7 +5,7 @@ export interface Step3BoxWidthsProps {
   boxes: BoxForm[];
   splitEqually: boolean;
   onSplitEquallyChange: (checked: boolean) => void;
-  onBoxChange: (index: number, field: keyof BoxForm, value: number | string) => void;
+  onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean) => void;
   onGoToStep: (step: number) => void;
   onSubmit: () => void;
   validationMessage: string | null;
@@ -55,15 +55,14 @@ export default function Step3BoxWidths({
                   readOnly={splitEqually}
                 />
               </div>
-              <div className="field">
-                <label>Rodzaj drzwi</label>
-                <select
-                  value={box.doorType}
-                  onChange={(e) => onBoxChange(i, 'doorType', e.target.value)}
-                >
-                  <option value="left">Lewe</option>
-                  <option value="right">Prawe</option>
-                </select>
+              <div className="checkbox-row">
+                <input
+                  type="checkbox"
+                  id={`double-door-${i}`}
+                  checked={box.doubleDoor}
+                  onChange={(e) => onBoxChange(i, 'doubleDoor', e.target.checked)}
+                />
+                <label htmlFor={`double-door-${i}`}>Podwójne drzwi</label>
               </div>
               <div className="field">
                 <label>Liczba półek</label>
