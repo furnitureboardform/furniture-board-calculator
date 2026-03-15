@@ -7,12 +7,13 @@ import {
   getNicheBoards,
 } from './boards';
 import { buildReport } from './report';
+import type { ReportResult } from './report';
 import type { Parameters } from './types';
 
 /**
- * Uruchamia pełny pipeline obliczeń i zwraca tekst raportu.
+ * Uruchamia pełny pipeline obliczeń i zwraca teksty raportu.
  */
-export function runReport(parameters: Parameters): string {
+export function runReport(parameters: Parameters): ReportResult {
   try {
     const woodenBoards = getWoodenBoards(parameters);
     const hdfBottom = getHDFBottom(parameters);
@@ -34,7 +35,8 @@ export function runReport(parameters: Parameters): string {
     );
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    return `Błąd podczas generowania raportu:\n${message}`;
+    const emptyNiches = { hasNiches: false, left: { widthMm: 0, heightMm: 0 }, right: { widthMm: 0, heightMm: 0 }, top: { widthMm: 0, heightMm: 0 }, bottom: { widthMm: 0, heightMm: 0 } };
+    return { parametersText: '', mainText: `Błąd podczas generowania raportu:\n${message}`, summaryText: '', elementsData: { boxes: [], niches: emptyNiches, maskings: null } };
   }
 }
 

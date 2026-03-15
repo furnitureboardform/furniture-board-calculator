@@ -5,24 +5,26 @@ interface UseBoxValidationArgs {
   numberOfBoxes: number;
   boxes: { width: number }[];
   nicheWidthMm: number;
-  hasNiches: boolean;
+  hasSideNiches: boolean;
   leftBlendMm: number;
   rightBlendMm: number;
   effectiveWardrobeWidthMm: number;
   availableInteriorWidth: number;
-  outerMaskingEnabled: boolean;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
 }
 
 export function useBoxValidation({
   numberOfBoxes,
   boxes,
   nicheWidthMm,
-  hasNiches,
+  hasSideNiches,
   leftBlendMm,
   rightBlendMm,
   effectiveWardrobeWidthMm,
   availableInteriorWidth,
-  outerMaskingEnabled,
+  outerMaskingLeft,
+  outerMaskingRight,
 }: UseBoxValidationArgs) {
   return useMemo(
     () =>
@@ -30,23 +32,25 @@ export function useBoxValidation({
         numberOfBoxes,
         boxes,
         nicheWidthMm,
-        hasNiches,
+        hasSideNiches,
         leftBlendMm,
         rightBlendMm,
         effectiveWardrobeWidthMm,
         availableInteriorWidth,
-        outerMaskingEnabled,
+        outerMaskingLeft,
+        outerMaskingRight,
       }),
     [
       numberOfBoxes,
       boxes,
       nicheWidthMm,
-      hasNiches,
+      hasSideNiches,
       leftBlendMm,
       rightBlendMm,
       effectiveWardrobeWidthMm,
       availableInteriorWidth,
-      outerMaskingEnabled,
+      outerMaskingLeft,
+      outerMaskingRight,
     ]
   );
 }

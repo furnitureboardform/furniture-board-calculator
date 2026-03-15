@@ -26,6 +26,10 @@ export interface Parameters {
   doorClearancePerSideMm: number;
   isLeftSideFullyCovered: boolean;
   isRightSideFullyCovered: boolean;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
+  outerMaskingLeftFullCover: boolean;
+  outerMaskingRightFullCover: boolean;
 }
 
 /** Wymiary szafy po odjęciu blendów. */

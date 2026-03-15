@@ -9,7 +9,8 @@ interface UsePreviewsArgs {
   nicheWidthMm: number;
   nicheHeightMm: number;
   cabinetDepthMm: number;
-  hasNiches: boolean;
+  hasSideNiches: boolean;
+  hasTopBottomNiches: boolean;
   leftBlendMm: number;
   rightBlendMm: number;
   topBlendMm: number;
@@ -22,7 +23,8 @@ export function usePreviews({
   nicheWidthMm,
   nicheHeightMm,
   cabinetDepthMm,
-  hasNiches,
+  hasSideNiches,
+  hasTopBottomNiches,
   leftBlendMm,
   rightBlendMm,
   topBlendMm,
@@ -35,10 +37,10 @@ export function usePreviews({
 } {
   const wardrobePreview = useMemo<ReactNode>(() => {
     if (!nicheWidthMm || !nicheHeightMm) return null;
-    const left = hasNiches ? leftBlendMm : 0;
-    const right = hasNiches ? rightBlendMm : 0;
-    const top = hasNiches ? topBlendMm : 0;
-    const bottom = hasNiches ? bottomBlendMm : 0;
+    const left = hasSideNiches ? leftBlendMm : 0;
+    const right = hasSideNiches ? rightBlendMm : 0;
+    const top = hasTopBottomNiches ? topBlendMm : 0;
+    const bottom = hasTopBottomNiches ? bottomBlendMm : 0;
     const w = nicheWidthMm - left - right;
     const h = nicheHeightMm - top - bottom;
     return (
@@ -53,7 +55,8 @@ export function usePreviews({
   }, [
     nicheWidthMm,
     nicheHeightMm,
-    hasNiches,
+    hasSideNiches,
+    hasTopBottomNiches,
     leftBlendMm,
     rightBlendMm,
     topBlendMm,

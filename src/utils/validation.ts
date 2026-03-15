@@ -9,8 +9,9 @@ export interface BoxValidationInput {
   rightBlendMm: number;
   effectiveWardrobeWidthMm: number;
   availableInteriorWidth: number;
-  /** Gdy true, w komunikacie OK pokazujemy odjęcie 2×OUTER_MASKING_SIDE_MM */
-  outerMaskingEnabled: boolean;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
+  hasSideNiches: boolean;
 }
 
 export interface BoxValidationResult {
@@ -24,35 +25,31 @@ export interface BoxValidationResult {
  */
 function formatAvailableWidthFormula(params: {
   nicheWidthMm: number;
-  hasNiches: boolean;
+  hasSideNiches: boolean;
   leftBlendMm: number;
   rightBlendMm: number;
   numberOfBoxes: number;
-  outerMaskingEnabled: boolean;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
 }): string {
   const {
     nicheWidthMm,
-    hasNiches,
+    hasSideNiches,
     leftBlendMm,
     rightBlendMm,
     numberOfBoxes: n,
-    outerMaskingEnabled,
+    outerMaskingLeft,
+    outerMaskingRight,
   } = params;
 
-  // Szerokość wnęki (baza, przed jakimikolwiek odjęciami)
   const base = nicheWidthMm;
-
-  // Odjęcie blend lewej i prawej – blendy zmniejszają użyteczną szerokość szafy
-  const leftBlend = hasNiches ? leftBlendMm : 0;
-  const rightBlend = hasNiches ? rightBlendMm : 0;
-
-  // Odjęcie na boki skrzyń: każdy box ma dwa boki (lewy + prawy), każdy po SIDE_PANEL_THICKNESS_MM (18 mm)
+  const leftBlend = hasSideNiches ? leftBlendMm : 0;
+  const rightBlend = hasSideNiches ? rightBlendMm : 0;
   const sidePanelsDeduction = `${n}×(2×${SIDE_PANEL_THICKNESS_MM})`;
 
-  // Odjęcie na maskownice zewnętrzne (2×18 mm), albo 0 gdy użytkownik je wyłączył
-  const outerMaskingStr = outerMaskingEnabled
-    ? `2×${OUTER_MASKING_SIDE_MM}`
-    : '0';
+  const maskCount = (outerMaskingLeft ? 1 : 0) + (outerMaskingRight ? 1 : 0);
+  const outerMaskingStr =
+    maskCount === 2 ? `2×${OUTER_MASKING_SIDE_MM}` : maskCount === 1 ? `${OUTER_MASKING_SIDE_MM}` : '0';
 
   return `${base} - ${leftBlend} - ${rightBlend} - ${sidePanelsDeduction} - ${outerMaskingStr}`;
 }
@@ -62,12 +59,13 @@ export function getBoxValidation(input: BoxValidationInput): BoxValidationResult
     numberOfBoxes: n,
     boxes,
     nicheWidthMm,
-    hasNiches,
+    hasSideNiches,
     leftBlendMm,
     rightBlendMm,
     effectiveWardrobeWidthMm,
     availableInteriorWidth,
-    outerMaskingEnabled,
+    outerMaskingLeft,
+    outerMaskingRight,
   } = input;
 
   const total = boxes.reduce((sum, b) => sum + (b.width || 0), 0);
@@ -81,11 +79,12 @@ export function getBoxValidation(input: BoxValidationInput): BoxValidationResult
   if (diff === 0) {
     const formula = formatAvailableWidthFormula({
       nicheWidthMm,
-      hasNiches,
+      hasSideNiches,
       leftBlendMm,
       rightBlendMm,
       numberOfBoxes: n,
-      outerMaskingEnabled,
+      outerMaskingLeft,
+      outerMaskingRight,
     });
     return {
       validationValid: true,

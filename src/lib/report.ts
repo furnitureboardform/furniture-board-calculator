@@ -9,6 +9,44 @@ import type {
   ShelvesRequirements,
 } from './types';
 
+export interface BoxElement {
+  boxNumber: number;
+  door?: { side: 'lewe' | 'prawe'; heightMm: number; widthMm: number; hinges: number };
+  shelves?: { quantity: number; widthMm: number; depthMm: number };
+  panels?: { sideHeightMm: number; topBottomWidthMm: number; depthMm: number };
+}
+
+export interface NichesElement {
+  hasNiches: boolean;
+  left: { widthMm: number; heightMm: number };
+  right: { widthMm: number; heightMm: number };
+  top: { widthMm: number; heightMm: number };
+  bottom: { widthMm: number; heightMm: number };
+}
+
+export interface MaskingItem {
+  heightMm: number;
+  widthMm: number;
+}
+
+export interface MaskingsElement {
+  left?: MaskingItem;
+  right?: MaskingItem;
+}
+
+export interface ElementsData {
+  boxes: BoxElement[];
+  niches: NichesElement;
+  maskings: MaskingsElement | null;
+}
+
+export interface ReportResult {
+  parametersText: string;
+  mainText: string;
+  summaryText: string;
+  elementsData: ElementsData;
+}
+
 /**
  * Buduje pełny tekst raportu z parametrów i wyliczonych danych.
  */
@@ -21,13 +59,10 @@ export function buildReport(
   nicheBoards: NicheBoard[],
   doorRequirements: DoorRequirements,
   shelvesRequirements: ShelvesRequirements
-): string {
+): ReportResult {
   const lines: string[] = [];
-
-  lines.push('');
-  lines.push('╔' + '═'.repeat(78) + '╗');
-  lines.push('║' + ' '.repeat(18) + 'NARZĘDZIE DO OBLICZANIA SZUFLAD' + ' '.repeat(29) + '║');
-  lines.push('╚' + '═'.repeat(78) + '╝');
+  const summaryLines: string[] = [];
+  const parametersLines: string[] = [];
 
   const effectiveWidthMm =
     parameters.nicheWidthMm -
@@ -41,37 +76,24 @@ export function buildReport(
   const availableInteriorWidthForBoxesMm =
     effectiveWidthMm - parameters.numberOfBoxes * perBoxDeductionMm;
 
-  lines.push('');
-  lines.push('📋 PARAMETRY WEJŚCIOWE:');
-  lines.push(`   ├─ Liczba szuflad: ${parameters.numberOfDrawers}`);
-  lines.push(`   ├─ Szerokość wnęki na szuflady: ${parameters.boxWidthMm} mm`);
-  lines.push(`   ├─ Głębokość szafki: ${parameters.cabinetDepthMm} mm`);
-  lines.push(`   ├─ Szerokość wnęki: ${parameters.nicheWidthMm} mm`);
-  lines.push(`   ├─ Wysokość wnęki: ${parameters.nicheHeightMm} mm`);
-  lines.push(
+  parametersLines.push('');
+  parametersLines.push('📋 PARAMETRY WEJŚCIOWE:');
+  parametersLines.push(`   ├─ Liczba szuflad: ${parameters.numberOfDrawers}`);
+  parametersLines.push(`   ├─ Szerokość wnęki na szuflady: ${parameters.boxWidthMm} mm`);
+  parametersLines.push(`   ├─ Głębokość szafki: ${parameters.cabinetDepthMm} mm`);
+  parametersLines.push(`   ├─ Szerokość wnęki: ${parameters.nicheWidthMm} mm`);
+  parametersLines.push(`   ├─ Wysokość wnęki: ${parameters.nicheHeightMm} mm`);
+  parametersLines.push(
     `   ├─ Blendy L/P/G/D: ${parameters.leftBlendMm || 0} / ${parameters.rightBlendMm || 0} / ${parameters.topBlendMm || 0} / ${parameters.bottomBlendMm || 0} mm`
   );
-  lines.push(`   ├─ Szerokość szafy po blendach: ${effectiveWidthMm} mm`);
-  lines.push(`   ├─ Wysokość szafy po blendach: ${effectiveHeightMm} mm`);
-  lines.push(
+  parametersLines.push(`   ├─ Szerokość szafy po blendach: ${effectiveWidthMm} mm`);
+  parametersLines.push(`   ├─ Wysokość szafy po blendach: ${effectiveHeightMm} mm`);
+  parametersLines.push(
     `   ├─ Odjęcie na boxy (po ${perBoxDeductionMm} mm): ${parameters.numberOfBoxes * perBoxDeductionMm} mm`
   );
-  lines.push(`   ├─ Dostępna szerokość wnętrz boxów: ${availableInteriorWidthForBoxesMm} mm`);
-  lines.push(`   ├─ Drzwi lewe: ${parameters.numberOfLeftDoors}`);
-  lines.push(`   └─ Drzwi prawe: ${parameters.numberOfRightDoors}`);
-
-  lines.push('─'.repeat(80));
-  lines.push('📋 PODSUMOWANIE LISTY ZAKUPÓW');
-  lines.push('─'.repeat(80));
-  lines.push('');
-
-  lines.push('🔧 PROWADNICE I SPRZĘGŁA');
-  lines.push('─'.repeat(80));
-  lines.push(`   • Prowadnice przesuwne (1 zestaw na szuflądę): ${hardware.totalGuides} szt.`);
-  lines.push(`   • Sprzęgła (1 zestaw na szuflądę): ${hardware.totalBrackets} szt.`);
-  lines.push(`   • Uchwyty (1 na drzwi): ${hardware.totalHandles} szt.`);
-  lines.push(`   • Zawiasy (5 na drzwi × ${hardware.totalDoors} drzwi): ${hardware.totalHinges} szt.`);
-  lines.push('');
+  parametersLines.push(`   ├─ Dostępna szerokość wnętrz boxów: ${availableInteriorWidthForBoxesMm} mm`);
+  parametersLines.push(`   ├─ Drzwi lewe: ${parameters.numberOfLeftDoors}`);
+  parametersLines.push(`   └─ Drzwi prawe: ${parameters.numberOfRightDoors}`);
 
   lines.push('📦 PŁYTY MEBLOWE KORPUS SZARY');
   lines.push('─'.repeat(80));
@@ -80,60 +102,137 @@ export function buildReport(
     lines.push(`   • ${board.dimensions} mm (${totalQty} szt.) - ${board.edgeBanding}`);
   }
   lines.push('');
-
-  lines.push('📦 PŁYTA HDF');
-  lines.push('─'.repeat(80));
-  const hdfQty = hdfBottom.qtyPerDrawer * parameters.numberOfDrawers;
-  lines.push(`   • ${hdfBottom.dimensions} mm: ${hdfQty} szt.`);
-  lines.push('');
   lines.push('═'.repeat(80));
   lines.push('');
 
+  const panelDepthMm = parameters.cabinetDepthMm - 18 - 2 - 3;
+  const sideHeightMm = effectiveHeightMm;
+  const boxWidthsForPanels =
+    parameters.boxWidths && parameters.boxWidths.length > 0
+      ? parameters.boxWidths.slice(0, parameters.numberOfBoxes)
+      : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm) as number[];
+
+  summaryLines.push('🔧 PROWADNICE I SPRZĘGŁA');
+  summaryLines.push('─'.repeat(80));
+  summaryLines.push(`   • Prowadnice przesuwne (1 zestaw na szuflądę): ${hardware.totalGuides} szt.`);
+  summaryLines.push(`   • Sprzęgła (1 zestaw na szuflądę): ${hardware.totalBrackets} szt.`);
+  summaryLines.push(`   • Uchwyty (1 na drzwi): ${hardware.totalHandles} szt.`);
+  summaryLines.push(`   • Zawiasy (5 na drzwi × ${hardware.totalDoors} drzwi): ${hardware.totalHinges} szt.`);
+  summaryLines.push('');
+
+  summaryLines.push('📦 PŁYTA HDF');
+  summaryLines.push('─'.repeat(80));
+  const hdfQty = hdfBottom.qtyPerDrawer * parameters.numberOfDrawers;
+  summaryLines.push(`   • ${hdfBottom.dimensions} mm: ${hdfQty} szt.`);
+  summaryLines.push('');
+
   lines.push('📦 PŁYTY MEBLOWE OBICIE KOLOR');
-  lines.push('─'.repeat(80));
-  for (const board of nicheBoards) {
-    lines.push(`   • ${board.name}: ${board.dimensions} mm (${board.qty} szt.) - ${board.edgeBanding}`);
-  }
-  lines.push(`   • Drzwi łącznie: ${doorRequirements.totalDoors} szt. (1 drzwi na 1 box)`);
-  lines.push(
-    `   • Wysokość drzwi: ${doorRequirements.doorHeightMm} mm (wysokość szafy po blendach ${doorRequirements.wardrobeHeightMm} mm, luz: ${doorRequirements.topClearanceMm} mm góra + ${doorRequirements.bottomClearanceMm} mm dół)`
-  );
-  lines.push(
-    `   • Wzór wys. drzwi: ${parameters.nicheHeightMm} - ${parameters.topBlendMm || 0} - ${parameters.bottomBlendMm || 0} - ${doorRequirements.topClearanceMm} - ${doorRequirements.bottomClearanceMm} = ${doorRequirements.doorHeightMm} mm`
-  );
-  lines.push(
-    `   • Szerokość drzwi: szerokość wnętrza boxa + 2 × ${doorRequirements.sidePanelThicknessMm} mm - ${doorRequirements.leftClearanceMm} mm lewy luz - ${doorRequirements.rightClearanceMm} mm prawy luz`
-  );
-  for (const door of doorRequirements.doors) {
-    const sideLabel = door.sideType === 'left' ? 'lewe' : 'prawe';
-    lines.push(`   • Box ${door.boxNumber}: drzwi ${sideLabel} ${door.heightMm} × ${door.widthMm} mm`);
-  }
-  lines.push(`   • Drzwi lewe: ${hardware.numberOfLeftDoors} szt.`);
-  lines.push(`   • Drzwi prawe: ${hardware.numberOfRightDoors} szt.`);
+  lines.push('═'.repeat(80));
   lines.push('');
 
-  lines.push('📦 PÓŁKI W BOXACH');
-  lines.push('─'.repeat(80));
-  lines.push(
-    `   • Głębokość półki: ${shelvesRequirements.shelfDepthMm} mm (${parameters.cabinetDepthMm} - ${shelvesRequirements.doorThicknessMm} - ${shelvesRequirements.doorClearanceFromCabinetMm} - ${shelvesRequirements.backBoardThicknessMm})`
-  );
-  lines.push(`   • Łącznie półek: ${shelvesRequirements.totalShelves} szt.`);
-  for (const shelf of shelvesRequirements.shelvesByBox) {
-    if (shelf.quantity === 0) continue;
-    lines.push(`   • Box ${shelf.boxNumber}: ${shelf.quantity} szt. (${shelf.widthMm} × ${shelf.depthMm} mm)`);
-  }
-  lines.push('');
+  for (let boxNum = 1; boxNum <= parameters.numberOfBoxes; boxNum++) {
+    const door = doorRequirements.doors.find((d) => d.boxNumber === boxNum);
+    const shelf = shelvesRequirements.shelvesByBox.find((s) => s.boxNumber === boxNum);
 
-  lines.push('📦 BLENDY / WNĘKI');
-  lines.push('─'.repeat(80));
+    lines.push(`  ── Box ${boxNum} ──`);
+    lines.push('  ' + '─'.repeat(78));
+
+    if (door) {
+      const sideLabel = door.sideType === 'left' ? 'lewe' : 'prawe';
+      const hinges = Math.max(2, Math.ceil(door.heightMm / 520));
+      lines.push(`   • Drzwi ${sideLabel}: ${door.heightMm} × ${door.widthMm} mm - Wszystkie obrzeża (4 strony), zawiasy: ${hinges} szt.`);
+    }
+
+    if (shelf && shelf.quantity > 0) {
+      lines.push(`   • Półki: ${shelf.quantity} szt. (${shelf.widthMm} × ${shelf.depthMm} mm) - Obrzeże na szerokości ${shelf.widthMm} mm (1 bok)`);
+    }
+
+    lines.push('');
+  }
+
+  const leftBlend = parameters.leftBlendMm || 0;
+  const rightBlend = parameters.rightBlendMm || 0;
+  const topBlend = parameters.topBlendMm || 0;
+
+  lines.push('  ── Blendy / Wnęki ──');
+  lines.push('  ' + '─'.repeat(78));
   lines.push(`   • Czy są wnęki: ${parameters.hasNiches ? 'Tak' : 'Nie'}`);
-  lines.push(`   • Lewa: szer. ${parameters.leftBlendMm || 0} mm, wys. ${parameters.leftNicheHeightMm || 0} mm`);
-  lines.push(`   • Prawa: szer. ${parameters.rightBlendMm || 0} mm, wys. ${parameters.rightNicheHeightMm || 0} mm`);
-  lines.push(`   • Górna: szer. ${parameters.topNicheWidthMm || 0} mm, wys. ${parameters.topBlendMm || 0} mm`);
-  lines.push(`   • Dolna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${parameters.bottomBlendMm || 0} mm`);
-  lines.push('   • Wpływ na szerokość szafy: lewa szerokość + prawa szerokość');
-  lines.push('   • Wpływ na wysokość szafy: górna wysokość + dolna wysokość');
+  lines.push(`   • Lewa: szer. ${leftBlend > 0 ? leftBlend + 50 : 0} mm, wys. ${parameters.leftNicheHeightMm || 0} mm - Bez obrzeży`);
+  lines.push(`   • Prawa: szer. ${rightBlend > 0 ? rightBlend + 50 : 0} mm, wys. ${parameters.rightNicheHeightMm || 0} mm - Bez obrzeży`);
+  lines.push(`   • Górna: szer. ${parameters.topNicheWidthMm || 0} mm, wys. ${topBlend > 0 ? topBlend + 50 : 0} mm - Bez obrzeży`);
+  lines.push(`   • Dolna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${parameters.bottomBlendMm || 0} mm - Bez obrzeży`);
   lines.push('');
 
-  return lines.join('\n');
+  if (parameters.outerMaskingLeft || parameters.outerMaskingRight) {
+    const maskingHeightMm = Math.max(0, parameters.nicheHeightMm - 2);
+    lines.push('  ── Maskownice ──');
+    lines.push('  ' + '─'.repeat(78));
+    if (parameters.outerMaskingLeft) {
+      const widthMm = parameters.outerMaskingLeftFullCover ? parameters.cabinetDepthMm : 100;
+      lines.push(`   • Maskownica lewa: ${maskingHeightMm} × ${widthMm} mm (1 szt.) - Obrzeże na wysokości ${maskingHeightMm} mm (1 bok)`);
+    }
+    if (parameters.outerMaskingRight) {
+      const widthMm = parameters.outerMaskingRightFullCover ? parameters.cabinetDepthMm : 100;
+      lines.push(`   • Maskownica prawa: ${maskingHeightMm} × ${widthMm} mm (1 szt.) - Obrzeże na wysokości ${maskingHeightMm} mm (1 bok)`);
+    }
+    lines.push('');
+  }
+
+  const leftBlendFinal = parameters.leftBlendMm || 0;
+  const rightBlendFinal = parameters.rightBlendMm || 0;
+  const topBlendFinal = parameters.topBlendMm || 0;
+  const maskingHeightFinal = Math.max(0, parameters.nicheHeightMm - 2);
+
+  const elementsData: ElementsData = {
+    boxes: Array.from({ length: parameters.numberOfBoxes }, (_, i) => {
+      const boxNum = i + 1;
+      const door = doorRequirements.doors.find((d) => d.boxNumber === boxNum);
+      const shelf = shelvesRequirements.shelvesByBox.find((s) => s.boxNumber === boxNum);
+      return {
+        boxNumber: boxNum,
+        door: door
+          ? {
+              side: door.sideType === 'left' ? 'lewe' : 'prawe',
+              heightMm: door.heightMm,
+              widthMm: door.widthMm,
+              hinges: Math.max(2, Math.ceil(door.heightMm / 520)),
+            }
+          : undefined,
+        shelves:
+          shelf && shelf.quantity > 0
+            ? { quantity: shelf.quantity, widthMm: shelf.widthMm, depthMm: shelf.depthMm }
+            : undefined,
+        panels: {
+          sideHeightMm,
+          topBottomWidthMm: boxWidthsForPanels[i] ?? parameters.boxWidthMm,
+          depthMm: panelDepthMm,
+        },
+      };
+    }),
+    niches: {
+      hasNiches: parameters.hasNiches,
+      left: { widthMm: leftBlendFinal > 0 ? leftBlendFinal + 50 : 0, heightMm: parameters.leftNicheHeightMm || 0 },
+      right: { widthMm: rightBlendFinal > 0 ? rightBlendFinal + 50 : 0, heightMm: parameters.rightNicheHeightMm || 0 },
+      top: { widthMm: parameters.topNicheWidthMm || 0, heightMm: topBlendFinal > 0 ? topBlendFinal + 50 : 0 },
+      bottom: { widthMm: parameters.bottomNicheWidthMm || 0, heightMm: parameters.bottomBlendMm || 0 },
+    },
+    maskings:
+      parameters.outerMaskingLeft || parameters.outerMaskingRight
+        ? {
+            left: parameters.outerMaskingLeft
+              ? { heightMm: maskingHeightFinal, widthMm: parameters.outerMaskingLeftFullCover ? parameters.cabinetDepthMm : 100 }
+              : undefined,
+            right: parameters.outerMaskingRight
+              ? { heightMm: maskingHeightFinal, widthMm: parameters.outerMaskingRightFullCover ? parameters.cabinetDepthMm : 100 }
+              : undefined,
+          }
+        : null,
+  };
+
+  return {
+    parametersText: parametersLines.join('\n'),
+    mainText: lines.join('\n'),
+    summaryText: summaryLines.join('\n'),
+    elementsData,
+  };
 }

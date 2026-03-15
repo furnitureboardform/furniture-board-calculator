@@ -15,6 +15,10 @@ export interface FormStateForParameters {
   rightNicheHeightMm: number;
   topNicheWidthMm: number;
   bottomNicheWidthMm: number;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
+  outerMaskingLeftFullCover: boolean;
+  outerMaskingRightFullCover: boolean;
 }
 
 /** Buduje obiekt Parameters do raportu z aktualnego stanu formularza. */
@@ -62,5 +66,9 @@ export function buildParameters(state: FormStateForParameters): Parameters {
     doorClearancePerSideMm: 2,
     isLeftSideFullyCovered: false,
     isRightSideFullyCovered: false,
+    outerMaskingLeft: state.outerMaskingLeft,
+    outerMaskingRight: state.outerMaskingRight,
+    outerMaskingLeftFullCover: state.outerMaskingLeftFullCover,
+    outerMaskingRightFullCover: state.outerMaskingRightFullCover,
   };
 }

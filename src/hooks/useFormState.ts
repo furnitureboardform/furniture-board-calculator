@@ -21,11 +21,12 @@ export function useFormState() {
   const [nicheWidthMm, setNicheWidthMm] = useState(3070);
   const [nicheHeightMm, setNicheHeightMm] = useState(2700);
   const [cabinetDepthMm, setCabinetDepthMm] = useState(600);
-  const [hasNiches, setHasNiches] = useState(false);
+  const [hasSideNiches, setHasSideNiches] = useState(false);
+  const [hasTopBottomNiches, setHasTopBottomNiches] = useState(false);
   const [leftBlendMm, setLeftBlendMm] = useState(0);
   const [rightBlendMm, setRightBlendMm] = useState(0);
   const [topBlendMm, setTopBlendMm] = useState(0);
-  const [bottomBlendMm, setBottomBlendMm] = useState(0);
+  const [bottomBlendMm, setBottomBlendMm] = useState(100);
   const [leftNicheHeightMm, setLeftNicheHeightMm] = useState(0);
   const [rightNicheHeightMm, setRightNicheHeightMm] = useState(0);
   const [topNicheWidthMm, setTopNicheWidthMm] = useState(0);
@@ -34,30 +35,60 @@ export function useFormState() {
   const [numberOfBoxes, setNumberOfBoxes] = useState(3);
   const [boxes, setBoxes] = useState<BoxForm[]>(INITIAL_BOXES);
   const [splitEqually, setSplitEquallyState] = useState(getStoredSplitEqually);
-  /** Maskownice zewnętrzne – gdy true, od dostępnej szerokości odejmowane jest 2×OUTER_MASKING_SIDE_MM */
-  const [outerMaskingEnabled, setOuterMaskingEnabled] = useState(true);
+  const [outerMaskingLeft, setOuterMaskingLeft] = useState(true);
+  const [outerMaskingRight, setOuterMaskingRight] = useState(true);
+  const [outerMaskingLeftFullCover, setOuterMaskingLeftFullCover] = useState(false);
+  const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(splitEqually));
   }, [splitEqually]);
 
+  useEffect(() => {
+    if (hasSideNiches) {
+      const autoHeight = Math.max(0, nicheHeightMm - 2);
+      setLeftNicheHeightMm(outerMaskingLeft ? 0 : autoHeight);
+      setRightNicheHeightMm(outerMaskingRight ? 0 : autoHeight);
+    }
+  }, [nicheHeightMm, hasSideNiches, outerMaskingLeft, outerMaskingRight]);
+
+  useEffect(() => {
+    if (hasTopBottomNiches) {
+      const maskingDeduction =
+        (outerMaskingLeft ? OUTER_MASKING_SIDE_MM : 0) +
+        (outerMaskingRight ? OUTER_MASKING_SIDE_MM : 0);
+      const sideNichesDeduction = hasSideNiches ? leftBlendMm + rightBlendMm : 0;
+      const autoWidth = Math.max(0, nicheWidthMm - maskingDeduction - sideNichesDeduction - 2);
+      setTopNicheWidthMm(autoWidth);
+    }
+  }, [hasTopBottomNiches, nicheWidthMm, outerMaskingLeft, outerMaskingRight, hasSideNiches, leftBlendMm, rightBlendMm]);
+
+  useEffect(() => {
+    const maskingDeduction =
+      (outerMaskingLeft ? OUTER_MASKING_SIDE_MM : 0) +
+      (outerMaskingRight ? OUTER_MASKING_SIDE_MM : 0);
+    const sideNichesDeduction = hasSideNiches ? leftBlendMm + rightBlendMm : 0;
+    const autoWidth = Math.max(0, nicheWidthMm - maskingDeduction - sideNichesDeduction - 2);
+    setBottomNicheWidthMm(autoWidth);
+  }, [nicheWidthMm, outerMaskingLeft, outerMaskingRight, hasSideNiches, leftBlendMm, rightBlendMm]);
+
   const effectiveWardrobeWidthMm = useMemo(() => {
-    const left = hasNiches ? leftBlendMm : 0;
-    const right = hasNiches ? rightBlendMm : 0;
+    const left = hasSideNiches ? leftBlendMm : 0;
+    const right = hasSideNiches ? rightBlendMm : 0;
     return (nicheWidthMm || 0) - left - right;
-  }, [nicheWidthMm, hasNiches, leftBlendMm, rightBlendMm]);
+  }, [nicheWidthMm, hasSideNiches, leftBlendMm, rightBlendMm]);
 
   const availableInteriorWidth = useMemo(() => {
     const n = Math.max(1, numberOfBoxes);
-    const outerMaskingDeduction = outerMaskingEnabled
-      ? 2 * OUTER_MASKING_SIDE_MM
-      : 0;
+    const outerMaskingDeduction =
+      (outerMaskingLeft ? OUTER_MASKING_SIDE_MM : 0) +
+      (outerMaskingRight ? OUTER_MASKING_SIDE_MM : 0);
     return (
       effectiveWardrobeWidthMm -
       n * (2 * SIDE_PANEL_THICKNESS_MM) -
       outerMaskingDeduction
     );
-  }, [effectiveWardrobeWidthMm, numberOfBoxes, outerMaskingEnabled]);
+  }, [effectiveWardrobeWidthMm, numberOfBoxes, outerMaskingLeft, outerMaskingRight]);
 
   useEffect(() => {
     setBoxes((prev) => {
@@ -113,19 +144,40 @@ export function useFormState() {
     setters[field]?.(val);
   }, []);
 
-  const onHasNichesChange = useCallback((checked: boolean) => {
-    setHasNiches(checked);
-    if (!checked) {
-      setLeftBlendMm(0);
-      setRightBlendMm(0);
-      setTopBlendMm(0);
-      setBottomBlendMm(0);
-      setLeftNicheHeightMm(0);
-      setRightNicheHeightMm(0);
-      setTopNicheWidthMm(0);
-      setBottomNicheWidthMm(0);
-    }
-  }, []);
+  const onHasSideNichesChange = useCallback(
+    (checked: boolean) => {
+      setHasSideNiches(checked);
+      if (checked) {
+        const autoHeight = Math.max(0, nicheHeightMm - 2);
+        setLeftNicheHeightMm(outerMaskingLeft ? 0 : autoHeight);
+        setRightNicheHeightMm(outerMaskingRight ? 0 : autoHeight);
+      } else {
+        setLeftBlendMm(0);
+        setRightBlendMm(0);
+        setLeftNicheHeightMm(0);
+        setRightNicheHeightMm(0);
+      }
+    },
+    [nicheHeightMm, outerMaskingLeft, outerMaskingRight]
+  );
+
+  const onHasTopBottomNichesChange = useCallback(
+    (checked: boolean) => {
+      setHasTopBottomNiches(checked);
+      if (checked) {
+        const maskingDeduction =
+          (outerMaskingLeft ? OUTER_MASKING_SIDE_MM : 0) +
+          (outerMaskingRight ? OUTER_MASKING_SIDE_MM : 0);
+        const sideNichesDeduction = hasSideNiches ? leftBlendMm + rightBlendMm : 0;
+        const autoWidth = Math.max(0, nicheWidthMm - maskingDeduction - sideNichesDeduction - 2);
+        setTopNicheWidthMm(autoWidth);
+      } else {
+        setTopBlendMm(0);
+        setTopNicheWidthMm(0);
+      }
+    },
+    [nicheWidthMm, outerMaskingLeft, outerMaskingRight, hasSideNiches, leftBlendMm, rightBlendMm]
+  );
 
   const onNumberOfBoxesChange = useCallback(
     (n: number) => {
@@ -171,12 +223,19 @@ export function useFormState() {
   return {
     step,
     setStep,
-    outerMaskingEnabled,
-    setOuterMaskingEnabled,
+    outerMaskingLeft,
+    setOuterMaskingLeft,
+    outerMaskingRight,
+    setOuterMaskingRight,
+    outerMaskingLeftFullCover,
+    setOuterMaskingLeftFullCover,
+    outerMaskingRightFullCover,
+    setOuterMaskingRightFullCover,
     nicheWidthMm,
     nicheHeightMm,
     cabinetDepthMm,
-    hasNiches,
+    hasSideNiches,
+    hasTopBottomNiches,
     leftBlendMm,
     rightBlendMm,
     topBlendMm,
@@ -192,7 +251,8 @@ export function useFormState() {
     effectiveWardrobeWidthMm,
     availableInteriorWidth,
     onNicheChange,
-    onHasNichesChange,
+    onHasSideNichesChange,
+    onHasTopBottomNichesChange,
     onNumberOfBoxesChange,
     onBoxChange,
   };

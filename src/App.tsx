@@ -10,7 +10,10 @@ import { buildParameters } from './utils/buildParameters';
 
 export default function App() {
   const [showReport, setShowReport] = useState(false);
+  const [reportParametersText, setReportParametersText] = useState('');
   const [reportText, setReportText] = useState('');
+  const [reportSummaryText, setReportSummaryText] = useState('');
+  const [reportElementsData, setReportElementsData] = useState<import('./lib/report').ElementsData | null>(null);
 
   const form = useFormState();
 
@@ -18,19 +21,21 @@ export default function App() {
     numberOfBoxes: form.numberOfBoxes,
     boxes: form.boxes,
     nicheWidthMm: form.nicheWidthMm,
-    hasNiches: form.hasNiches,
+    hasSideNiches: form.hasSideNiches,
     leftBlendMm: form.leftBlendMm,
     rightBlendMm: form.rightBlendMm,
     effectiveWardrobeWidthMm: form.effectiveWardrobeWidthMm,
     availableInteriorWidth: form.availableInteriorWidth,
-    outerMaskingEnabled: form.outerMaskingEnabled,
+    outerMaskingLeft: form.outerMaskingLeft,
+    outerMaskingRight: form.outerMaskingRight,
   });
 
   const { wardrobePreview, shelvesPreview } = usePreviews({
     nicheWidthMm: form.nicheWidthMm,
     nicheHeightMm: form.nicheHeightMm,
     cabinetDepthMm: form.cabinetDepthMm,
-    hasNiches: form.hasNiches,
+    hasSideNiches: form.hasSideNiches,
+    hasTopBottomNiches: form.hasTopBottomNiches,
     leftBlendMm: form.leftBlendMm,
     rightBlendMm: form.rightBlendMm,
     topBlendMm: form.topBlendMm,
@@ -47,7 +52,7 @@ export default function App() {
       nicheWidthMm: form.nicheWidthMm,
       nicheHeightMm: form.nicheHeightMm,
       cabinetDepthMm: form.cabinetDepthMm,
-      hasNiches: form.hasNiches,
+      hasNiches: form.hasSideNiches || form.hasTopBottomNiches,
       leftBlendMm: form.leftBlendMm,
       rightBlendMm: form.rightBlendMm,
       topBlendMm: form.topBlendMm,
@@ -56,9 +61,16 @@ export default function App() {
       rightNicheHeightMm: form.rightNicheHeightMm,
       topNicheWidthMm: form.topNicheWidthMm,
       bottomNicheWidthMm: form.bottomNicheWidthMm,
+      outerMaskingLeft: form.outerMaskingLeft,
+      outerMaskingRight: form.outerMaskingRight,
+      outerMaskingLeftFullCover: form.outerMaskingLeftFullCover,
+      outerMaskingRightFullCover: form.outerMaskingRightFullCover,
     });
-    const text = runReport(parameters);
-    setReportText(text);
+    const { parametersText, mainText, summaryText, elementsData } = runReport(parameters);
+    setReportParametersText(parametersText);
+    setReportText(mainText);
+    setReportSummaryText(summaryText);
+    setReportElementsData(elementsData);
     setShowReport(true);
     window.scrollTo(0, 0);
   }
@@ -73,7 +85,10 @@ export default function App() {
         <Header />
         <main>
           <ReportView
+            parametersText={reportParametersText}
             reportText={reportText}
+            summaryText={reportSummaryText}
+            elementsData={reportElementsData}
             onBackToConfig={handleBackToConfig}
           />
         </main>
@@ -95,9 +110,18 @@ export default function App() {
           nicheWidthMm={form.nicheWidthMm}
           nicheHeightMm={form.nicheHeightMm}
           cabinetDepthMm={form.cabinetDepthMm}
-          hasNiches={form.hasNiches}
-          outerMaskingEnabled={form.outerMaskingEnabled}
-          onOuterMaskingChange={form.setOuterMaskingEnabled}
+          hasSideNiches={form.hasSideNiches}
+          onHasSideNichesChange={form.onHasSideNichesChange}
+          hasTopBottomNiches={form.hasTopBottomNiches}
+          onHasTopBottomNichesChange={form.onHasTopBottomNichesChange}
+          outerMaskingLeft={form.outerMaskingLeft}
+          onOuterMaskingLeftChange={form.setOuterMaskingLeft}
+          outerMaskingLeftFullCover={form.outerMaskingLeftFullCover}
+          onOuterMaskingLeftFullCoverChange={form.setOuterMaskingLeftFullCover}
+          outerMaskingRight={form.outerMaskingRight}
+          onOuterMaskingRightChange={form.setOuterMaskingRight}
+          outerMaskingRightFullCover={form.outerMaskingRightFullCover}
+          onOuterMaskingRightFullCoverChange={form.setOuterMaskingRightFullCover}
           leftBlendMm={form.leftBlendMm}
           rightBlendMm={form.rightBlendMm}
           topBlendMm={form.topBlendMm}
@@ -107,7 +131,6 @@ export default function App() {
           topNicheWidthMm={form.topNicheWidthMm}
           bottomNicheWidthMm={form.bottomNicheWidthMm}
           onNicheChange={form.onNicheChange}
-          onHasNichesChange={form.onHasNichesChange}
           onGoToStep={form.setStep}
           wardrobePreview={wardrobePreview}
         />

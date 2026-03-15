@@ -5,10 +5,18 @@ export interface Step1NicheProps {
   nicheWidthMm: number;
   nicheHeightMm: number;
   cabinetDepthMm: number;
-  hasNiches: boolean;
-  /** Maskownice zewnętrzne – domyślnie zaznaczone; gdy true, od dostępnej szerokości odejmowane jest 2×18 mm */
-  outerMaskingEnabled: boolean;
-  onOuterMaskingChange: (checked: boolean) => void;
+  hasSideNiches: boolean;
+  onHasSideNichesChange: (checked: boolean) => void;
+  hasTopBottomNiches: boolean;
+  onHasTopBottomNichesChange: (checked: boolean) => void;
+  outerMaskingLeft: boolean;
+  onOuterMaskingLeftChange: (checked: boolean) => void;
+  outerMaskingLeftFullCover: boolean;
+  onOuterMaskingLeftFullCoverChange: (checked: boolean) => void;
+  outerMaskingRight: boolean;
+  onOuterMaskingRightChange: (checked: boolean) => void;
+  outerMaskingRightFullCover: boolean;
+  onOuterMaskingRightFullCoverChange: (checked: boolean) => void;
   leftBlendMm: number;
   rightBlendMm: number;
   topBlendMm: number;
@@ -18,7 +26,6 @@ export interface Step1NicheProps {
   topNicheWidthMm: number;
   bottomNicheWidthMm: number;
   onNicheChange: (field: NicheFieldName, value: string) => void;
-  onHasNichesChange: (checked: boolean) => void;
   onGoToStep: (step: number) => void;
   wardrobePreview: ReactNode;
   active: boolean;
@@ -28,9 +35,18 @@ export default function Step1Niche({
   nicheWidthMm,
   nicheHeightMm,
   cabinetDepthMm,
-  hasNiches,
-  outerMaskingEnabled,
-  onOuterMaskingChange,
+  hasSideNiches,
+  onHasSideNichesChange,
+  hasTopBottomNiches,
+  onHasTopBottomNichesChange,
+  outerMaskingLeft,
+  onOuterMaskingLeftChange,
+  outerMaskingLeftFullCover,
+  onOuterMaskingLeftFullCoverChange,
+  outerMaskingRight,
+  onOuterMaskingRightChange,
+  outerMaskingRightFullCover,
+  onOuterMaskingRightFullCoverChange,
   leftBlendMm,
   rightBlendMm,
   topBlendMm,
@@ -40,7 +56,6 @@ export default function Step1Niche({
   topNicheWidthMm,
   bottomNicheWidthMm,
   onNicheChange,
-  onHasNichesChange,
   onGoToStep,
   wardrobePreview,
   active,
@@ -80,25 +95,61 @@ export default function Step1Niche({
         <div className="checkbox-row">
           <input
             type="checkbox"
-            id="outer-masking"
-            checked={outerMaskingEnabled}
-            onChange={(e) => onOuterMaskingChange(e.target.checked)}
+            id="outer-masking-left"
+            checked={outerMaskingLeft}
+            onChange={(e) => onOuterMaskingLeftChange(e.target.checked)}
           />
-          <label htmlFor="outer-masking">Maskownice zewnętrzne</label>
+          <label htmlFor="outer-masking-left">Maskownica lewa</label>
         </div>
+        {outerMaskingLeft && (
+          <div className="checkbox-row checkbox-row--sub">
+            <input
+              type="checkbox"
+              id="outer-masking-left-full-cover"
+              checked={outerMaskingLeftFullCover}
+              onChange={(e) => onOuterMaskingLeftFullCoverChange(e.target.checked)}
+            />
+            <label htmlFor="outer-masking-left-full-cover">Czy całe obicie</label>
+          </div>
+        )}
         <div className="checkbox-row">
           <input
             type="checkbox"
-            id="has-niches"
-            checked={hasNiches}
-            onChange={(e) => onHasNichesChange(e.target.checked)}
+            id="outer-masking-right"
+            checked={outerMaskingRight}
+            onChange={(e) => onOuterMaskingRightChange(e.target.checked)}
           />
-          <label htmlFor="has-niches">Blendy</label>
+          <label htmlFor="outer-masking-right">Maskownica prawa</label>
         </div>
-        {hasNiches && (
+        {outerMaskingRight && (
+          <div className="checkbox-row checkbox-row--sub">
+            <input
+              type="checkbox"
+              id="outer-masking-right-full-cover"
+              checked={outerMaskingRightFullCover}
+              onChange={(e) => onOuterMaskingRightFullCoverChange(e.target.checked)}
+            />
+            <label htmlFor="outer-masking-right-full-cover">Czy całe obicie</label>
+          </div>
+        )}
+        <div className="checkbox-row">
+          <input
+            type="checkbox"
+            id="has-side-niches"
+            checked={hasSideNiches}
+            onChange={(e) => onHasSideNichesChange(e.target.checked)}
+          />
+          <label htmlFor="has-side-niches">Wnęki boczne</label>
+        </div>
+        {hasSideNiches && (
           <>
-            <div className="niche-group">
-              <div className="niche-group-title">Lewa blenda</div>
+            <div className={`niche-group${outerMaskingLeft ? ' niche-group--disabled' : ''}`}>
+              <div className="niche-group-title">
+                Wnęka lewa
+                {outerMaskingLeft && (
+                  <span className="niche-group-disabled-hint"> – zakryta maskownicą</span>
+                )}
+              </div>
               <div className="field">
                 <label>Szerokość (mm)</label>
                 <input
@@ -106,6 +157,7 @@ export default function Step1Niche({
                   value={leftBlendMm}
                   onChange={(e) => onNicheChange('leftBlendMm', e.target.value)}
                   min={0}
+                  readOnly={outerMaskingLeft}
                 />
               </div>
               <div className="field">
@@ -115,11 +167,18 @@ export default function Step1Niche({
                   value={leftNicheHeightMm}
                   onChange={(e) => onNicheChange('leftNicheHeightMm', e.target.value)}
                   min={0}
+                  readOnly
+                  className="input--auto"
                 />
               </div>
             </div>
-            <div className="niche-group">
-              <div className="niche-group-title">Prawa blenda</div>
+            <div className={`niche-group${outerMaskingRight ? ' niche-group--disabled' : ''}`}>
+              <div className="niche-group-title">
+                Wnęka prawa
+                {outerMaskingRight && (
+                  <span className="niche-group-disabled-hint"> – zakryta maskownicą</span>
+                )}
+              </div>
               <div className="field">
                 <label>Szerokość (mm)</label>
                 <input
@@ -127,6 +186,7 @@ export default function Step1Niche({
                   value={rightBlendMm}
                   onChange={(e) => onNicheChange('rightBlendMm', e.target.value)}
                   min={0}
+                  readOnly={outerMaskingRight}
                 />
               </div>
               <div className="field">
@@ -136,53 +196,72 @@ export default function Step1Niche({
                   value={rightNicheHeightMm}
                   onChange={(e) => onNicheChange('rightNicheHeightMm', e.target.value)}
                   min={0}
-                />
-              </div>
-            </div>
-            <div className="niche-group">
-              <div className="niche-group-title">Górna blenda</div>
-              <div className="field">
-                <label>Szerokość (mm)</label>
-                <input
-                  type="number"
-                  value={topNicheWidthMm}
-                  onChange={(e) => onNicheChange('topNicheWidthMm', e.target.value)}
-                  min={0}
-                />
-              </div>
-              <div className="field">
-                <label>Wysokość (mm)</label>
-                <input
-                  type="number"
-                  value={topBlendMm}
-                  onChange={(e) => onNicheChange('topBlendMm', e.target.value)}
-                  min={0}
-                />
-              </div>
-            </div>
-            <div className="niche-group">
-              <div className="niche-group-title">Dolna blenda</div>
-              <div className="field">
-                <label>Szerokość (mm)</label>
-                <input
-                  type="number"
-                  value={bottomNicheWidthMm}
-                  onChange={(e) => onNicheChange('bottomNicheWidthMm', e.target.value)}
-                  min={0}
-                />
-              </div>
-              <div className="field">
-                <label>Wysokość (mm)</label>
-                <input
-                  type="number"
-                  value={bottomBlendMm}
-                  onChange={(e) => onNicheChange('bottomBlendMm', e.target.value)}
-                  min={0}
+                  readOnly
+                  className="input--auto"
                 />
               </div>
             </div>
           </>
         )}
+        <div className="checkbox-row">
+          <input
+            type="checkbox"
+            id="has-top-bottom-niches"
+            checked={hasTopBottomNiches}
+            onChange={(e) => onHasTopBottomNichesChange(e.target.checked)}
+          />
+          <label htmlFor="has-top-bottom-niches">Wnęka górna</label>
+        </div>
+        {hasTopBottomNiches && (
+          <div className="niche-group">
+            <div className="niche-group-title">Wnęka górna</div>
+            <div className="field">
+              <label>Szerokość (mm)</label>
+              <input
+                type="number"
+                value={topNicheWidthMm}
+                onChange={(e) => onNicheChange('topNicheWidthMm', e.target.value)}
+                min={0}
+                readOnly
+                className="input--auto"
+              />
+            </div>
+            <div className="field">
+              <label>Wysokość (mm)</label>
+              <input
+                type="number"
+                value={topBlendMm}
+                onChange={(e) => onNicheChange('topBlendMm', e.target.value)}
+                min={0}
+              />
+            </div>
+          </div>
+        )}
+        <div className="niche-group">
+          <div className="niche-group-title">Wnęka dolna</div>
+          <div className="field">
+            <label>Szerokość (mm)</label>
+            <input
+              type="number"
+              value={bottomNicheWidthMm}
+              onChange={(e) => onNicheChange('bottomNicheWidthMm', e.target.value)}
+              min={0}
+              readOnly
+              className="input--auto"
+            />
+          </div>
+          <div className="field">
+            <label>Wysokość (mm)</label>
+            <input
+              type="number"
+              value={bottomBlendMm}
+              onChange={(e) => onNicheChange('bottomBlendMm', e.target.value)}
+              min={0}
+              readOnly
+              className="input--auto"
+            />
+          </div>
+        </div>
         {wardrobePreview && (
           <div className="preview-box">{wardrobePreview}</div>
         )}
