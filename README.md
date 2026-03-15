@@ -21,12 +21,9 @@ Konfiguracja jest w trzech krokach: wymiary wnęki (i opcjonalnie blendy), liczb
 
 ## Uruchomienie aplikacji
 
-Aplikacja (React + TypeScript + Vite) znajduje się w katalogu `client/`.
-
 ### Tryb deweloperski (na lokalnej maszynie)
 
 ```bash
-cd client
 npm install
 npm run dev
 ```
@@ -36,12 +33,11 @@ W terminalu pojawi się adres (zazwyczaj **http://localhost:5173**). Otwórz go 
 ### Build produkcyjny
 
 ```bash
-cd client
 npm install
 npm run build
 ```
 
-Wynik trafia do katalogu `client/dist/`. Aby podejrzeć zbudowaną wersję lokalnie:
+Wynik trafia do katalogu `dist/`. Aby podejrzeć zbudowaną wersję lokalnie:
 
 ```bash
 npm run preview
@@ -51,10 +47,9 @@ npm run preview
 
 ## Struktura projektu
 
-| Ścieżka        | Opis |
-|----------------|------|
-| `/`      | Aplikacja React (Vite, TypeScript) |
-| `/src/`  | Komponenty, hooki, logika (`lib/`), stałe, walidacja |
-| `parameters.js`| Opcjonalnie: używany przez wersję CLI (jeśli jest w projekcie) |
+| Ścieżka   | Opis |
+|-----------|------|
+| `src/`    | Komponenty, hooki, logika (`lib/`), stałe, walidacja |
+| `dist/`   | Zbudowana wersja (po `npm run build`) |
 
 Raport jest generowany w przeglądarce – nie jest potrzebny backend do działania kalkulatora.
