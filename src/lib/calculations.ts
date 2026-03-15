@@ -71,7 +71,10 @@ export function calculateHardware(parameters: Parameters): Hardware {
     (parameters.numberOfLeftDoors || 0) + (parameters.numberOfRightDoors || 0);
   const totalDoors =
     totalDoorsFromSides > 0 ? totalDoorsFromSides : parameters.numberOfBoxes;
-  const totalHandles = totalDoors * constants.HANDLES_PER_DOOR;
+  const boxDoubleDoors = parameters.boxDoubleDoors ?? [];
+  const totalHandles = Array.from({ length: parameters.numberOfBoxes }, (_, i) =>
+    boxDoubleDoors[i] ? 2 : 1
+  ).reduce((sum, n) => sum + n, 0) * constants.HANDLES_PER_DOOR;
   const totalHinges = totalDoors * constants.HINGES_PER_DOOR;
   return {
     totalGuides,
