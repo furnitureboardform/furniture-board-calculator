@@ -76,6 +76,7 @@ export function calculateHardware(parameters: Parameters): Hardware {
     boxDoubleDoors[i] ? 2 : 1
   ).reduce((sum, n) => sum + n, 0) * constants.HANDLES_PER_DOOR;
   const totalHinges = totalDoors * constants.HINGES_PER_DOOR;
+  const totalLegs = parameters.numberOfBoxes * constants.LEGS_PER_BOX;
   return {
     totalGuides,
     totalBrackets,
@@ -84,6 +85,7 @@ export function calculateHardware(parameters: Parameters): Hardware {
     totalDoors,
     totalHandles,
     totalHinges,
+    totalLegs,
   };
 }
 

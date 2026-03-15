@@ -112,6 +112,7 @@ export interface Hardware {
   totalDoors: number;
   totalHandles: number;
   totalHinges: number;
+  totalLegs: number;
 }
 
 export type DoorSideType = 'left' | 'right';

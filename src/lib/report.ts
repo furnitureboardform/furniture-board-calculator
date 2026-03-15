@@ -24,6 +24,9 @@ export interface BoxElement {
     internalWall1: { heightMm: number; widthMm: number };
     internalWall2: { heightMm: number; widthMm: number };
     hdfBottom: { depthMm: number; widthMm: number };
+    sets: number;
+    separator: { heightMm: number; widthMm: number; qty: number };
+    drawerRail: { heightMm: number; widthMm: number };
   };
 }
 
@@ -55,6 +58,7 @@ export interface HardwareSummary {
   totalGuides: number;
   totalBrackets: number;
   totalHandles: number;
+  totalLegs: number;
 }
 
 export interface ParameterRow {
@@ -281,9 +285,13 @@ export function buildReport(
         drawerBoards: (() => {
           const drawerCount = parameters.boxDrawers?.[i] ?? 0;
           if (drawerCount === 0) return undefined;
+          const isDouble = parameters.boxDoubleDoors?.[i] ?? false;
           const boxW = boxWidthsForPanels[i] ?? parameters.boxWidthMm;
-          const internalW = boxW - 2 * specs.sideMatThicknessMm;
+          const halfBoxW = Math.floor(boxW / 2);
+          const unitW = isDouble ? halfBoxW : boxW;
+          const internalW = unitW - 2 * specs.sideMatThicknessMm;
           const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm;
+          const sets = isDouble ? 2 : 1;
           return {
             count: drawerCount,
             sidePanel: { heightMm: specs.drawerSideHeightMm, depthMm: internalD },
@@ -291,6 +299,16 @@ export function buildReport(
             internalWall1: { heightMm: specs.internalWallHeight1Mm, widthMm: internalW - specs.internalWallMarginMm },
             internalWall2: { heightMm: specs.internalWallHeight2Mm, widthMm: internalW - specs.internalWallMarginMm },
             hdfBottom: { depthMm: internalD - specs.bottomDepthMarginMm, widthMm: internalW - specs.bottomWidthMarginMm },
+            sets,
+            separator: {
+              heightMm: drawerCount * 200,
+              widthMm: 40,
+              qty: sets,
+            },
+            drawerRail: {
+              heightMm: drawerCount * 20,
+              widthMm: parameters.cabinetDepthMm - 2 - 3 - 400,
+            },
           };
         })(),
       };
@@ -324,6 +342,7 @@ export function buildReport(
       totalGuides: hardware.totalGuides,
       totalBrackets: hardware.totalBrackets,
       totalHandles: hardware.totalHandles,
+      totalLegs: hardware.totalLegs,
     },
   };
 }

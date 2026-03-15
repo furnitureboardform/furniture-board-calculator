@@ -102,10 +102,13 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
 
     if (box.drawerBoards) {
       const d = box.drawerBoards;
-      boards.push({ dim1: d.sidePanel.heightMm, dim2: d.sidePanel.depthMm, edgeBanding: `Obrzeże na długości ${d.sidePanel.depthMm} mm (1 bok)`, qty: d.count * 2 });
-      boards.push({ dim1: d.frontPanel.heightMm, dim2: d.frontPanel.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', qty: d.count });
-      boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, qty: d.count });
-      boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, qty: d.count });
+      const s = d.sets;
+      boards.push({ dim1: d.sidePanel.heightMm, dim2: d.sidePanel.depthMm, edgeBanding: `Obrzeże na długości ${d.sidePanel.depthMm} mm (1 bok)`, qty: d.count * 2 * s });
+      boards.push({ dim1: d.frontPanel.heightMm, dim2: d.frontPanel.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', qty: d.count * s });
+      boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, qty: d.count * s });
+      boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, qty: d.count * s });
+      boards.push({ dim1: d.separator.heightMm, dim2: d.separator.widthMm, edgeBanding: 'Bez obrzeży', qty: d.separator.qty });
+      boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, qty: 2 });
     }
   }
 
@@ -157,7 +160,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
         .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 })),
       ...elementsData.boxes
         .filter((b) => b.drawerBoards)
-        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', qty: b.drawerBoards!.count })),
+        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', qty: b.drawerBoards!.count * b.drawerBoards!.sets })),
     ]) : [],
     [elementsData]
   );
@@ -299,10 +302,10 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                       <>
                         <div className="element-card__divider" />
                         <div className="element-card__row">
-                          <span className="element-card__label">Szuflady ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__label">Szuflady ({box.drawerBoards.count} szt. × {box.drawerBoards.sets} {box.drawerBoards.sets > 1 ? 'zestawy' : 'zestaw'})</span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Bok szuflady ({box.drawerBoards.count * 2} szt.)</span>
+                          <span className="element-card__label">Bok szuflady ({box.drawerBoards.count * 2 * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.sidePanel.heightMm} × {box.drawerBoards.sidePanel.depthMm} mm
                           </span>
@@ -311,7 +314,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Front szuflady ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__label">Front szuflady ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.frontPanel.heightMm} × {box.drawerBoards.frontPanel.widthMm} mm
                           </span>
@@ -320,7 +323,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Ściana wew. 1 ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__label">Ściana wew. 1 ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.internalWall1.heightMm} × {box.drawerBoards.internalWall1.widthMm} mm
                           </span>
@@ -329,7 +332,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Ściana wew. 2 ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__label">Ściana wew. 2 ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.internalWall2.heightMm} × {box.drawerBoards.internalWall2.widthMm} mm
                           </span>
@@ -338,12 +341,30 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Dno szuflady HDF ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__label">Dno szuflady HDF ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.hdfBottom.depthMm} × {box.drawerBoards.hdfBottom.widthMm} mm
                           </span>
                           <span className="element-card__meta">
                             Bez obrzeży · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Płyta separatorów ({box.drawerBoards.separator.qty} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.separator.heightMm} × {box.drawerBoards.separator.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Bez obrzeży · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Płyta prowadnicy szuflady (2 szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.drawerRail.heightMm} × {box.drawerBoards.drawerRail.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Jedno obrzeże na długości {box.drawerBoards.drawerRail.widthMm} mm · <span className="element-card__color element-card__color--szary">szary</span>
                           </span>
                         </div>
                       </>
@@ -423,7 +444,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                     <tr>
                       <td>Zawiasy</td>
                       <td>{totalHinges} szt.</td>
-                      <td />
+                      <td>na drzwi (wg wysokości drzwi)</td>
                     </tr>
                     {hardwareSummary && (
                       <>
@@ -441,6 +462,11 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           <td>Uchwyty</td>
                           <td>{hardwareSummary.totalHandles} szt.</td>
                           <td>1 na drzwi</td>
+                        </tr>
+                        <tr>
+                          <td>Nóżki</td>
+                          <td>{hardwareSummary.totalLegs} szt.</td>
+                          <td>4 na box</td>
                         </tr>
                       </>
                     )}
