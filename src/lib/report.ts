@@ -1,3 +1,4 @@
+import * as specs from './specifications';
 import type {
   Parameters,
   Hardware,
@@ -16,6 +17,14 @@ export interface BoxElement {
   rods?: number;
   hdf?: { widthMm: number; heightMm: number };
   panels?: { sideHeightMm: number; topBottomWidthMm: number; depthMm: number };
+  drawerBoards?: {
+    count: number;
+    sidePanel: { heightMm: number; depthMm: number };
+    frontPanel: { heightMm: number; widthMm: number };
+    internalWall1: { heightMm: number; widthMm: number };
+    internalWall2: { heightMm: number; widthMm: number };
+    hdfBottom: { depthMm: number; widthMm: number };
+  };
 }
 
 export interface NichesElement {
@@ -269,6 +278,21 @@ export function buildReport(
           topBottomWidthMm: boxWidthsForPanels[i] ?? parameters.boxWidthMm,
           depthMm: panelDepthMm,
         },
+        drawerBoards: (() => {
+          const drawerCount = parameters.boxDrawers?.[i] ?? 0;
+          if (drawerCount === 0) return undefined;
+          const boxW = boxWidthsForPanels[i] ?? parameters.boxWidthMm;
+          const internalW = boxW - 2 * specs.sideMatThicknessMm;
+          const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm;
+          return {
+            count: drawerCount,
+            sidePanel: { heightMm: specs.drawerSideHeightMm, depthMm: internalD },
+            frontPanel: { heightMm: specs.drawerFrontHeightMm, widthMm: internalW },
+            internalWall1: { heightMm: specs.internalWallHeight1Mm, widthMm: internalW - specs.internalWallMarginMm },
+            internalWall2: { heightMm: specs.internalWallHeight2Mm, widthMm: internalW - specs.internalWallMarginMm },
+            hdfBottom: { depthMm: internalD - specs.bottomDepthMarginMm, widthMm: internalW - specs.bottomWidthMarginMm },
+          };
+        })(),
       };
     }),
     niches: {

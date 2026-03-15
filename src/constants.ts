@@ -18,7 +18,7 @@ export const defaultBox = (): BoxForm => ({
   doubleDoor: false,
   shelves: 2,
   rods: 0,
-  drawers: 2,
+  drawers: 0,
 });
 
 export function getStoredSplitEqually(): boolean {

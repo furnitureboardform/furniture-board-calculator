@@ -10,9 +10,9 @@ import {
 } from '../constants';
 
 const INITIAL_BOXES: BoxForm[] = [
-  { ...defaultBox(), width: 952, shelves: 4, rods: 1, drawers: 0 },
-  { ...defaultBox(), width: 952, shelves: 2, rods: 0, drawers: 2 },
-  { ...defaultBox(), width: 952, shelves: 2, rods: 0, drawers: 2 },
+  { ...defaultBox(), width: 952, shelves: 4, rods: 1 },
+  { ...defaultBox(), width: 952, shelves: 2, rods: 0 },
+  { ...defaultBox(), width: 952, shelves: 2, rods: 0 },
 ];
 
 export function useFormState() {

@@ -99,6 +99,14 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
         qty: 2,
       });
     }
+
+    if (box.drawerBoards) {
+      const d = box.drawerBoards;
+      boards.push({ dim1: d.sidePanel.heightMm, dim2: d.sidePanel.depthMm, edgeBanding: `Obrzeże na długości ${d.sidePanel.depthMm} mm (1 bok)`, qty: d.count * 2 });
+      boards.push({ dim1: d.frontPanel.heightMm, dim2: d.frontPanel.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', qty: d.count });
+      boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, qty: d.count });
+      boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, qty: d.count });
+    }
   }
 
   return boards;
@@ -143,11 +151,14 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     [elementsData]
   );
   const hdfBoards = useMemo(
-    () => elementsData ? groupBoards(
-      elementsData.boxes
+    () => elementsData ? groupBoards([
+      ...elementsData.boxes
         .filter((b) => b.hdf)
-        .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 }))
-    ) : [],
+        .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 })),
+      ...elementsData.boxes
+        .filter((b) => b.drawerBoards)
+        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', qty: b.drawerBoards!.count })),
+    ]) : [],
     [elementsData]
   );
   const totalRods = useMemo(
@@ -280,6 +291,59 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                           <span className="element-card__meta">
                             Obrzeże na szerokości {box.panels.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    {box.drawerBoards && (
+                      <>
+                        <div className="element-card__divider" />
+                        <div className="element-card__row">
+                          <span className="element-card__label">Szuflady ({box.drawerBoards.count} szt.)</span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Bok szuflady ({box.drawerBoards.count * 2} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.sidePanel.heightMm} × {box.drawerBoards.sidePanel.depthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Obrzeże na długości {box.drawerBoards.sidePanel.depthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Front szuflady ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.frontPanel.heightMm} × {box.drawerBoards.frontPanel.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Wszystkie obrzeża (4 strony) · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Ściana wew. 1 ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.internalWall1.heightMm} × {box.drawerBoards.internalWall1.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Obrzeże na długości {box.drawerBoards.internalWall1.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Ściana wew. 2 ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.internalWall2.heightMm} × {box.drawerBoards.internalWall2.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Obrzeże na długości {box.drawerBoards.internalWall2.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                          </span>
+                        </div>
+                        <div className="element-card__row">
+                          <span className="element-card__label">Dno szuflady HDF ({box.drawerBoards.count} szt.)</span>
+                          <span className="element-card__value">
+                            {box.drawerBoards.hdfBottom.depthMm} × {box.drawerBoards.hdfBottom.widthMm} mm
+                          </span>
+                          <span className="element-card__meta">
+                            Bez obrzeży · <span className="element-card__color element-card__color--szary">szary</span>
                           </span>
                         </div>
                       </>
