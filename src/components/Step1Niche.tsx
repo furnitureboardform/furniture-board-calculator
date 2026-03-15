@@ -84,7 +84,7 @@ export default function Step1Niche({
           />
         </div>
         <div className="field">
-          <label>Głębokość szafy (mm)</label>
+          <label>Głębokość wnęki (mm)</label>
           <input
             type="number"
             value={cabinetDepthMm}

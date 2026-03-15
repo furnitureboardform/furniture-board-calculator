@@ -48,8 +48,22 @@ export interface HardwareSummary {
   totalHandles: number;
 }
 
+export interface ParameterRow {
+  label: string;
+  value: string;
+}
+
+export interface ParameterGroup {
+  title: string;
+  rows: ParameterRow[];
+}
+
+export interface ParametersData {
+  groups: ParameterGroup[];
+}
+
 export interface ReportResult {
-  parametersText: string;
+  parametersData: ParametersData;
   mainText: string;
   summaryText: string;
   elementsData: ElementsData;
@@ -57,7 +71,7 @@ export interface ReportResult {
 }
 
 /**
- * Buduje pełny tekst raportu z parametrów i wyliczonych danych.
+ * Builds the full report from parameters and calculated data.
  */
 export function buildReport(
   parameters: Parameters,
@@ -104,6 +118,46 @@ export function buildReport(
   const doubleDoorCount = (parameters.boxDoubleDoors ?? []).filter(Boolean).length;
   parametersLines.push(`   ├─ Boxy z podwójnymi drzwiami: ${doubleDoorCount}`);
   parametersLines.push(`   └─ Boxy z pojedynczymi drzwiami: ${parameters.numberOfBoxes - doubleDoorCount}`);
+
+  const parametersData: ParametersData = {
+    groups: [
+      {
+        title: 'Wymiary wnęki',
+        rows: [
+          { label: 'Szerokość wnęki', value: `${parameters.nicheWidthMm} mm` },
+          { label: 'Wysokość wnęki', value: `${parameters.nicheHeightMm} mm` },
+          { label: 'Głębokość wnęki', value: `${parameters.cabinetDepthMm} mm` },
+        ],
+      },
+      {
+        title: 'Blendy',
+        rows: [
+          { label: 'Lewa', value: `${parameters.leftBlendMm || 0} mm` },
+          { label: 'Prawa', value: `${parameters.rightBlendMm || 0} mm` },
+          { label: 'Górna', value: `${parameters.topBlendMm || 0} mm` },
+          { label: 'Dolna', value: `${parameters.bottomBlendMm || 0} mm` },
+        ],
+      },
+      {
+        title: 'Wymiary szafy (po blendach)',
+        rows: [
+          { label: 'Szerokość efektywna', value: `${effectiveWidthMm} mm` },
+          { label: 'Wysokość efektywna', value: `${effectiveHeightMm} mm` },
+        ],
+      },
+      {
+        title: 'Szuflady i boxy',
+        rows: [
+          { label: 'Liczba szuflad', value: `${parameters.numberOfDrawers}` },
+          { label: 'Liczba boxów', value: `${parameters.numberOfBoxes}` },
+          { label: 'Szerokość wnęki na szuflady', value: `${parameters.boxWidthMm} mm` },
+          { label: 'Dostępna szerokość wnętrz boxów', value: `${availableInteriorWidthForBoxesMm} mm` },
+          { label: 'Boxy z podwójnymi drzwiami', value: `${doubleDoorCount}` },
+          { label: 'Boxy z pojedynczymi drzwiami', value: `${parameters.numberOfBoxes - doubleDoorCount}` },
+        ],
+      },
+    ],
+  };
 
   lines.push('📦 PŁYTY MEBLOWE KORPUS SZARY');
   lines.push('─'.repeat(80));
@@ -238,7 +292,7 @@ export function buildReport(
   };
 
   return {
-    parametersText: parametersLines.join('\n'),
+    parametersData,
     mainText: lines.join('\n'),
     summaryText: summaryLines.join('\n'),
     elementsData,

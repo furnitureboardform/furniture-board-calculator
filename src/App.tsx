@@ -10,7 +10,7 @@ import { buildParameters } from './utils/buildParameters';
 
 export default function App() {
   const [showReport, setShowReport] = useState(false);
-  const [reportParametersText, setReportParametersText] = useState('');
+  const [reportParametersData, setReportParametersData] = useState<import('./lib/report').ParametersData | null>(null);
   const [reportText, setReportText] = useState('');
   const [reportSummaryText, setReportSummaryText] = useState('');
   const [reportElementsData, setReportElementsData] = useState<import('./lib/report').ElementsData | null>(null);
@@ -67,8 +67,8 @@ export default function App() {
       outerMaskingLeftFullCover: form.outerMaskingLeftFullCover,
       outerMaskingRightFullCover: form.outerMaskingRightFullCover,
     });
-    const { parametersText, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
-    setReportParametersText(parametersText);
+    const { parametersData, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
+    setReportParametersData(parametersData);
     setReportText(mainText);
     setReportSummaryText(summaryText);
     setReportElementsData(elementsData);
@@ -87,7 +87,7 @@ export default function App() {
         <Header />
         <main>
           <ReportView
-            parametersText={reportParametersText}
+            parametersData={reportParametersData}
             reportText={reportText}
             summaryText={reportSummaryText}
             elementsData={reportElementsData}

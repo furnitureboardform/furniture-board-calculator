@@ -1,5 +1,7 @@
 # Copilot Instructions
 
+> **Sync rule**: These instructions are mirrored in `.cursor/rules/main.mdc`. Whenever rules are added or changed here, the same change must be applied to that file — and vice versa.
+
 ## Stack
 
 - **React 18** with functional components and hooks only — no class components
@@ -63,3 +65,4 @@
 
 - Comments should provide context, reasoning, or clarification
 - Keep code self-documenting with clear function, variable, and component names
+- **All comments must be written in English** — never use Polish or any other language in code comments, JSDoc, or inline annotations

@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import type { ElementsData, HardwareSummary } from '../lib/report';
+import type { ElementsData, HardwareSummary, ParametersData } from '../lib/report';
 
 type ReportTab = 'parameters' | 'elements' | 'summary';
 
 export interface ReportViewProps {
-  parametersText: string;
+  parametersData: ParametersData | null;
   reportText: string;
   summaryText: string;
   elementsData: ElementsData | null;
@@ -131,7 +131,7 @@ function BoardsSection({ title, colorClass, boards }: { title: string; colorClas
   );
 }
 
-export default function ReportView({ parametersText, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, onBackToConfig }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, onBackToConfig }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
 
   const kolorBoards = useMemo(
@@ -187,7 +187,23 @@ export default function ReportView({ parametersText, reportText: _reportText, su
         </div>
 
         <div className="report-tab-content">
-          {activeTab === 'parameters' && <pre>{parametersText}</pre>}
+          {activeTab === 'parameters' && parametersData && (
+            <div className="elements-grid">
+              {parametersData.groups.map((group) => (
+                <div key={group.title} className="element-card">
+                  <div className="element-card__header">{group.title}</div>
+                  <div className="element-card__body">
+                    {group.rows.map((row) => (
+                      <div key={row.label} className="element-card__row">
+                        <span className="element-card__label">{row.label}</span>
+                        <span className="element-card__value">{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {activeTab === 'elements' && elementsData && (
             <div className="elements-grid">
