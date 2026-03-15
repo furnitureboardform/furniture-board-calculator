@@ -1,145 +1,822 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kalkulator Mebli</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
-        header { background: #1a1a2e; color: #fff; padding: 24px 40px; }
-        header h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: 0.5px; }
-        header p { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
-        main { max-width: 700px; margin: 40px auto; padding: 0 20px 60px; }
-        .step { display: none; }
-        .step.active { display: block; }
-        .card { background: #fff; border-radius: 10px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .field { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .field label { font-size: 0.95rem; color: #444; flex: 1; }
-        .field input[type="number"] { width: 120px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; text-align: right; transition: border-color 0.2s; }
-        .field input[type="number"]:focus { outline: none; border-color: #4f8ef7; }
-        .btn { width: 100%; padding: 14px; background: #1a1a2e; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
-        .btn:hover { background: #2d2d5e; }
-        .btn-outline { background: transparent; color: #1a1a2e; border: 2px solid #1a1a2e; margin-bottom: 12px; }
-        .btn-outline:hover { background: #f0f2f5; }
-        .steps-indicator { display: flex; gap: 8px; margin-bottom: 28px; }
-        .steps-indicator span { flex: 1; height: 4px; background: #ddd; border-radius: 2px; transition: background 0.3s; }
-        .steps-indicator span.done { background: #1a1a2e; }
-        .step-label { font-size: 0.75rem; color: #aaa; margin-bottom: 6px; }
-        .report { background: #1a1a2e; color: #e8eaf6; border-radius: 10px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .report h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #7986cb; margin-bottom: 18px; border-bottom: 1px solid #2d2d5e; padding-bottom: 10px; }
-        .report pre { font-family: 'Consolas', 'Courier New', monospace; font-size: 0.875rem; white-space: pre-wrap; line-height: 1.6; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        color: #333;
+      }
+      header {
+        background: #1a1a2e;
+        color: #fff;
+        padding: 24px 40px;
+      }
+      header h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      header p {
+        font-size: 0.85rem;
+        color: #aaa;
+        margin-top: 4px;
+      }
+      main {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 0 20px 60px;
+      }
+      .step {
+        display: none;
+      }
+      .step.active {
+        display: block;
+      }
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 28px 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .card h2 {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .field {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .field label {
+        font-size: 0.95rem;
+        color: #444;
+        flex: 1;
+      }
+      .field input[type="number"] {
+        width: 120px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        text-align: right;
+        transition: border-color 0.2s;
+      }
+      .field input[type="number"]:focus {
+        outline: none;
+        border-color: #4f8ef7;
+      }
+      .field select {
+        width: 120px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        background: #fff;
+        color: #333;
+        transition: border-color 0.2s;
+      }
+      .field select:focus {
+        outline: none;
+        border-color: #4f8ef7;
+      }
+      .btn {
+        width: 100%;
+        padding: 14px;
+        background: #1a1a2e;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        letter-spacing: 0.5px;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #2d2d5e;
+      }
+      .btn-outline {
+        background: transparent;
+        color: #1a1a2e;
+        border: 2px solid #1a1a2e;
+        margin-bottom: 12px;
+      }
+      .btn-outline:hover {
+        background: #f0f2f5;
+      }
+      .steps-indicator {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 28px;
+      }
+      .steps-indicator span {
+        flex: 1;
+        height: 4px;
+        background: #ddd;
+        border-radius: 2px;
+        transition: background 0.3s;
+      }
+      .steps-indicator span.done {
+        background: #1a1a2e;
+      }
+      .step-label {
+        font-size: 0.75rem;
+        color: #aaa;
+        margin-bottom: 6px;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .checkbox-row label {
+        font-size: 0.95rem;
+        color: #444;
+      }
+      .report {
+        background: #1a1a2e;
+        color: #e8eaf6;
+        border-radius: 10px;
+        padding: 28px 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      .report h2 {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7986cb;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #2d2d5e;
+        padding-bottom: 10px;
+      }
+      .report pre {
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 0.875rem;
+        white-space: pre-wrap;
+        line-height: 1.6;
+      }
+      .validation-msg {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+      .validation-msg.error {
+        background: #fff1f0;
+        border: 1px solid #ffccc7;
+        color: #a8071a;
+      }
+      .validation-msg.ok {
+        background: #f6ffed;
+        border: 1px solid #b7eb8f;
+        color: #237804;
+      }
+      .preview-box {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        background: #fafafa;
+        border: 1px solid #eee;
+        font-size: 0.9rem;
+        color: #444;
+      }
+      .preview-box strong {
+        color: #1a1a2e;
+      }
+      .niche-group {
+        margin-bottom: 12px;
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+      }
+      .niche-group-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 10px;
+      }
     </style>
-</head>
-<body>
-<header>
-    <h1>Kalkulator Mebli</h1>
-    <p>Konfiguruj parametry krok po kroku</p>
-</header>
-<main>
-    {{REPORT_SECTION}}
+  </head>
+  <body>
+    <header>
+      <h1>Kalkulator Mebli</h1>
+      <p>Konfiguruj parametry krok po kroku</p>
+    </header>
+    <main>
+      {{REPORT_SECTION}}
 
-    <div id="form-section"{{FORM_HIDDEN}}>
+      <div id="form-section" {{FORM_HIDDEN}}>
         <div class="steps-indicator">
-            <span id="ind-1" class="done"></span>
-            <span id="ind-2"></span>
-            <span id="ind-3"></span>
+          <span id="ind-1" class="done"></span>
+          <span id="ind-2"></span>
+          <span id="ind-3"></span>
         </div>
 
         <form method="POST" action="/" id="main-form">
-
-            <div class="step active" id="step-1">
-                <div class="step-label">Krok 1 z 3</div>
-                <div class="card">
-                    <h2>Wymiary wnęki</h2>
-                    <div class="field">
-                        <label>Szerokość wnęki (mm)</label>
-                        <input type="number" name="nicheWidthMm" id="nicheWidthMm" value="{{NICHE_WIDTH}}" min="1" required>
-                    </div>
-                    <div class="field">
-                        <label>Wysokość wnęki (mm)</label>
-                        <input type="number" name="nicheHeightMm" id="nicheHeightMm" value="{{NICHE_HEIGHT}}" min="1" required>
-                    </div>
+          <div class="step active" id="step-1">
+            <div class="step-label">Krok 1 z 3</div>
+            <div class="card">
+              <h2>Wymiary wnęki</h2>
+              <div class="field">
+                <label>Szerokość wnęki (mm)</label>
+                <input
+                  type="number"
+                  name="nicheWidthMm"
+                  id="nicheWidthMm"
+                  value="{{NICHE_WIDTH}}"
+                  min="1"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label>Wysokość wnęki (mm)</label>
+                <input
+                  type="number"
+                  name="nicheHeightMm"
+                  id="nicheHeightMm"
+                  value="{{NICHE_HEIGHT}}"
+                  min="1"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label>Głębokość szafy (mm)</label>
+                <input
+                  type="number"
+                  name="cabinetDepthMm"
+                  id="cabinetDepthMm"
+                  value="{{CABINET_DEPTH}}"
+                  min="1"
+                  required
+                />
+              </div>
+              <input
+                type="hidden"
+                name="hasNiches"
+                id="hasNichesValue"
+                value="false"
+              />
+              <div class="checkbox-row">
+                <input type="checkbox" id="has-niches" {{HAS_NICHES_CHECKED}} />
+                <label for="has-niches">Blendy</label>
+              </div>
+              <div id="niches-section" style="display: none">
+                <div class="niche-group">
+                  <div class="niche-group-title">Lewa blenda</div>
+                  <div class="field">
+                    <label>Szerokość (mm)</label>
+                    <input
+                      type="number"
+                      name="leftBlendMm"
+                      id="leftBlendMm"
+                      value="{{LEFT_BLEND}}"
+                      min="0"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label>Wysokość (mm)</label>
+                    <input
+                      type="number"
+                      name="leftNicheHeightMm"
+                      id="leftNicheHeightMm"
+                      value="{{LEFT_NICHE_HEIGHT}}"
+                      min="0"
+                      required
+                    />
+                  </div>
                 </div>
-                <button type="button" class="btn" onclick="goToStep(2)">Dalej →</button>
-            </div>
 
-            <div class="step" id="step-2">
-                <div class="step-label">Krok 2 z 3</div>
-                <div class="card">
-                    <h2>Liczba boxów</h2>
-                    <div class="field">
-                        <label>Ile boxów ma być w szafie?</label>
-                        <input type="number" name="numberOfBoxes" id="numberOfBoxes" value="{{NUMBER_OF_BOXES}}" min="1" max="20" required>
-                    </div>
+                <div class="niche-group">
+                  <div class="niche-group-title">Prawa blenda</div>
+                  <div class="field">
+                    <label>Szerokość (mm)</label>
+                    <input
+                      type="number"
+                      name="rightBlendMm"
+                      id="rightBlendMm"
+                      value="{{RIGHT_BLEND}}"
+                      min="0"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label>Wysokość (mm)</label>
+                    <input
+                      type="number"
+                      name="rightNicheHeightMm"
+                      id="rightNicheHeightMm"
+                      value="{{RIGHT_NICHE_HEIGHT}}"
+                      min="0"
+                      required
+                    />
+                  </div>
                 </div>
-                <button type="button" class="btn btn-outline" onclick="goToStep(1)">← Wróć</button>
-                <button type="button" class="btn" onclick="goToStep(3)">Dalej →</button>
-            </div>
 
-            <div class="step" id="step-3">
-                <div class="step-label">Krok 3 z 3</div>
-                <div class="card">
-                    <h2>Szerokości boxów</h2>
-                    <div id="boxes-container"></div>
+                <div class="niche-group">
+                  <div class="niche-group-title">Górna blenda</div>
+                  <div class="field">
+                    <label>Szerokość (mm)</label>
+                    <input
+                      type="number"
+                      name="topNicheWidthMm"
+                      id="topNicheWidthMm"
+                      value="{{TOP_NICHE_WIDTH}}"
+                      min="0"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label>Wysokość (mm)</label>
+                    <input
+                      type="number"
+                      name="topBlendMm"
+                      id="topBlendMm"
+                      value="{{TOP_BLEND}}"
+                      min="0"
+                      required
+                    />
+                  </div>
                 </div>
-                <button type="button" class="btn btn-outline" onclick="goToStep(2)">← Wróć</button>
-                <button type="submit" class="btn">Generuj</button>
-            </div>
 
+                <div class="niche-group">
+                  <div class="niche-group-title">Dolna blenda</div>
+                  <div class="field">
+                    <label>Szerokość (mm)</label>
+                    <input
+                      type="number"
+                      name="bottomNicheWidthMm"
+                      id="bottomNicheWidthMm"
+                      value="{{BOTTOM_NICHE_WIDTH}}"
+                      min="0"
+                      required
+                    />
+                  </div>
+                  <div class="field">
+                    <label>Wysokość (mm)</label>
+                    <input
+                      type="number"
+                      name="bottomBlendMm"
+                      id="bottomBlendMm"
+                      value="{{BOTTOM_BLEND}}"
+                      min="0"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                id="wardrobe-preview"
+                class="preview-box"
+                style="display: none"
+              ></div>
+            </div>
+            <button type="button" class="btn" onclick="goToStep(2)">
+              Dalej →
+            </button>
+          </div>
+
+          <div class="step" id="step-2">
+            <div class="step-label">Krok 2 z 3</div>
+            <div class="card">
+              <h2>Liczba boxów</h2>
+              <div class="field">
+                <label>Ile boxów ma być w szafie?</label>
+                <input
+                  type="number"
+                  name="numberOfBoxes"
+                  id="numberOfBoxes"
+                  value="{{NUMBER_OF_BOXES}}"
+                  min="1"
+                  max="20"
+                  required
+                />
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="goToStep(1)">
+              ← Wróć
+            </button>
+            <button type="button" class="btn" onclick="goToStep(3)">
+              Dalej →
+            </button>
+          </div>
+
+          <div class="step" id="step-3">
+            <div class="step-label">Krok 3 z 3</div>
+            <div class="card">
+              <h2>Szerokości boxów</h2>
+              <div class="checkbox-row">
+                <input type="checkbox" id="split-equally" checked />
+                <label for="split-equally">Podziel po rowno</label>
+              </div>
+              <div id="boxes-container"></div>
+              <div
+                id="box-width-validation"
+                class="validation-msg"
+                style="display: none"
+              ></div>
+              <div
+                id="shelves-preview"
+                class="preview-box"
+                style="display: none"
+              ></div>
+            </div>
+            <button type="button" class="btn btn-outline" onclick="goToStep(2)">
+              ← Wróć
+            </button>
+            <button type="submit" class="btn">Generuj</button>
+          </div>
         </form>
-    </div>
-</main>
-<script>
-    const savedWidths   = {{SAVED_WIDTHS}};
-    const savedShelves  = {{SAVED_SHELVES}};
-    const savedRods     = {{SAVED_RODS}};
-    const savedDrawers  = {{SAVED_DRAWERS}};
+      </div>
+    </main>
+    <script>
+      const savedWidths   = {{SAVED_WIDTHS}};
+      const savedShelves  = {{SAVED_SHELVES}};
+      const savedRods     = {{SAVED_RODS}};
+      const savedDrawers  = {{SAVED_DRAWERS}};
+      const SIDE_PANEL_THICKNESS_MM = 18;
+      const OUTER_MASKING_SIDE_MM = 18;
+      const DOOR_THICKNESS_MM = 18;
+      const DOOR_CLEARANCE_FROM_CABINET_MM = 2;
+      const BACK_BOARD_THICKNESS_MM = 3;
+      const SPLIT_EQUALLY_STORAGE_KEY = 'splitEquallyEnabled';
 
-    function goToStep(n) {
-        if (n === 3) buildBoxInputs();
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step-' + n).classList.add('active');
-        document.querySelectorAll('.steps-indicator span').forEach((el, i) => {
-            el.classList.toggle('done', i < n);
-        });
-        window.scrollTo(0, 0);
-    }
-
-    function buildBoxInputs() {
-        const count = parseInt(document.getElementById('numberOfBoxes').value) || 1;
-        const container = document.getElementById('boxes-container');
-        container.innerHTML = '';
-        for (let i = 0; i < count; i++) {
-            const w  = savedWidths[i]  !== undefined ? savedWidths[i]  : 964;
-            const sh = savedShelves[i] !== undefined ? savedShelves[i] : 2;
-            const ro = savedRods[i]    !== undefined ? savedRods[i]    : 0;
-            const dr = savedDrawers[i] !== undefined ? savedDrawers[i] : 2;
-
-            const section = document.createElement('div');
-            section.style.cssText = 'margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #eee;';
-            section.innerHTML =
-                '<div style="font-size:0.85rem;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Box ' + (i + 1) + '</div>' +
-                field('Szerokość (mm)',  'boxWidth_'   + i, w,  1) +
-                field('Liczba półek',   'boxShelves_' + i, sh, 0) +
-                field('Liczba drążków', 'boxRods_'    + i, ro, 0) +
-                field('Liczba szuflad', 'boxDrawers_' + i, dr, 0);
-            container.appendChild(section);
+        function getHasNichesEnabled() {
+          return document.getElementById('has-niches').checked;
         }
-    }
 
-    function field(label, name, value, min) {
-        return '<div class="field"><label>' + label + '</label>' +
-            '<input type="number" name="' + name + '" value="' + value + '" min="' + min + '" required></div>';
-    }
+        function setNichesInputsToZero() {
+          [
+            'leftBlendMm',
+            'rightBlendMm',
+            'topBlendMm',
+            'bottomBlendMm',
+            'leftNicheHeightMm',
+            'rightNicheHeightMm',
+            'topNicheWidthMm',
+            'bottomNicheWidthMm',
+          ].forEach((id) => {
+            const field = document.getElementById(id);
+            if (field) {
+              field.value = 0;
+            }
+          });
+        }
 
-    function showForm() {
-        document.getElementById('form-section').style.display = '';
-        document.querySelector('.report').style.display = 'none';
-        document.querySelector('.btn-outline[onclick="showForm()"]').style.display = 'none';
-        goToStep(1);
-    }
-</script>
-</body>
+        function syncNichesSectionState() {
+          const hasNiches = getHasNichesEnabled();
+          document.getElementById('hasNichesValue').value = hasNiches ? 'true' : 'false';
+          document.getElementById('niches-section').style.display = hasNiches ? '' : 'none';
+          if (!hasNiches) {
+            setNichesInputsToZero();
+          }
+        }
+
+        function getSplitEquallyPreference() {
+          const stored = localStorage.getItem(SPLIT_EQUALLY_STORAGE_KEY);
+          if (stored === null) {
+            return true;
+          }
+          return stored === 'true';
+        }
+
+        function setSplitEquallyPreference(value) {
+          localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(value));
+        }
+
+      function goToStep(n) {
+        if (n === 3) {
+          buildBoxInputs();
+          validateBoxWidths();
+        }
+          document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+          document.getElementById('step-' + n).classList.add('active');
+          document.querySelectorAll('.steps-indicator span').forEach((el, i) => {
+              el.classList.toggle('done', i < n);
+          });
+          window.scrollTo(0, 0);
+      }
+
+      function buildBoxInputs() {
+          const count = parseInt(document.getElementById('numberOfBoxes').value) || 1;
+          const container = document.getElementById('boxes-container');
+          const splitEqually = document.getElementById('split-equally').checked;
+          container.innerHTML = '';
+          for (let i = 0; i < count; i++) {
+              const w  = savedWidths[i]  !== undefined ? savedWidths[i]  : 964;
+              const sh = savedShelves[i] !== undefined ? savedShelves[i] : 2;
+              const ro = savedRods[i]    !== undefined ? savedRods[i]    : 0;
+              const dr = savedDrawers[i] !== undefined ? savedDrawers[i] : 2;
+
+              const section = document.createElement('div');
+              section.style.cssText = 'margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #eee;';
+              section.innerHTML =
+                  '<div style="font-size:0.85rem;font-weight:600;color:#1a1a2e;margin-bottom:10px;">Box ' + (i + 1) + '</div>' +
+                  field('Szerokość (mm) wnętrza boxa', 'boxWidth_'   + i, w,  1) +
+                  selectField('Rodzaj drzwi', 'boxDoorType_' + i) +
+                  field('Liczba półek',   'boxShelves_' + i, sh, 0) +
+                  field('Liczba drążków', 'boxRods_'    + i, ro, 0) +
+                  field('Liczba szuflad', 'boxDrawers_' + i, dr, 0);
+              container.appendChild(section);
+          }
+
+              container.querySelectorAll('input[type="number"]').forEach((input) => {
+                input.addEventListener('input', () => {
+                  validateBoxWidths();
+                  renderShelvesPreview();
+                });
+              });
+
+              if (splitEqually) {
+                applyEvenSplit();
+              }
+
+              lockOrUnlockWidthInputs(splitEqually);
+                renderShelvesPreview();
+      }
+
+      function field(label, name, value, min) {
+          return '<div class="field"><label>' + label + '</label>' +
+              '<input type="number" name="' + name + '" value="' + value + '" min="' + min + '" required></div>';
+      }
+
+        function selectField(label, name) {
+          return '<div class="field"><label>' + label + '</label>' +
+            '<select name="' + name + '" required>' +
+            '<option value="left">Lewe</option>' +
+            '<option value="right">Prawe</option>' +
+            '</select></div>';
+        }
+
+      function showForm() {
+          document.getElementById('form-section').style.display = '';
+          document.querySelector('.report').style.display = 'none';
+          document.querySelector('.btn-outline[onclick="showForm()"]').style.display = 'none';
+          goToStep(1);
+      }
+
+        function lockOrUnlockWidthInputs(shouldLock) {
+          const numberOfBoxes = parseInt(document.getElementById('numberOfBoxes').value, 10) || 0;
+          for (let i = 0; i < numberOfBoxes; i++) {
+            const widthInput = document.querySelector(`input[name="boxWidth_${i}"]`);
+            if (!widthInput) continue;
+            widthInput.readOnly = shouldLock;
+            widthInput.style.backgroundColor = shouldLock ? '#f5f5f5' : '#fff';
+          }
+        }
+
+        function getEvenSplitWidths(totalWidth, count) {
+          const safeCount = Math.max(1, count);
+          const safeTotal = Math.max(0, totalWidth);
+          const baseWidth = Math.floor(safeTotal / safeCount);
+          const remainder = safeTotal - (baseWidth * safeCount);
+          const widths = Array(safeCount).fill(baseWidth);
+
+          for (let i = 0; i < remainder; i++) {
+            const indexFromEnd = safeCount - 1 - i;
+            widths[indexFromEnd] += 1;
+          }
+
+          return widths;
+        }
+
+        function getEffectiveWardrobeWidthMm() {
+          const nicheWidthMm = parseInt(document.getElementById('nicheWidthMm').value, 10) || 0;
+          const hasNiches = getHasNichesEnabled();
+          const leftBlendMm = hasNiches ? parseInt(document.getElementById('leftBlendMm').value, 10) || 0 : 0;
+          const rightBlendMm = hasNiches ? parseInt(document.getElementById('rightBlendMm').value, 10) || 0 : 0;
+          return nicheWidthMm - leftBlendMm - rightBlendMm;
+        }
+
+        function applyEvenSplit() {
+          const numberOfBoxes = parseInt(document.getElementById('numberOfBoxes').value, 10) || 0;
+          const wardrobeWidthMm = getEffectiveWardrobeWidthMm();
+          const deductionPerBoxMm = 2 * SIDE_PANEL_THICKNESS_MM;
+          const outerMaskingDeductionMm = 2 * OUTER_MASKING_SIDE_MM;
+          const availableInteriorWidth =
+            wardrobeWidthMm -
+            (numberOfBoxes * deductionPerBoxMm) -
+            outerMaskingDeductionMm;
+          const equalWidths = getEvenSplitWidths(availableInteriorWidth, numberOfBoxes);
+
+          for (let i = 0; i < numberOfBoxes; i++) {
+            const widthInput = document.querySelector(`input[name="boxWidth_${i}"]`);
+            if (!widthInput) continue;
+            widthInput.value = equalWidths[i];
+          }
+        }
+
+        function showValidationMessage(text, isValid) {
+          const messageBox = document.getElementById('box-width-validation');
+          messageBox.style.display = 'block';
+          messageBox.className = 'validation-msg ' + (isValid ? 'ok' : 'error');
+          messageBox.textContent = text;
+        }
+
+        function renderWardrobePreview() {
+          const preview = document.getElementById('wardrobe-preview');
+          const nicheWidthMm = parseInt(document.getElementById('nicheWidthMm').value, 10) || 0;
+          const nicheHeightMm = parseInt(document.getElementById('nicheHeightMm').value, 10) || 0;
+          const hasNiches = getHasNichesEnabled();
+          const leftBlendMm = hasNiches ? parseInt(document.getElementById('leftBlendMm').value, 10) || 0 : 0;
+          const rightBlendMm = hasNiches ? parseInt(document.getElementById('rightBlendMm').value, 10) || 0 : 0;
+          const topBlendMm = hasNiches ? parseInt(document.getElementById('topBlendMm').value, 10) || 0 : 0;
+          const bottomBlendMm = hasNiches ? parseInt(document.getElementById('bottomBlendMm').value, 10) || 0 : 0;
+
+          if (nicheWidthMm <= 0 || nicheHeightMm <= 0) {
+            preview.style.display = 'none';
+            return;
+          }
+
+          const wardrobeWidthMm = nicheWidthMm - leftBlendMm - rightBlendMm;
+          const wardrobeHeightMm = nicheHeightMm - topBlendMm - bottomBlendMm;
+
+          preview.innerHTML =
+            `<strong>Szafa po blendach (podgląd)</strong><br>` +
+            `Szerokość: ${wardrobeWidthMm} mm (${nicheWidthMm} - ${leftBlendMm} - ${rightBlendMm})<br>` +
+            `Wysokość: ${wardrobeHeightMm} mm (${nicheHeightMm} - ${topBlendMm} - ${bottomBlendMm})`;
+          preview.style.display = 'block';
+        }
+
+        function renderShelvesPreview() {
+          const preview = document.getElementById('shelves-preview');
+          const numberOfBoxes = parseInt(document.getElementById('numberOfBoxes').value, 10) || 0;
+          const cabinetDepthMm = parseInt(document.getElementById('cabinetDepthMm').value, 10) || 0;
+
+          if (numberOfBoxes <= 0 || cabinetDepthMm <= 0) {
+            preview.style.display = 'none';
+            return;
+          }
+
+          const shelfDepthMm =
+            cabinetDepthMm -
+            DOOR_THICKNESS_MM -
+            DOOR_CLEARANCE_FROM_CABINET_MM -
+            BACK_BOARD_THICKNESS_MM;
+
+          let totalShelves = 0;
+          const lines = [];
+          for (let i = 0; i < numberOfBoxes; i++) {
+            const shelvesInput = document.querySelector(`input[name="boxShelves_${i}"]`);
+            const boxWidthInput = document.querySelector(`input[name="boxWidth_${i}"]`);
+            const quantity = shelvesInput ? parseInt(shelvesInput.value, 10) || 0 : 0;
+            const widthMm = boxWidthInput ? parseInt(boxWidthInput.value, 10) || 0 : 0;
+            totalShelves += quantity;
+
+            if (quantity > 0) {
+              lines.push(`Box ${i + 1}: ${quantity} szt. (${widthMm} × ${shelfDepthMm} mm)`);
+            }
+          }
+
+          const details = lines.length > 0 ? `<br>${lines.join('<br>')}` : '';
+          preview.innerHTML =
+            `<strong>Półki (podgląd)</strong><br>` +
+            `Głębokość półki: ${shelfDepthMm} mm (${cabinetDepthMm} - ${DOOR_THICKNESS_MM} - ${DOOR_CLEARANCE_FROM_CABINET_MM} - ${BACK_BOARD_THICKNESS_MM})<br>` +
+            `Łącznie półek: ${totalShelves} szt.` +
+            details;
+          preview.style.display = 'block';
+        }
+
+        function validateBoxWidths() {
+          const numberOfBoxes = parseInt(document.getElementById('numberOfBoxes').value, 10) || 0;
+          const nicheWidthMm = parseInt(document.getElementById('nicheWidthMm').value, 10) || 0;
+          const hasNiches = getHasNichesEnabled();
+          const leftBlendMm = hasNiches ? parseInt(document.getElementById('leftBlendMm').value, 10) || 0 : 0;
+          const rightBlendMm = hasNiches ? parseInt(document.getElementById('rightBlendMm').value, 10) || 0 : 0;
+          const wardrobeWidthMm = nicheWidthMm - leftBlendMm - rightBlendMm;
+          const deductionPerBoxMm = 2 * SIDE_PANEL_THICKNESS_MM;
+          const outerMaskingDeductionMm = 2 * OUTER_MASKING_SIDE_MM;
+          const availableInteriorWidth =
+            wardrobeWidthMm -
+            (numberOfBoxes * deductionPerBoxMm) -
+            outerMaskingDeductionMm;
+
+          if (numberOfBoxes <= 0 || nicheWidthMm <= 0 || wardrobeWidthMm <= 0) {
+            return false;
+          }
+
+          let totalInteriorWidth = 0;
+          for (let i = 0; i < numberOfBoxes; i++) {
+            const field = document.querySelector(`input[name="boxWidth_${i}"]`);
+            const value = field ? parseInt(field.value, 10) : 0;
+            totalInteriorWidth += isNaN(value) ? 0 : value;
+          }
+
+          const difference = availableInteriorWidth - totalInteriorWidth;
+          if (difference === 0) {
+            showValidationMessage(
+                `OK. Suma szerokości wnętrz boxów = ${totalInteriorWidth} mm (dostępne: ${availableInteriorWidth} mm = ${nicheWidthMm} - ${leftBlendMm} - ${rightBlendMm} - ${numberOfBoxes}×(2×${SIDE_PANEL_THICKNESS_MM}) - 2×${OUTER_MASKING_SIDE_MM}).`,
+              true
+            );
+            return true;
+          }
+
+          if (difference > 0) {
+            showValidationMessage(
+              `Za mało. Zostało jeszcze ${difference} mm do rozdzielenia między boxy. Dostępne łącznie: ${availableInteriorWidth} mm.`,
+              false
+            );
+            return false;
+          }
+
+          showValidationMessage(
+            `Za dużo. Przekroczono dostępne miejsce o ${Math.abs(difference)} mm. Dostępne łącznie: ${availableInteriorWidth} mm.`,
+            false
+          );
+          return false;
+        }
+
+        document.getElementById('numberOfBoxes').addEventListener('input', () => {
+          buildBoxInputs();
+          validateBoxWidths();
+          renderShelvesPreview();
+        });
+
+        document.getElementById('split-equally').addEventListener('change', function () {
+            setSplitEquallyPreference(this.checked);
+          if (this.checked) {
+            applyEvenSplit();
+          }
+          lockOrUnlockWidthInputs(this.checked);
+          validateBoxWidths();
+        });
+
+        document.getElementById('nicheWidthMm').addEventListener('input', () => {
+          if (document.getElementById('split-equally').checked) {
+            applyEvenSplit();
+          }
+          validateBoxWidths();
+          renderShelvesPreview();
+          renderWardrobePreview();
+        });
+
+        document.getElementById('nicheHeightMm').addEventListener('input', () => {
+          renderWardrobePreview();
+        });
+
+        ['leftBlendMm', 'rightBlendMm'].forEach((fieldId) => {
+          document.getElementById(fieldId).addEventListener('input', () => {
+            if (document.getElementById('split-equally').checked) {
+              applyEvenSplit();
+            }
+            validateBoxWidths();
+            renderWardrobePreview();
+          });
+        });
+
+        ['topBlendMm', 'bottomBlendMm'].forEach((fieldId) => {
+          document.getElementById(fieldId).addEventListener('input', () => {
+            renderWardrobePreview();
+          });
+        });
+
+        ['leftNicheHeightMm', 'rightNicheHeightMm', 'topNicheWidthMm', 'bottomNicheWidthMm'].forEach((fieldId) => {
+          document.getElementById(fieldId).addEventListener('input', () => {
+            renderWardrobePreview();
+          });
+        });
+
+        document.getElementById('has-niches').addEventListener('change', () => {
+          syncNichesSectionState();
+          if (document.getElementById('split-equally').checked) {
+            applyEvenSplit();
+          }
+          validateBoxWidths();
+          renderWardrobePreview();
+        });
+
+        document.getElementById('cabinetDepthMm').addEventListener('input', () => {
+          renderShelvesPreview();
+        });
+
+        document.getElementById('main-form').addEventListener('submit', function (event) {
+          syncNichesSectionState();
+          if (!validateBoxWidths()) {
+            event.preventDefault();
+          }
+        });
+
+        document.getElementById('split-equally').checked = getSplitEquallyPreference();
+        syncNichesSectionState();
+        renderShelvesPreview();
+        renderWardrobePreview();
+    </script>
+  </body>
 </html>
