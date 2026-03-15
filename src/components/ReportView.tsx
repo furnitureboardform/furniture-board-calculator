@@ -1,7 +1,37 @@
 import { useState, useMemo } from 'react';
 import type { ElementsData, HardwareSummary, ParametersData } from '../lib/report';
 
-type ReportTab = 'parameters' | 'elements' | 'summary';
+type ReportTab = 'parameters' | 'elements' | 'summary' | 'costs';
+
+const COST_PER_HINGE_PLN = 13;
+const COST_PER_GUIDE_SET_PLN = 104;
+const COST_PER_BRACKET_SET_PLN = 8;
+const COST_PER_HANDLE_PLN = 10;
+const COST_PER_LEG_PLN = 6;
+const COST_PER_LEG_CLIP_PLN = 1;
+
+const BOARD_PIECE_WIDTH_MM = 2800;
+const BOARD_PIECE_HEIGHT_MM = 1045;
+const BOARD_PIECE_AREA_MM2 = BOARD_PIECE_WIDTH_MM * BOARD_PIECE_HEIGHT_MM;
+const COST_PER_SZARY_PIECE_PLN = 120;
+const COST_PER_KOLOR_PIECE_PLN = 205;
+const COST_PER_METER_CUTTING_PLN = 5;
+const COST_PER_METER_BANDING_PLN = 6;
+
+function calcBoardPieces(boards: { dim1: number; dim2: number; qty: number }[]): number {
+  const totalArea = boards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
+  return Math.ceil(totalArea / BOARD_PIECE_AREA_MM2);
+}
+
+function calcCuttingLengthM(boards: { dim1: number; dim2: number; qty: number }[]): number {
+  const totalMm = boards.reduce((sum, b) => sum + (b.dim1 + b.dim2) * b.qty, 0);
+  return Math.round(totalMm) / 1000;
+}
+
+function calcEdgeBandingLengthM(boards: { edgeBandingMm: number; qty: number }[]): number {
+  const totalMm = boards.reduce((sum, b) => sum + b.edgeBandingMm * b.qty, 0);
+  return Math.round(totalMm) / 1000;
+}
 
 export interface ReportViewProps {
   parametersData: ParametersData | null;
@@ -16,6 +46,7 @@ interface BoardEntry {
   dim1: number;
   dim2: number;
   edgeBanding: string;
+  edgeBandingMm: number;
   qty: number;
 }
 
@@ -39,32 +70,32 @@ function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   for (const box of elementsData.boxes) {
     if (box.door) {
       const qty = box.door.doubleDoor ? 2 : 1;
-      boards.push({ dim1: box.door.heightMm, dim2: box.door.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', qty });
+      boards.push({ dim1: box.door.heightMm, dim2: box.door.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', edgeBandingMm: 2 * (box.door.heightMm + box.door.widthMm), qty });
     }
   }
 
   const { left, right, top, bottom } = elementsData.niches;
   if (left.widthMm > 0 && left.heightMm > 0) {
-    boards.push({ dim1: left.widthMm, dim2: left.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 });
+    boards.push({ dim1: left.widthMm, dim2: left.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
   }
   if (right.widthMm > 0 && right.heightMm > 0) {
-    boards.push({ dim1: right.widthMm, dim2: right.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 });
+    boards.push({ dim1: right.widthMm, dim2: right.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
   }
   if (top.widthMm > 0 && top.heightMm > 0) {
-    boards.push({ dim1: top.widthMm, dim2: top.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 });
+    boards.push({ dim1: top.widthMm, dim2: top.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
   }
   if (bottom.widthMm > 0 && bottom.heightMm > 0) {
-    boards.push({ dim1: bottom.widthMm, dim2: bottom.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 });
+    boards.push({ dim1: bottom.widthMm, dim2: bottom.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
   }
 
   if (elementsData.maskings) {
     if (elementsData.maskings.left) {
       const { heightMm, widthMm } = elementsData.maskings.left;
-      boards.push({ dim1: heightMm, dim2: widthMm, edgeBanding: `Obrzeże na wysokości ${heightMm} mm (1 bok)`, qty: 1 });
+      boards.push({ dim1: heightMm, dim2: widthMm, edgeBanding: `Obrzeże na wysokości ${heightMm} mm (1 bok)`, edgeBandingMm: heightMm, qty: 1 });
     }
     if (elementsData.maskings.right) {
       const { heightMm, widthMm } = elementsData.maskings.right;
-      boards.push({ dim1: heightMm, dim2: widthMm, edgeBanding: `Obrzeże na wysokości ${heightMm} mm (1 bok)`, qty: 1 });
+      boards.push({ dim1: heightMm, dim2: widthMm, edgeBanding: `Obrzeże na wysokości ${heightMm} mm (1 bok)`, edgeBandingMm: heightMm, qty: 1 });
     }
   }
 
@@ -80,6 +111,7 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
         dim1: box.shelves.widthMm,
         dim2: box.shelves.depthMm,
         edgeBanding: `Obrzeże na szerokości ${box.shelves.widthMm} mm (1 bok)`,
+        edgeBandingMm: box.shelves.widthMm,
         qty: box.shelves.quantity,
       });
     }
@@ -89,6 +121,7 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
         dim1: box.panels.sideHeightMm,
         dim2: box.panels.depthMm,
         edgeBanding: `Obrzeże na wysokości ${box.panels.sideHeightMm} mm (1 bok)`,
+        edgeBandingMm: box.panels.sideHeightMm,
         qty: 2,
       });
       // top and bottom have the same dimensions — push 2 together
@@ -96,6 +129,7 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
         dim1: box.panels.topBottomWidthMm,
         dim2: box.panels.depthMm,
         edgeBanding: `Obrzeże na szerokości ${box.panels.topBottomWidthMm} mm (1 bok)`,
+        edgeBandingMm: box.panels.topBottomWidthMm,
         qty: 2,
       });
     }
@@ -103,12 +137,12 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
     if (box.drawerBoards) {
       const d = box.drawerBoards;
       const s = d.sets;
-      boards.push({ dim1: d.sidePanel.heightMm, dim2: d.sidePanel.depthMm, edgeBanding: `Obrzeże na długości ${d.sidePanel.depthMm} mm (1 bok)`, qty: d.count * 2 * s });
-      boards.push({ dim1: d.frontPanel.heightMm, dim2: d.frontPanel.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', qty: d.count * s });
-      boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, qty: d.count * s });
-      boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, qty: d.count * s });
-      boards.push({ dim1: d.separator.heightMm, dim2: d.separator.widthMm, edgeBanding: 'Bez obrzeży', qty: d.separator.qty });
-      boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, qty: 2 });
+      boards.push({ dim1: d.sidePanel.heightMm, dim2: d.sidePanel.depthMm, edgeBanding: `Obrzeże na długości ${d.sidePanel.depthMm} mm (1 bok)`, edgeBandingMm: d.sidePanel.depthMm, qty: d.count * 2 * s });
+      boards.push({ dim1: d.frontPanel.heightMm, dim2: d.frontPanel.widthMm, edgeBanding: 'Wszystkie obrzeża (4 strony)', edgeBandingMm: 2 * (d.frontPanel.heightMm + d.frontPanel.widthMm), qty: d.count * s });
+      boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, edgeBandingMm: d.internalWall1.widthMm, qty: d.count * s });
+      boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, edgeBandingMm: d.internalWall2.widthMm, qty: d.count * s });
+      boards.push({ dim1: d.separator.heightMm, dim2: d.separator.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: d.separator.qty });
+      boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, edgeBandingMm: d.drawerRail.widthMm, qty: 2 });
     }
   }
 
@@ -157,10 +191,10 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     () => elementsData ? groupBoards([
       ...elementsData.boxes
         .filter((b) => b.hdf)
-        .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', qty: 1 })),
+        .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 })),
       ...elementsData.boxes
         .filter((b) => b.drawerBoards)
-        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', qty: b.drawerBoards!.count * b.drawerBoards!.sets })),
+        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: b.drawerBoards!.count * b.drawerBoards!.sets })),
     ]) : [],
     [elementsData]
   );
@@ -197,6 +231,13 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             onClick={() => setActiveTab('summary')}
           >
             Podsumowanie listy zakupów
+          </button>
+          <button
+            type="button"
+            className={`report-tab${activeTab === 'costs' ? ' report-tab--active' : ''}`}
+            onClick={() => setActiveTab('costs')}
+          >
+            Koszty
           </button>
         </div>
 
@@ -475,6 +516,171 @@ export default function ReportView({ parametersData, reportText: _reportText, su
               </div>
             </div>
           )}
+
+          {activeTab === 'costs' && hardwareSummary && (() => {
+            const hingesCost = totalHinges * COST_PER_HINGE_PLN;
+            const guidesCost = hardwareSummary.totalGuides * COST_PER_GUIDE_SET_PLN;
+            const bracketsCost = hardwareSummary.totalBrackets * COST_PER_BRACKET_SET_PLN;
+            const handlesCost = hardwareSummary.totalHandles * COST_PER_HANDLE_PLN;
+            const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
+            const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
+            const szaryPieces = calcBoardPieces(szaryBoards);
+            const kolorPieces = calcBoardPieces(kolorBoards);
+            const szaryBoardCost = szaryPieces * COST_PER_SZARY_PIECE_PLN;
+            const kolorBoardCost = kolorPieces * COST_PER_KOLOR_PIECE_PLN;
+            const cuttingLengthM = Math.round((calcCuttingLengthM(szaryBoards) + calcCuttingLengthM(kolorBoards)) * 100) / 100;
+            const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
+            const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
+            const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
+            const totalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
+            return (
+              <div className="summary-tab">
+                <div className="boards-summary-section">
+                  <div className="boards-summary-section__header boards-summary-section__header--szary">Płyty szare (2800 × 1045 mm)</div>
+                  <table className="boards-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Element</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn.</th>
+                        <th>Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Płyta szara</td>
+                        <td>{szaryPieces} szt.</td>
+                        <td>{COST_PER_SZARY_PIECE_PLN} zł</td>
+                        <td>{szaryBoardCost} zł</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="boards-summary-section">
+                  <div className="boards-summary-section__header boards-summary-section__header--kolor">Płyty kolor (2800 × 1045 mm)</div>
+                  <table className="boards-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Element</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn.</th>
+                        <th>Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Płyta kolor</td>
+                        <td>{kolorPieces} szt.</td>
+                        <td>{COST_PER_KOLOR_PIECE_PLN} zł</td>
+                        <td>{kolorBoardCost} zł</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="boards-summary-section">
+                  <div className="boards-summary-section__header boards-summary-section__header--dodatki">Cięcie płyt</div>
+                  <table className="boards-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Element</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn.</th>
+                        <th>Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Cięcie</td>
+                        <td>{cuttingLengthM} m</td>
+                        <td>{COST_PER_METER_CUTTING_PLN} zł/m</td>
+                        <td>{cuttingCost} zł</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="boards-summary-section">
+                  <div className="boards-summary-section__header boards-summary-section__header--dodatki">Oklejanie płyt</div>
+                  <table className="boards-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Element</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn.</th>
+                        <th>Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Oklejanie</td>
+                        <td>{bandingLengthM} m</td>
+                        <td>{COST_PER_METER_BANDING_PLN} zł/m</td>
+                        <td>{bandingCost} zł</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="boards-summary-section">
+                  <div className="boards-summary-section__header boards-summary-section__header--dodatki">Koszty sprzętu</div>
+                  <table className="boards-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Element</th>
+                        <th>Ilość</th>
+                        <th>Cena jedn.</th>
+                        <th>Razem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Zawiasy</td>
+                        <td>{totalHinges} szt.</td>
+                        <td>{COST_PER_HINGE_PLN} zł</td>
+                        <td>{hingesCost} zł</td>
+                      </tr>
+                      <tr>
+                        <td>Prowadnice przesuwne</td>
+                        <td>{hardwareSummary.totalGuides} szt.</td>
+                        <td>{COST_PER_GUIDE_SET_PLN} zł</td>
+                        <td>{guidesCost} zł</td>
+                      </tr>
+                      <tr>
+                        <td>Sprzęgła</td>
+                        <td>{hardwareSummary.totalBrackets} szt.</td>
+                        <td>{COST_PER_BRACKET_SET_PLN} zł</td>
+                        <td>{bracketsCost} zł</td>
+                      </tr>
+                      <tr>
+                        <td>Uchwyty</td>
+                        <td>{hardwareSummary.totalHandles} szt.</td>
+                        <td>{COST_PER_HANDLE_PLN} zł</td>
+                        <td>{handlesCost} zł</td>
+                      </tr>
+                      <tr>
+                        <td>Nóżki</td>
+                        <td>{hardwareSummary.totalLegs} szt.</td>
+                        <td>{COST_PER_LEG_PLN} zł</td>
+                        <td>{legsCost} zł</td>
+                      </tr>
+                      <tr>
+                        <td>Klip zatrzask (na nóżkę)</td>
+                        <td>{hardwareSummary.totalLegs} szt.</td>
+                        <td>{COST_PER_LEG_CLIP_PLN} zł</td>
+                        <td>{clipsCost} zł</td>
+                      </tr>
+                      <tr style={{ fontWeight: 'bold', borderTop: '2px solid currentColor' }}>
+                        <td colSpan={3}>Suma całkowita (koszt własny)</td>
+                        <td>{totalCost} zł</td>
+                      </tr>
+                      <tr style={{ fontWeight: 'bold', color: 'var(--color-kolor, #c0392b)' }}>
+                        <td colSpan={3}>Cena dla klienta (×2)</td>
+                        <td>{totalCost * 2} zł</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
       <button type="button" className="btn btn-outline" onClick={onBackToConfig}>
