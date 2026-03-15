@@ -1,0 +1,259 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+
+header {
+  background: #1a1a2e;
+  color: #fff;
+  padding: 24px 40px;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+header p {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-top: 4px;
+}
+
+main {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px 60px;
+}
+
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.field label {
+  font-size: 0.95rem;
+  color: #444;
+  flex: 1;
+}
+
+.field input[type="number"] {
+  width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-align: right;
+  transition: border-color 0.2s;
+}
+
+.field input[type="number"]:focus {
+  outline: none;
+  border-color: #4f8ef7;
+}
+
+.field input[type="number"]:read-only {
+  background: #f5f5f5;
+}
+
+.field select {
+  width: 120px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+.field select:focus {
+  outline: none;
+  border-color: #4f8ef7;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #2d2d5e;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #1a1a2e;
+  border: 2px solid #1a1a2e;
+  margin-bottom: 12px;
+}
+
+.btn-outline:hover {
+  background: #f0f2f5;
+}
+
+.steps-indicator {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.steps-indicator span {
+  flex: 1;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+.steps-indicator span.done {
+  background: #1a1a2e;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.checkbox-row label {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.report {
+  background: #1a1a2e;
+  color: #e8eaf6;
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.report h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #7986cb;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #2d2d5e;
+  padding-bottom: 10px;
+}
+
+.report pre {
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.validation-msg {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.validation-msg.error {
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #a8071a;
+}
+
+.validation-msg.ok {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #237804;
+}
+
+.preview-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.preview-box strong {
+  color: #1a1a2e;
+}
+
+.niche-group {
+  margin-bottom: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+}
+
+.niche-group-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+}
+
+.box-section {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.box-section-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+}

@@ -1,20 +1,60 @@
-# furniture-board-calculator
+# Kalkulator Mebli – szafa wnękowa
 
-## Opis aplikacji
+Aplikacja webowa do wyliczania materiałów i listy zakupów pod **szafę wnękową** (garderobę w ścianie). Na podstawie wymiarów wnęki, liczby boxów oraz konfiguracji każdego boxa (półki, szuflady, drzwi) generuje raport z:
 
-Aplikacja do wyliczania komponentów szafy na podstawie danych wejściowych. Program analizuje parametry takie jak:
-- Ilość szuflad
-- Ilość drzwi
-- Ilość półek
-- Wymiary szafy
+- **Płyty meblowe** (korpus, szuflady) i **HDF** (dna szuflad)
+- **Prowadnice, sprzęgła, uchwyty, zawiasy**
+- **Drzwi** – wymiary i ilość (lewe/prawe)
+- **Półki** – głębokość i liczba w każdym boxie
+- **Blendy/wnęki** – półka i listwy, gdy są włączone
 
-Na podstawie podanych danych aplikacja automatycznie wylicza wszystkie elementy potrzebne do budowy pełnej szafy, w tym:
-- Płyty meblowe
-- Płyty HDF
-- Nogi
-- Zawiasy
-- Prowadnice
-- Uchwyty
-- Inne części montażowe
+Konfiguracja jest w trzech krokach: wymiary wnęki (i opcjonalnie blendy), liczba boxów, a potem dla każdego boxa – szerokość wnętrza, rodzaj drzwi, półki, drążki, szuflady. Aplikacja pilnuje, żeby suma szerokości wnętrz boxów zgadzała się z dostępnym miejscem.
 
-Aplikacja generuje szczegółowy raport z listą wszystkich wymaganych komponentów, ich ilościami i wymiarami.
+---
+
+## Wymagania
+
+- **Node.js** (np. 18+)
+- **npm**
+
+---
+
+## Uruchomienie aplikacji
+
+Aplikacja (React + TypeScript + Vite) znajduje się w katalogu `client/`.
+
+### Tryb deweloperski (na lokalnej maszynie)
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+W terminalu pojawi się adres (zazwyczaj **http://localhost:5173**). Otwórz go w przeglądarce.
+
+### Build produkcyjny
+
+```bash
+cd client
+npm install
+npm run build
+```
+
+Wynik trafia do katalogu `client/dist/`. Aby podejrzeć zbudowaną wersję lokalnie:
+
+```bash
+npm run preview
+```
+
+---
+
+## Struktura projektu
+
+| Ścieżka        | Opis |
+|----------------|------|
+| `/`      | Aplikacja React (Vite, TypeScript) |
+| `/src/`  | Komponenty, hooki, logika (`lib/`), stałe, walidacja |
+| `parameters.js`| Opcjonalnie: używany przez wersję CLI (jeśli jest w projekcie) |
+
+Raport jest generowany w przeglądarce – nie jest potrzebny backend do działania kalkulatora.
