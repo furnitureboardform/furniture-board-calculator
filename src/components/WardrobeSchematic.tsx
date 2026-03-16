@@ -250,6 +250,7 @@ export default function WardrobeSchematic({
   }
 
   function removeItem(boxIdx: number, itemId: string, type: ItemType) {
+    setTooltip(null);
     setPlacedItems((prev) => {
       const existing = prev[boxIdx] || [];
       const updated = existing.filter((it) => it.id !== itemId);
@@ -319,6 +320,7 @@ export default function WardrobeSchematic({
     Object.values(placedItems).flat().filter((it) => it.type === type).length;
 
   function clearAll() {
+    setTooltip(null);
     setPlacedItems((prev) => {
       const cleared: Record<number, PositionedItem[]> = {};
       Object.keys(prev).forEach((k) => { cleared[Number(k)] = []; });
