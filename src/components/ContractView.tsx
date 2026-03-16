@@ -78,29 +78,41 @@ export function ContractView({
     if (!contractRef.current || isGeneratingPdf) return;
     setIsGeneratingPdf(true);
     try {
-      const canvas = await html2canvas(contractRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-      });
-      const imageData = canvas.toDataURL('image/png');
+      const sections = Array.from(
+        contractRef.current.querySelectorAll<HTMLElement>('.contract-pdf-section')
+      );
+      if (sections.length === 0) return;
+
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
-      const imageWidth = pageWidth - margin * 2;
-      const imageHeight = (canvas.height * imageWidth) / canvas.width;
-      let remainingHeight = imageHeight;
-      let positionY = margin;
+      const maxContentHeight = pageHeight - margin * 2;
 
-      pdf.addImage(imageData, 'PNG', margin, positionY, imageWidth, imageHeight);
-      remainingHeight -= pageHeight - margin * 2;
+      for (let i = 0; i < sections.length; i++) {
+        if (i > 0) {
+          pdf.addPage();
+        }
 
-      while (remainingHeight > 0) {
-        pdf.addPage();
-        positionY = margin - (imageHeight - remainingHeight);
-        pdf.addImage(imageData, 'PNG', margin, positionY, imageWidth, imageHeight);
-        remainingHeight -= pageHeight - margin * 2;
+        const section = sections[i]!;
+        const canvas = await html2canvas(section, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          useCORS: true,
+        });
+
+        const imageData = canvas.toDataURL('image/png');
+        let imageWidth = pageWidth - margin * 2;
+        let imageHeight = (canvas.height * imageWidth) / canvas.width;
+
+        // If a single section is taller than one page, scale it down to keep it whole.
+        if (imageHeight > maxContentHeight) {
+          imageHeight = maxContentHeight;
+          imageWidth = (canvas.width * imageHeight) / canvas.height;
+        }
+
+        const drawX = margin + ((pageWidth - margin * 2) - imageWidth) / 2;
+        pdf.addImage(imageData, 'PNG', drawX, margin, imageWidth, imageHeight);
       }
 
       pdf.save('umowa-szafa.pdf');
@@ -112,40 +124,22 @@ export function ContractView({
   return (
     <div className="contract-view">
       <div ref={contractRef} className="contract-sheet">
-        <div className="contract-sheet__header">
-          <div>
-            <h2>Umowa</h2>
-            <p>Dokument roboczy do akceptacji projektu i warunków realizacji.</p>
+        <section className="contract-page contract-pdf-section">
+          <div className="contract-sheet__header">
+            <div>
+              <h2>Umowa</h2>
+              <p>Dokument roboczy do akceptacji projektu i warunków realizacji.</p>
+            </div>
+            <div className="contract-price-card">
+              <span>Kwota całkowita</span>
+              <strong>{pricing.clientPrice} zł</strong>
+            </div>
           </div>
-          <div className="contract-price-card">
-            <span>Kwota całkowita</span>
-            <strong>{pricing.clientPrice} zł</strong>
-          </div>
-        </div>
 
-        <div className="contract-layout">
           <div className="contract-copy">
             {paragraphs.map((paragraph, index) => (
               <p key={index} className={index === 0 ? 'contract-copy__title' : ''}>{paragraph}</p>
             ))}
-
-            <div className="contract-data-grid">
-              <div className="contract-data-card">
-                <span>Model</span>
-                <strong>{numberOfBoxes} boxy</strong>
-                <small>{nicheWidthMm} × {nicheHeightMm} × {cabinetDepthMm} mm</small>
-              </div>
-              <div className="contract-data-card">
-                <span>Okleina / kolor</span>
-                <strong>{selectedFinish?.label ?? boardFinish.optionId}</strong>
-                <small>{getFinishTypeLabel(boardFinish.type)}</small>
-              </div>
-              <div className="contract-data-card">
-                <span>Uchwyt</span>
-                <strong>{selectedHandle?.label ?? doorHandle.optionId}</strong>
-                <small>{pricing.handleUnitPrice.toFixed(2)} zł / szt.</small>
-              </div>
-            </div>
 
             <div className="contract-fields">
               <div className="contract-field">
@@ -163,8 +157,34 @@ export function ContractView({
             </div>
           </div>
 
-          <div className="contract-side">
-            <h3>Model szafy</h3>
+          <div className="contract-signatures">
+            <div className="signature-box">
+              <div className="contract-line" />
+              <span>Podpis zamawiającego</span>
+            </div>
+            <div className="signature-box">
+              <div className="contract-line" />
+              <span>Podpis wykonawcy</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="contract-page contract-pdf-section">
+          <div className="contract-page__title">Załącznik techniczny</div>
+
+          <div className="contract-data-grid">
+            <div className="contract-data-card">
+              <span>Okleina / kolor</span>
+              <strong>{selectedFinish?.label ?? boardFinish.optionId}</strong>
+            </div>
+            <div className="contract-data-card">
+              <span>Uchwyt</span>
+              <strong>{selectedHandle?.label ?? doorHandle.optionId}</strong>
+            </div>
+          </div>
+
+          <div className="contract-side contract-side--full">
+            <h3>Model graficzny szafy</h3>
             <ContractWardrobePreview
               nicheWidthMm={nicheWidthMm}
               nicheHeightMm={nicheHeightMm}
@@ -180,18 +200,7 @@ export function ContractView({
               finishColor={selectedFinish?.swatchColor ?? '#d6c0a8'}
             />
           </div>
-        </div>
-
-        <div className="contract-signatures">
-          <div className="signature-box">
-            <div className="contract-line" />
-            <span>Podpis zamawiającego</span>
-          </div>
-          <div className="signature-box">
-            <div className="contract-line" />
-            <span>Podpis wykonawcy</span>
-          </div>
-        </div>
+        </section>
       </div>
 
       <div className="contract-actions">

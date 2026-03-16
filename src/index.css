@@ -829,6 +829,26 @@ main {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+.contract-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contract-page + .contract-page {
+  margin-top: 28px;
+  border-top: 1px dashed #d3d8e2;
+  padding-top: 26px;
+}
+
+.contract-page__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .contract-sheet__header {
   display: flex;
   align-items: flex-start;
@@ -867,12 +887,6 @@ main {
 .contract-price-card strong {
   font-size: 1.4rem;
   color: #1a1a2e;
-}
-
-.contract-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.95fr);
-  gap: 24px;
 }
 
 .contract-copy {
@@ -957,6 +971,10 @@ main {
   margin-bottom: 10px;
 }
 
+.contract-side--full {
+  margin-top: 4px;
+}
+
 .contract-preview {
   border: 1px solid #e4e7ec;
   border-radius: 10px;
@@ -984,10 +1002,6 @@ main {
 }
 
 @media (max-width: 900px) {
-  .contract-layout {
-    grid-template-columns: 1fr;
-  }
-
   .contract-data-grid {
     grid-template-columns: 1fr;
   }
