@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { ElementsData, HardwareSummary, ParametersData } from '../lib/report';
 import type { BoardFinish, DoorHandleSelection } from '../lib/types';
 import { ALL_FINISH_OPTIONS } from '../lib/finishOptions';
@@ -54,6 +54,10 @@ export interface ReportViewProps {
   hardwareSummary: HardwareSummary | null;
   boardFinish: BoardFinish;
   doorHandle: DoorHandleSelection;
+  discountPln: number;
+  onDiscountPlnChange: (discountPln: number) => void;
+  discountPercent: number;
+  onDiscountPercentChange: (discountPercent: number) => void;
   onBackToConfig: () => void;
   onOpenContract: () => void;
 }
@@ -206,15 +210,91 @@ function BoardsSection({ title, colorClass, boards }: { title: string; colorClas
   );
 }
 
-export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, onBackToConfig, onOpenContract }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, onDiscountPlnChange, discountPercent, onDiscountPercentChange, onBackToConfig, onOpenContract }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
+  const [discountInput, setDiscountInput] = useState<string>('0');
+  const [discountPercentInput, setDiscountPercentInput] = useState<string>('0');
+
+  const parsedDiscountPln = useMemo(() => {
+    if (!Number.isFinite(discountPln)) return 0;
+    return Math.max(0, discountPln);
+  }, [discountPln]);
+
+  const parsedDiscountPercent = useMemo(() => {
+    if (!Number.isFinite(discountPercent)) return 0;
+    return Math.min(100, Math.max(0, discountPercent));
+  }, [discountPercent]);
+
+  useEffect(() => {
+    setDiscountInput(String(parsedDiscountPln));
+  }, [parsedDiscountPln]);
+
+  useEffect(() => {
+    setDiscountPercentInput(String(parsedDiscountPercent));
+  }, [parsedDiscountPercent]);
+
+  function parseDiscountPlnInput(rawValue: string): number | null {
+    const normalized = rawValue.trim().replace(',', '.');
+    if (normalized === '') return null;
+    const parsed = Number(normalized);
+    if (!Number.isFinite(parsed)) return null;
+    return Math.max(0, Math.round(parsed));
+  }
+
+  function parseDiscountPercentInput(rawValue: string): number | null {
+    const normalized = rawValue.trim().replace(',', '.');
+    if (normalized === '') return null;
+    const parsed = Number(normalized);
+    if (!Number.isFinite(parsed)) return null;
+    const rounded = Math.round(parsed);
+    return Math.min(100, Math.max(0, rounded));
+  }
+
+  function handleDiscountPlnInput(value: string) {
+    setDiscountInput(value);
+    const parsed = parseDiscountPlnInput(value);
+    if (parsed !== null) {
+      onDiscountPlnChange(parsed);
+    }
+  }
+
+  function handleDiscountPercentInput(value: string) {
+    setDiscountPercentInput(value);
+    const parsed = parseDiscountPercentInput(value);
+    if (parsed !== null) {
+      onDiscountPercentChange(parsed);
+    }
+  }
+
+  function commitDiscountPlnInput() {
+    const parsed = parseDiscountPlnInput(discountInput);
+    if (parsed === null) {
+      onDiscountPlnChange(0);
+      setDiscountInput('0');
+      return;
+    }
+    onDiscountPlnChange(parsed);
+    setDiscountInput(String(parsed));
+  }
+
+  function commitDiscountPercentInput() {
+    const parsed = parseDiscountPercentInput(discountPercentInput);
+    if (parsed === null) {
+      onDiscountPercentChange(0);
+      setDiscountPercentInput('0');
+      return;
+    }
+    onDiscountPercentChange(parsed);
+    setDiscountPercentInput(String(parsed));
+  }
+
   const selectedHandle = useMemo(
     () => ALL_HANDLE_OPTIONS.get(doorHandle.optionId),
     [doorHandle.optionId]
   );
   const pricingSummary = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle),
-    [elementsData, hardwareSummary, boardFinish, doorHandle]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent]
   );
 
   const kolorBoards = useMemo(
@@ -590,7 +670,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
             const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
             const totalCost = pricingSummary.totalCost || roundUpToCents(rawTotalCost);
-            const clientPrice = pricingSummary.clientPrice || (roundUpToHundreds(totalCost) * 2);
+            const materialsDeposit = pricingSummary.materialsDeposit || roundUpToHundreds(totalCost);
+            const clientPrice = pricingSummary.clientPriceAfterDiscount;
             const colGroup = (
               <colgroup>
                 <col style={{ width: '45%' }} />
@@ -752,8 +833,53 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                         <td colSpan={3}>Suma całkowita (koszt własny)</td>
                         <td>{totalCost.toFixed(2)} zł</td>
                       </tr>
+                      <tr style={{ fontWeight: 'bold' }}>
+                        <td colSpan={3}>Zaliczka</td>
+                        <td>{materialsDeposit} zł</td>
+                      </tr>
+                      <tr style={{ fontWeight: 'bold' }}>
+                        <td colSpan={3}>Rabat %</td>
+                        <td>
+                          <input
+                            id="discount-percent-input"
+                            type="number"
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="report-discount-input"
+                            value={discountPercentInput}
+                            onChange={(e) => handleDiscountPercentInput(e.target.value)}
+                            onBlur={commitDiscountPercentInput}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                commitDiscountPercentInput();
+                              }
+                            }}
+                          />
+                        </td>
+                      </tr>
+                      <tr style={{ fontWeight: 'bold' }}>
+                        <td colSpan={3}>Rabat</td>
+                        <td>
+                          <input
+                            id="discount-pln-input"
+                            type="number"
+                            min={0}
+                            step={1}
+                            className="report-discount-input"
+                            value={discountInput}
+                            onChange={(e) => handleDiscountPlnInput(e.target.value)}
+                            onBlur={commitDiscountPlnInput}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                commitDiscountPlnInput();
+                              }
+                            }}
+                          />
+                        </td>
+                      </tr>
                       <tr style={{ fontWeight: 'bold', color: 'var(--color-kolor, #c0392b)' }}>
-                        <td colSpan={3}>Cena dla klienta (×2)</td>
+                        <td colSpan={3}>Cena dla klienta</td>
                         <td>{clientPrice} zł</td>
                       </tr>
                     </tbody>

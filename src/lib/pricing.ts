@@ -28,8 +28,38 @@ interface BoardEntry {
 export interface PricingSummary {
   totalCost: number;
   roundedBaseForClient: number;
+  materialsDeposit: number;
   clientPrice: number;
+  discountPercent: number;
+  discountPercentAmount: number;
+  discountFixedAmount: number;
+  discountAmount: number;
+  clientPriceAfterDiscount: number;
   handleUnitPrice: number;
+}
+
+export interface DiscountResult {
+  discountAmount: number;
+  discountedAmount: number;
+}
+
+function clampDiscountPln(discountPln: number): number {
+  if (!Number.isFinite(discountPln)) return 0;
+  return Math.max(0, discountPln);
+}
+
+function clampDiscountPercent(discountPercent: number): number {
+  if (!Number.isFinite(discountPercent)) return 0;
+  return Math.min(100, Math.max(0, discountPercent));
+}
+
+export function applyFixedDiscountToPln(amountPln: number, discountPln: number): DiscountResult {
+  const safeDiscountPln = clampDiscountPln(discountPln);
+  const appliedDiscount = Math.min(amountPln, safeDiscountPln);
+  return {
+    discountAmount: appliedDiscount,
+    discountedAmount: amountPln - appliedDiscount,
+  };
 }
 
 function calcBoardPieces(boards: BoardEntry[]): number {
@@ -180,12 +210,22 @@ export function calculatePricingSummary(
   hardwareSummary: HardwareSummary | null,
   boardFinish: BoardFinish,
   doorHandle: DoorHandleSelection,
+  discountPln = 0,
+  discountPercent = 0,
 ): PricingSummary {
   if (!elementsData || !hardwareSummary) {
+    const safePercent = clampDiscountPercent(discountPercent);
+    const discount = applyFixedDiscountToPln(0, discountPln);
     return {
       totalCost: 0,
       roundedBaseForClient: 0,
+      materialsDeposit: 0,
       clientPrice: 0,
+      discountPercent: safePercent,
+      discountPercentAmount: 0,
+      discountFixedAmount: discount.discountAmount,
+      discountAmount: discount.discountAmount,
+      clientPriceAfterDiscount: discount.discountedAmount,
       handleUnitPrice: ALL_HANDLE_OPTIONS.get(doorHandle.optionId)?.pricePln ?? DEFAULT_HANDLE_PRICE_PLN,
     };
   }
@@ -216,11 +256,27 @@ export function calculatePricingSummary(
   const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
   const totalCost = roundUpToCents(rawTotalCost);
   const roundedBaseForClient = roundUpToHundreds(totalCost);
+  const materialsDeposit = roundedBaseForClient;
+  const clientPrice = roundedBaseForClient * 2;
+  const safePercent = clampDiscountPercent(discountPercent);
+  const serviceAmount = Math.max(0, clientPrice - materialsDeposit);
+  const discountPercentAmount = Math.min(serviceAmount, Math.round((serviceAmount * safePercent) / 100));
+  const afterPercentDiscount = clientPrice - discountPercentAmount;
+  const fixedDiscount = applyFixedDiscountToPln(afterPercentDiscount, discountPln);
+  const discountFixedAmount = fixedDiscount.discountAmount;
+  const clientPriceAfterDiscount = fixedDiscount.discountedAmount;
+  const discountAmount = discountPercentAmount + discountFixedAmount;
 
   return {
     totalCost,
     roundedBaseForClient,
-    clientPrice: roundedBaseForClient * 2,
+    materialsDeposit,
+    clientPrice,
+    discountPercent: safePercent,
+    discountPercentAmount,
+    discountFixedAmount,
+    discountAmount,
+    clientPriceAfterDiscount,
     handleUnitPrice,
   };
 }

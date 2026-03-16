@@ -5,7 +5,7 @@ export interface Step3BoxWidthsProps {
   boxes: BoxForm[];
   splitEqually: boolean;
   onSplitEquallyChange: (checked: boolean) => void;
-  onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean) => void;
+  onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean | number[]) => void;
   onGoToStep: (step: number) => void;
   validationMessage: string | null;
   validationValid: boolean;

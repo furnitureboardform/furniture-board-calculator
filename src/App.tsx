@@ -29,6 +29,7 @@ export default function App() {
     numberOfBoxes: form.numberOfBoxes,
     boxes: form.boxes,
     nicheWidthMm: form.nicheWidthMm,
+    hasNiches: form.hasSideNiches || form.hasTopBottomNiches,
     hasSideNiches: form.hasSideNiches,
     leftBlendMm: form.leftBlendMm,
     rightBlendMm: form.rightBlendMm,
@@ -132,6 +133,10 @@ export default function App() {
               hardwareSummary={reportHardwareSummary}
               boardFinish={form.boardFinish}
               doorHandle={form.doorHandle}
+              discountPln={form.discountPln}
+              onDiscountPlnChange={form.setDiscountPln}
+              discountPercent={form.discountPercent}
+              onDiscountPercentChange={form.setDiscountPercent}
               onBackToConfig={handleBackToConfig}
               onOpenContract={handleOpenContract}
             />
@@ -141,6 +146,8 @@ export default function App() {
               hardwareSummary={reportHardwareSummary}
               boardFinish={form.boardFinish}
               doorHandle={form.doorHandle}
+              discountPln={form.discountPln}
+              discountPercent={form.discountPercent}
               boxes={form.boxes}
               numberOfBoxes={form.numberOfBoxes}
               nicheWidthMm={form.nicheWidthMm}

@@ -5,6 +5,7 @@ interface UseBoxValidationArgs {
   numberOfBoxes: number;
   boxes: { width: number }[];
   nicheWidthMm: number;
+  hasNiches: boolean;
   hasSideNiches: boolean;
   leftBlendMm: number;
   rightBlendMm: number;
@@ -18,6 +19,7 @@ export function useBoxValidation({
   numberOfBoxes,
   boxes,
   nicheWidthMm,
+  hasNiches,
   hasSideNiches,
   leftBlendMm,
   rightBlendMm,
@@ -32,6 +34,7 @@ export function useBoxValidation({
         numberOfBoxes,
         boxes,
         nicheWidthMm,
+        hasNiches,
         hasSideNiches,
         leftBlendMm,
         rightBlendMm,
@@ -44,6 +47,7 @@ export function useBoxValidation({
       numberOfBoxes,
       boxes,
       nicheWidthMm,
+      hasNiches,
       hasSideNiches,
       leftBlendMm,
       rightBlendMm,

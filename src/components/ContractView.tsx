@@ -14,6 +14,8 @@ export interface ContractViewProps {
   readonly hardwareSummary: HardwareSummary | null;
   readonly boardFinish: BoardFinish;
   readonly doorHandle: DoorHandleSelection;
+  readonly discountPln: number;
+  readonly discountPercent: number;
   readonly boxes: BoxForm[];
   readonly numberOfBoxes: number;
   readonly nicheWidthMm: number;
@@ -40,6 +42,8 @@ export function ContractView({
   hardwareSummary,
   boardFinish,
   doorHandle,
+  discountPln,
+  discountPercent,
   boxes,
   numberOfBoxes,
   nicheWidthMm,
@@ -59,8 +63,8 @@ export function ContractView({
   const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
   const selectedHandle = ALL_HANDLE_OPTIONS.get(doorHandle.optionId);
   const pricing = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle),
-    [elementsData, hardwareSummary, boardFinish, doorHandle]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent]
   );
   const contractSections = buildContractTemplate({
     finishTypeLabel: getFinishTypeLabel(boardFinish.type),
@@ -69,7 +73,8 @@ export function ContractView({
     nicheWidthMm,
     nicheHeightMm,
     cabinetDepthMm,
-    totalAmountPln: pricing.clientPrice,
+    totalAmountPln: pricing.clientPriceAfterDiscount,
+    depositAmountPln: pricing.materialsDeposit,
   });
 
   async function handleGeneratePdf() {
@@ -130,7 +135,9 @@ export function ContractView({
             </div>
             <div className="contract-price-card">
               <span>Kwota całkowita</span>
-              <strong>{pricing.clientPrice} zł</strong>
+              <strong>{pricing.clientPriceAfterDiscount} zł</strong>
+              <span>Zaliczka</span>
+              <strong>{pricing.materialsDeposit} zł</strong>
             </div>
           </div>
 

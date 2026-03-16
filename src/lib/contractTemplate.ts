@@ -12,6 +12,7 @@ export interface ContractTemplateData {
   nicheHeightMm: number;
   cabinetDepthMm: number;
   totalAmountPln: number;
+  depositAmountPln: number;
 }
 
 export function buildContractTemplate(data: ContractTemplateData): ContractSection[] {
@@ -33,7 +34,7 @@ export function buildContractTemplate(data: ContractTemplateData): ContractSecti
     },
     {
       heading: '§ 3. Wynagrodzenie',
-      body: `Łączna kwota wynagrodzenia Wykonawcy za realizację przedmiotu umowy wynosi ${data.totalAmountPln} zł brutto. Kwota obejmuje wykonanie i przygotowanie zabudowy do montażu zgodnie z zaakceptowanym projektem oraz specyfikacją techniczną. Szczegółowy harmonogram płatności zostanie uzgodniony przez Strony przed podpisaniem umowy.`,
+      body: `Łączna kwota wynagrodzenia Wykonawcy za realizację przedmiotu umowy wynosi ${data.totalAmountPln} zł brutto. Zaliczka wynosi ${data.depositAmountPln} zł brutto. Kwota obejmuje wykonanie i przygotowanie zabudowy do montażu zgodnie z zaakceptowanym projektem oraz specyfikacją techniczną. Szczegółowy harmonogram płatności zostanie uzgodniony przez Strony przed podpisaniem umowy.`,
     },
     {
       heading: '§ 4. Oświadczenie Zamawiającego',

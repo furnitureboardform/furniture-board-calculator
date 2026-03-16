@@ -36,7 +36,13 @@ export function runReport(parameters: Parameters): ReportResult {
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     const emptyNiches = { hasNiches: false, left: { widthMm: 0, heightMm: 0 }, right: { widthMm: 0, heightMm: 0 }, top: { widthMm: 0, heightMm: 0 }, bottom: { widthMm: 0, heightMm: 0 } };
-    return { parametersText: '', mainText: `Błąd podczas generowania raportu:\n${message}`, summaryText: '', elementsData: { boxes: [], niches: emptyNiches, maskings: null } };
+    return {
+      parametersData: { groups: [] },
+      mainText: `Błąd podczas generowania raportu:\n${message}`,
+      summaryText: '',
+      elementsData: { boxes: [], niches: emptyNiches, maskings: null },
+      hardwareSummary: { totalGuides: 0, totalBrackets: 0, totalHandles: 0, totalLegs: 0 },
+    };
   }
 }
 

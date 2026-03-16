@@ -884,6 +884,21 @@ main {
   margin-bottom: 6px;
 }
 
+.report-discount-input {
+  width: 90px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-align: right;
+  transition: border-color 0.2s;
+}
+
+.report-discount-input:focus {
+  outline: none;
+  border-color: #4f8ef7;
+}
+
 .contract-price-card strong {
   font-size: 1.4rem;
   color: #1a1a2e;

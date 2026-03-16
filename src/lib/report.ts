@@ -91,9 +91,9 @@ export function buildReport(
   parameters: Parameters,
   hardware: Hardware,
   woodenBoards: WoodenBoard[],
-  hdfBottom: HDFBoard,
+  _hdfBottom: HDFBoard,
   _boardsSummary: BoardsSummary,
-  nicheBoards: NicheBoard[],
+  _nicheBoards: NicheBoard[],
   doorRequirements: DoorRequirements,
   shelvesRequirements: ShelvesRequirements
 ): ReportResult {
@@ -189,8 +189,6 @@ export function buildReport(
     parameters.boxWidths && parameters.boxWidths.length > 0
       ? parameters.boxWidths.slice(0, parameters.numberOfBoxes)
       : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm) as number[];
-
-  const _hdfQty = hdfBottom.qtyPerDrawer * parameters.numberOfDrawers;
 
   lines.push('📦 PŁYTY MEBLOWE OBICIE KOLOR');
   lines.push('═'.repeat(80));
@@ -303,9 +301,6 @@ export function buildReport(
           if (drawerCount === 0) return undefined;
           const isDouble = parameters.boxDoubleDoors?.[i] ?? false;
           const boxW = boxWidthsForPanels[i] ?? parameters.boxWidthMm;
-          const halfBoxW = Math.floor(boxW / 2);
-          const unitW = isDouble ? halfBoxW : boxW;
-          const internalW = unitW - 2 * specs.sideMatThicknessMm;
           const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm;
           const sets = 1; // szuflady są zawsze 1 zestaw na box, niezależnie od drzwi
           // Front szuflady: boxW - (80mm podwójne / 40mm pojedyncze) - luz 8mm

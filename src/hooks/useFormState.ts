@@ -40,6 +40,25 @@ export function useFormState() {
   const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
   const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'laminat', optionId: 'U156' });
   const [doorHandle, setDoorHandle] = useState<DoorHandleSelection>({ optionId: 'UZ_NYXA_320' });
+  const [discountPln, setDiscountPlnState] = useState<number>(0);
+  const [discountPercent, setDiscountPercentState] = useState<number>(0);
+
+  const setDiscountPln = useCallback((value: number) => {
+    if (!Number.isFinite(value)) {
+      setDiscountPlnState(0);
+      return;
+    }
+    setDiscountPlnState(Math.max(0, value));
+  }, []);
+
+  const setDiscountPercent = useCallback((value: number) => {
+    if (!Number.isFinite(value)) {
+      setDiscountPercentState(0);
+      return;
+    }
+    const clamped = Math.min(100, Math.max(0, value));
+    setDiscountPercentState(clamped);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(splitEqually));
@@ -256,5 +275,9 @@ export function useFormState() {
     setBoardFinish,
     doorHandle,
     setDoorHandle,
+    discountPln,
+    setDiscountPln,
+    discountPercent,
+    setDiscountPercent,
   };
 }
