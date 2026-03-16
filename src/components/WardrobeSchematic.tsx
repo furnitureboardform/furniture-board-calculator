@@ -18,25 +18,25 @@ export interface WardrobeSchematicProps {
   onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean | number[]) => void;
 }
 
-type ItemType = 'shelves' | 'rods' | 'drawers' | 'slupki';
+type ItemType = 'shelves' | 'rods' | 'drawers' | 'partition';
 
 interface PositionedItem {
   id: string;
   type: ItemType;
   /** mm from top of main area — for shelves/rods/drawers */
   yMm: number;
-  /** mm from left edge of box interior — only for slupki */
+  /** mm from left edge of box interior — only for partitions */
   xMm?: number;
   /**
    * For shelves/rods/drawers: fixed horizontal span expressed in mm
    * from left edge of box interior. Once set, it does NOT change even
-   * if new słupki are added later.
+   * if new partitions are added later.
    */
   startMm?: number;
   endMm?: number;
-  /** computed top of slupek span — only for slupki */
+  /** computed top of partition span — only for partitions */
   spanTopMm?: number;
-  /** computed bottom of slupek span — only for slupki */
+  /** computed bottom of partition span — only for partitions */
   spanBotMm?: number;
 }
 
@@ -62,7 +62,7 @@ const PALETTE: PaletteConfig[] = [
   { type: 'shelves', label: 'Półka',    icon: '━', fill: 'rgba(59,130,246,0.10)',  stroke: '#3b7dd8', heightMm: 22,  boardMm: 18  },
   { type: 'rods',    label: 'Drążek',   icon: '◎', fill: 'rgba(217,119,6,0.10)',   stroke: '#c97c10', heightMm: 50,  boardMm: 0   },
   { type: 'drawers', label: 'Szuflada', icon: '▭', fill: 'rgba(22,163,74,0.10)',   stroke: '#16a34a', heightMm: 160, boardMm: 160 },
-  { type: 'slupki',  label: 'Słupek',   icon: '┃', fill: 'rgba(147,51,234,0.10)',  stroke: '#9333ea', heightMm: 0,   boardMm: 0   },
+  { type: 'partition', label: 'Przegroda', icon: '┃', fill: 'rgba(147,51,234,0.10)',  stroke: '#9333ea', heightMm: 0,   boardMm: 0   },
 ];
 
 const PANEL_MM = 18;
@@ -110,7 +110,7 @@ function getSnappedY(
 ): number {
   const newH = PALETTE.find((p) => p.type === newItemType)?.heightMm ?? 22;
   for (const item of (placed[boxIdx] || [])) {
-    if (item.type === 'slupki') continue;
+    if (item.type === 'partition') continue;
     // jeżeli mamy segment, ignorujemy elementy które z nim się nie przecinają
     if (segmentStartMm !== undefined && segmentEndMm !== undefined) {
       const s = item.startMm ?? 0;
@@ -132,10 +132,10 @@ function getSnappedY(
   return rawYMm;
 }
 
-/** Compute the vertical span of a słupek based on horizontal item boundaries around the cursor Y.
+/** Compute the vertical span of a partition based on horizontal item boundaries around the cursor Y.
  *  Uses actual board thickness (PANEL_MM) for shelves and drawers for accurate height calculation.
  */
-function getSlupekSpan(
+function getPartitionSpan(
   cursorYMm: number,
   boxIdx: number,
   placed: Record<number, PositionedItem[]>,
@@ -159,8 +159,8 @@ function getSlupekSpan(
   };
 }
 
-/** Given anchor X, Y and słupki in the box, return horizontal segment [start,end] in mm.
- *  Only słupki whose vertical span overlaps the item's Y position are considered.
+/** Given anchor X, Y and partitions in the box, return horizontal segment [start,end] in mm.
+ *  Only partitions whose vertical span overlaps the item's Y position are considered.
  */
 function getHorizontalSegmentForItem(
   boxIdx: number,
@@ -171,9 +171,9 @@ function getHorizontalSegmentForItem(
   itemHeightMm?: number
 ): { startMm: number; endMm: number } {
   const clampedAnchor = Math.max(0, Math.min(boxWidthMm, anchorXMm));
-  const słupki = (placed[boxIdx] || [])
+  const partitionEdgesMm = (placed[boxIdx] || [])
     .filter((it) => {
-      if (it.type !== 'slupki' || typeof it.xMm !== 'number') return false;
+      if (it.type !== 'partition' || typeof it.xMm !== 'number') return false;
       if (yMm === undefined) return true;
       const sTop = it.spanTopMm ?? 0;
       const sBot = it.spanBotMm ?? Infinity;
@@ -187,7 +187,7 @@ function getHorizontalSegmentForItem(
     })
     .sort((a, b) => a - b);
 
-  const bounds: number[] = [0, ...słupki, boxWidthMm];
+  const bounds: number[] = [0, ...partitionEdgesMm, boxWidthMm];
   let start = 0;
   let end = boxWidthMm;
   for (let i = 1; i < bounds.length; i++) {
@@ -203,7 +203,7 @@ function getHorizontalSegmentForItem(
 type DragHoverPos = {
   boxIdx: number;
   yMm: number;
-  /** for slupki: X position within box interior */
+  /** for partitions: X position within box interior */
   xMm?: number;
   spanTopMm?: number;
   spanBotMm?: number;
@@ -232,18 +232,19 @@ export default function WardrobeSchematic({
     setPlacedItems((prev) => {
       const existing = prev[boxIdx] || [];
       const updated = [...existing, newItem];
-      if (item.type === 'slupki') {
+      if (item.type === 'partition') {
         const heights = updated
-          .filter((it) => it.type === 'slupki')
+          .filter((it) => it.type === 'partition')
           .map((it) => Math.round((it.spanBotMm ?? 0) - (it.spanTopMm ?? 0)));
-        setTimeout(() => onBoxChange(boxIdx, 'slupki', heights), 0);
+        setTimeout(() => onBoxChange(boxIdx, 'partitions', heights), 0);
       } else if (item.type === 'shelves') {
         const shelveItems = updated.filter((it) => it.type === 'shelves');
         const widths = shelveItems.map((it) => Math.round((it.endMm ?? 0) - (it.startMm ?? 0)));
         setTimeout(() => { onBoxChange(boxIdx, 'shelves', shelveItems.length); onBoxChange(boxIdx, 'shelvesMm', widths); }, 0);
       } else {
         const count = updated.filter((it) => it.type === item.type).length;
-        setTimeout(() => onBoxChange(boxIdx, item.type, count), 0);
+        const field = item.type as Extract<keyof BoxForm, 'rods' | 'drawers'>;
+        setTimeout(() => onBoxChange(boxIdx, field, count), 0);
       }
       return { ...prev, [boxIdx]: updated };
     });
@@ -254,18 +255,19 @@ export default function WardrobeSchematic({
     setPlacedItems((prev) => {
       const existing = prev[boxIdx] || [];
       const updated = existing.filter((it) => it.id !== itemId);
-      if (type === 'slupki') {
+      if (type === 'partition') {
         const heights = updated
-          .filter((it) => it.type === 'slupki')
+          .filter((it) => it.type === 'partition')
           .map((it) => Math.round((it.spanBotMm ?? 0) - (it.spanTopMm ?? 0)));
-        setTimeout(() => onBoxChange(boxIdx, 'slupki', heights), 0);
+        setTimeout(() => onBoxChange(boxIdx, 'partitions', heights), 0);
       } else if (type === 'shelves') {
         const shelveItems = updated.filter((it) => it.type === 'shelves');
         const widths = shelveItems.map((it) => Math.round((it.endMm ?? 0) - (it.startMm ?? 0)));
         setTimeout(() => { onBoxChange(boxIdx, 'shelves', shelveItems.length); onBoxChange(boxIdx, 'shelvesMm', widths); }, 0);
       } else {
         const count = updated.filter((it) => it.type === type).length;
-        setTimeout(() => onBoxChange(boxIdx, type, count), 0);
+        const field = type as Extract<keyof BoxForm, 'rods' | 'drawers'>;
+        setTimeout(() => onBoxChange(boxIdx, field, count), 0);
       }
       return { ...prev, [boxIdx]: updated };
     });
@@ -479,8 +481,8 @@ export default function WardrobeSchematic({
 
                   {/* ── Items ── */}
                   {boxItems.map((item) => {
-                    // ── Słupek ──────────────────────────────────────────
-                    if (item.type === 'slupki') {
+                    // ── Przegroda ───────────────────────────────────────
+                    if (item.type === 'partition') {
                       const pc = PALETTE.find((p) => p.type === item.type)!;
                       const itemX   = sx + sw(item.xMm ?? 0);
                       const sTopY   = py(mainY + (item.spanTopMm ?? 0));
@@ -498,7 +500,7 @@ export default function WardrobeSchematic({
                             setTooltip({
                               x: e.clientX + 10,
                               y: e.clientY + 10,
-                              text: `Słupek\nSzerokość: ${widthMm} mm\nWysokość: ${spanMm} mm\nOd lewej: ${Math.round(item.xMm ?? 0)} mm`,
+                              text: `Przegroda\nSzerokość: ${widthMm} mm\nWysokość: ${spanMm} mm\nOd lewej: ${Math.round(item.xMm ?? 0)} mm`,
                             });
                           }}
                           onMouseLeave={() => setTooltip(null)}
@@ -523,7 +525,7 @@ export default function WardrobeSchematic({
                     const itemYpx = py(mainY + item.yMm);
                     const itemHpx = Math.max(4, sh(pc.heightMm));
 
-                    // compute horizontal segment for non-słupek items:
+                    // compute horizontal segment for non-partition items:
                     // if item has its own fixed span, use it; otherwise span whole box
                     const spanStartMm = item.startMm !== undefined ? item.startMm : 0;
                     const spanEndMm   = item.endMm   !== undefined ? item.endMm   : seg.wMm;
@@ -652,7 +654,7 @@ export default function WardrobeSchematic({
                   })}
 
                   {/* ── Drop preview ─ */}
-                  {hover && hoverCfg && draggingType !== 'slupki' && (
+                  {hover && hoverCfg && draggingType !== 'partition' && (
                     <g clipPath={`url(#clip-box-${bIdx})`}>
                       {(() => {
                         const anchor =
@@ -704,8 +706,8 @@ export default function WardrobeSchematic({
                     </g>
                   )}
 
-                  {/* ── Słupek drop preview ── */}
-                  {hover && hoverCfg && draggingType === 'slupki' && hover.xMm !== undefined && (
+                  {/* ── Przegroda drop preview ── */}
+                  {hover && hoverCfg && draggingType === 'partition' && hover.xMm !== undefined && (
                     <g clipPath={`url(#clip-box-${bIdx})`}>
                       {/* Span highlight */}
                       <rect
@@ -792,9 +794,9 @@ export default function WardrobeSchematic({
 
               const rawX = calcDropX(e, seg.wMm);
 
-              if (draggingType === 'slupki') {
+              if (draggingType === 'partition') {
                 const rawY = calcDropY(e, mainH, 0);
-                const { spanTopMm, spanBotMm } = getSlupekSpan(rawY, seg.boxIdx, placedItems, mainH);
+                const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, seg.boxIdx, placedItems, mainH);
                 setDragHoverPos({ boxIdx: seg.boxIdx, yMm: rawY, xMm: rawX, spanTopMm, spanBotMm });
               } else if (draggingType) {
                 const dragItemH = PALETTE.find((p) => p.type === draggingType)?.boardMm ?? 0;
@@ -816,10 +818,10 @@ export default function WardrobeSchematic({
               }
               const rawX = calcDropX(e, seg.wMm);
 
-              if (type === 'slupki') {
+              if (type === 'partition') {
                 const rawY = calcDropY(e, mainH, 0);
-                const { spanTopMm, spanBotMm } = getSlupekSpan(rawY, seg.boxIdx, placedItems, mainH);
-                addItem(seg.boxIdx, { type: 'slupki', yMm: rawY, xMm: rawX, spanTopMm, spanBotMm });
+                const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, seg.boxIdx, placedItems, mainH);
+                addItem(seg.boxIdx, { type: 'partition', yMm: rawY, xMm: rawX, spanTopMm, spanBotMm });
               } else {
                 const dropItemH = PALETTE.find((p) => p.type === type)?.boardMm ?? 0;
                 const rawY = calcDropY(e, mainH, dropItemH);

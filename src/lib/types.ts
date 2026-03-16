@@ -42,7 +42,7 @@ export interface Parameters {
   outerMaskingRight: boolean;
   outerMaskingLeftFullCover: boolean;
   outerMaskingRightFullCover: boolean;
-  boxSlupki: number[][];
+  boxPartitions: number[][];
   boxShelvesMm: number[][];
 }
 
@@ -177,7 +177,7 @@ export interface BoxForm {
   shelvesMm: number[];
   rods: number;
   drawers: number;
-  slupki: number[];
+  partitions: number[];
 }
 
 /** Nazwy pól wnęki do onNicheChange. */

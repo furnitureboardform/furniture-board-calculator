@@ -17,7 +17,7 @@ export interface BoxElement {
   rods?: number;
   hdf?: { widthMm: number; heightMm: number };
   panels?: { sideHeightMm: number; topBottomWidthMm: number; depthMm: number };
-  slupki?: { heightMm: number; depthMm: number }[];
+  partitions?: { heightMm: number; depthMm: number }[];
   drawerBoards?: {
     count: number;
     sidePanel: { heightMm: number; depthMm: number };
@@ -272,7 +272,7 @@ export function buildReport(
           const depthMm = shelf.depthMm;
           const perShelfMm = parameters.boxShelvesMm?.[i] ?? [];
           if (perShelfMm.length > 0) {
-            // grup według szerokości (ze schematu — uwzględnia słupki)
+            // grup według szerokości (ze schematu — uwzględnia przegrody)
             const map = new Map<number, number>();
             for (const w of perShelfMm) map.set(w, (map.get(w) ?? 0) + 1);
             return { depthMm, groups: [...map.entries()].map(([widthMm, qty]) => ({ widthMm, qty })) };
@@ -290,11 +290,11 @@ export function buildReport(
           topBottomWidthMm: boxWidthsForPanels[i] ?? parameters.boxWidthMm,
           depthMm: panelDepthMm,
         },
-        slupki: (() => {
-          const heights = parameters.boxSlupki?.[i] ?? [];
+        partitions: (() => {
+          const heights = parameters.boxPartitions?.[i] ?? [];
           if (heights.length === 0) return undefined;
-          const slupDepth = parameters.cabinetDepthMm - 23; // głębokość = głębokość półki
-          return heights.map((h) => ({ heightMm: h, depthMm: slupDepth }));
+          const partitionDepthMm = parameters.cabinetDepthMm - 23; // głębokość = głębokość półki
+          return heights.map((h) => ({ heightMm: h, depthMm: partitionDepthMm }));
         })(),
         drawerBoards: (() => {
           const drawerCount = parameters.boxDrawers?.[i] ?? 0;

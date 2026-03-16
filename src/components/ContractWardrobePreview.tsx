@@ -103,7 +103,7 @@ export function ContractWardrobePreview({
           const shelvesCount = Math.max(0, box.shelves || 0);
           const drawersCount = Math.max(0, box.drawers || 0);
           const rodsCount = Math.max(0, box.rods || 0);
-          const slupki = box.slupki ?? [];
+          const partitions = box.partitions ?? [];
 
           const drawerGap = 4;
           const drawerHeight = drawersCount > 0
@@ -120,18 +120,18 @@ export function ContractWardrobePreview({
             <g key={index}>
               <rect x={boxX} y={boxY} width={boxW} height={boxH} fill="#ffffff" stroke={finishColor} strokeWidth={1.2} />
 
-              {/* Słupki pionowe (wewnętrzne podziały) */}
-              {slupki.map((slupekHeight, sIndex) => {
-                const slupekW = Math.max(2, boxW * 0.018);
-                const xPos = boxX + ((sIndex + 1) / (slupki.length + 1)) * boxW - slupekW / 2;
-                const hPx = Math.max(0, Math.min(boxH, slupekHeight * scale));
+              {/* Przegrody pionowe (wewnętrzne podziały) */}
+              {partitions.map((partitionHeight, partitionIndex) => {
+                const partitionW = Math.max(2, boxW * 0.018);
+                const xPos = boxX + ((partitionIndex + 1) / (partitions.length + 1)) * boxW - partitionW / 2;
+                const hPx = Math.max(0, Math.min(boxH, partitionHeight * scale));
                 const yPos = boxY + boxH - hPx;
                 return (
                   <rect
-                    key={`slupek-${sIndex}`}
+                    key={`partition-${partitionIndex}`}
                     x={xPos}
                     y={yPos}
-                    width={slupekW}
+                    width={partitionW}
                     height={hPx}
                     fill="#a48dd6"
                     opacity={0.85}

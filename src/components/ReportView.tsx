@@ -167,8 +167,8 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, edgeBandingMm: d.drawerRail.widthMm, qty: 2 });
     }
 
-    if (box.slupki && box.slupki.length > 0) {
-      for (const s of box.slupki) {
+    if (box.partitions && box.partitions.length > 0) {
+      for (const s of box.partitions) {
         boards.push({
           dim1: s.heightMm,
           dim2: s.depthMm,
@@ -414,12 +414,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                         <span className="element-card__label">Drążki ({box.rods} szt.)</span>
                       </div>
                     )}
-                    {box.slupki && box.slupki.length > 0 && (
+                    {box.partitions && box.partitions.length > 0 && (
                       <>
                         <div className="element-card__divider" />
-                        {box.slupki.map((s, si) => (
+                        {box.partitions.map((s, si) => (
                           <div key={si} className="element-card__row">
-                            <span className="element-card__label">Słupek {si + 1} (1 szt.)</span>
+                            <span className="element-card__label">Przegroda {si + 1} (1 szt.)</span>
                             <span className="element-card__value">{s.heightMm} × {s.depthMm} mm</span>
                             <span className="element-card__meta">
                               Obrzeże na wysokości {s.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
@@ -475,7 +475,9 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                       <>
                         <div className="element-card__divider" />
                         <div className="element-card__row">
-                          <span className="element-card__label">Szuflady ({box.drawerBoards.count} szt. × {box.drawerBoards.sets} {box.drawerBoards.sets > 1 ? 'zestawy' : 'zestaw'})</span>
+                          <span className="element-card__label">
+                            Szuflady ({box.drawerBoards.count} szt.{box.drawerBoards.sets > 1 ? (<> × {box.drawerBoards.sets} {box.drawerBoards.sets > 1 ? 'zestawy' : 'zestaw'}</>) : null})
+                          </span>
                         </div>
                         <div className="element-card__row">
                           <span className="element-card__label">Bok szuflady ({box.drawerBoards.count * 2 * box.drawerBoards.sets} szt.)</span>

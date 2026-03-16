@@ -190,12 +190,12 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: drawerBoards.drawerRail.heightMm, dim2: drawerBoards.drawerRail.widthMm, edgeBandingMm: drawerBoards.drawerRail.widthMm, qty: 2 });
     }
 
-    if (box.slupki && box.slupki.length > 0) {
-      for (const slupek of box.slupki) {
+    if (box.partitions && box.partitions.length > 0) {
+      for (const partition of box.partitions) {
         boards.push({
-          dim1: slupek.heightMm,
-          dim2: slupek.depthMm,
-          edgeBandingMm: slupek.heightMm,
+          dim1: partition.heightMm,
+          dim2: partition.depthMm,
+          edgeBandingMm: partition.heightMm,
           qty: 1,
         });
       }
