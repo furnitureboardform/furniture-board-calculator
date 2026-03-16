@@ -62,17 +62,15 @@ export function ContractView({
     () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle),
     [elementsData, hardwareSummary, boardFinish, doorHandle]
   );
-  const contractText = buildContractTemplate({
+  const contractSections = buildContractTemplate({
     finishTypeLabel: getFinishTypeLabel(boardFinish.type),
     finishLabel: selectedFinish?.label ?? boardFinish.optionId,
     handleLabel: selectedHandle?.label ?? doorHandle.optionId,
-    numberOfBoxes,
     nicheWidthMm,
     nicheHeightMm,
     cabinetDepthMm,
     totalAmountPln: pricing.clientPrice,
   });
-  const paragraphs = contractText.split('\n\n');
 
   async function handleGeneratePdf() {
     if (!contractRef.current || isGeneratingPdf) return;
@@ -137,35 +135,14 @@ export function ContractView({
           </div>
 
           <div className="contract-copy">
-            {paragraphs.map((paragraph, index) => (
-              <p key={index} className={index === 0 ? 'contract-copy__title' : ''}>{paragraph}</p>
+            {contractSections.map((section, index) => (
+              <div key={index} className={section.heading ? 'contract-section' : undefined}>
+                {section.heading && (
+                  <h4 className="contract-section__heading">{section.heading}</h4>
+                )}
+                <p className={section.isTitle ? 'contract-copy__title' : undefined}>{section.body}</p>
+              </div>
             ))}
-
-            <div className="contract-fields">
-              <div className="contract-field">
-                <span>Imię i nazwisko zamawiającego</span>
-                <div className="contract-line" />
-              </div>
-              <div className="contract-field">
-                <span>Telefon / e-mail</span>
-                <div className="contract-line" />
-              </div>
-              <div className="contract-field">
-                <span>Adres realizacji</span>
-                <div className="contract-line" />
-              </div>
-            </div>
-          </div>
-
-          <div className="contract-signatures">
-            <div className="signature-box">
-              <div className="contract-line" />
-              <span>Podpis zamawiającego</span>
-            </div>
-            <div className="signature-box">
-              <div className="contract-line" />
-              <span>Podpis wykonawcy</span>
-            </div>
           </div>
         </section>
 
@@ -199,6 +176,32 @@ export function ContractView({
               outerMaskingRight={outerMaskingRight}
               finishColor={selectedFinish?.swatchColor ?? '#d6c0a8'}
             />
+          </div>
+
+          <div className="contract-fields">
+            <div className="contract-field">
+              <span>Imię i nazwisko zamawiającego</span>
+              <div className="contract-line" />
+            </div>
+            <div className="contract-field">
+              <span>Telefon / e-mail</span>
+              <div className="contract-line" />
+            </div>
+            <div className="contract-field">
+              <span>Adres realizacji</span>
+              <div className="contract-line" />
+            </div>
+          </div>
+
+          <div className="contract-signatures">
+            <div className="signature-box">
+              <div className="contract-line" />
+              <span>Podpis zamawiającego</span>
+            </div>
+            <div className="signature-box">
+              <div className="contract-line" />
+              <span>Podpis wykonawcy</span>
+            </div>
           </div>
         </section>
       </div>

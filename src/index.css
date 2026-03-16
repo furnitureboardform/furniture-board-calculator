@@ -899,6 +899,7 @@ main {
   font-size: 0.95rem;
   line-height: 1.65;
   color: #2d3648;
+  text-align: justify;
 }
 
 .contract-copy__title {
@@ -906,6 +907,22 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: #1a1a2e;
+  text-align: center !important;
+}
+
+.contract-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contract-section__heading {
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1a1a2e;
+  margin: 0;
 }
 
 .contract-data-grid {
