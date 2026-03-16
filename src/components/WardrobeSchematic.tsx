@@ -764,7 +764,7 @@ export default function WardrobeSchematic({
           )}
 
           {/* Legend */}
-          <g transform={`translate(${ox}, ${SVG_H - 14})`}>
+          <g transform={`translate(${ox}, ${SVG_H - 4})`}>
             {maskLeftW > 0 && (<g><rect x={0} y={-6} width={10} height={10} fill="url(#hatch-mask)" stroke={COLORS.mask} strokeWidth={0.5} /><text x={13} y={1} fill={COLORS.mask} fontSize={8}>Maskownica</text></g>)}
             {(leftNicheW > 0 || rightNicheW > 0) && (<g transform="translate(90,0)"><rect x={0} y={-6} width={10} height={10} fill="url(#hatch-niche)" stroke={COLORS.niche} strokeWidth={0.5} /><text x={13} y={1} fill={COLORS.niche} fontSize={8}>Wnęka boczna</text></g>)}
             {(topBlendH > 0 || bottomBlendH > 0) && (<g transform="translate(200,0)"><rect x={0} y={-6} width={10} height={10} fill="url(#hatch-blend)" stroke={COLORS.blend} strokeWidth={0.5} /><text x={13} y={1} fill={COLORS.blend} fontSize={8}>Blenda/Wnęka</text></g>)}
