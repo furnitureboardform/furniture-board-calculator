@@ -31,10 +31,13 @@ export function calculateDimensions(parameters: Parameters): DrawerDimensions {
   const internalWidth = parameters.boxWidthMm - 2 * specs.sideMatThicknessMm;
   const internalDepth = parameters.cabinetDepthMm - specs.guidesMarginMm;
   const sideDepth = internalDepth;
-  const frontWidth = internalWidth;
-  const internalWallsWidth = internalWidth - specs.internalWallMarginMm;
-  const bottomDepth = internalDepth - specs.bottomDepthMarginMm;
-  const bottomWidth = internalWidth - specs.bottomWidthMarginMm;
+  // Front = wnętrze boxa - 1 separator 40mm - luz 8mm (ogólny przypadek, pojedyncze drzwi)
+  const frontWidth = parameters.boxWidthMm - specs.separatorWidthMm - specs.drawerFrontClearanceMm;
+  // Przód/Tył: boxWidth - 40mm (1 separator) - 90mm (5× grubość płyty)
+  const internalWallsWidth = parameters.boxWidthMm - specs.separatorWidthMm - specs.drawerInternalWallDeductionMm;
+  // HDF: głębokość = bok szuflady - 8mm; szerokość = przód/tył + 20mm
+  const bottomDepth = internalDepth - 4;
+  const bottomWidth = (parameters.boxWidthMm - specs.separatorWidthMm - specs.drawerInternalWallDeductionMm) + 18;
   return {
     internalWidth,
     internalDepth,

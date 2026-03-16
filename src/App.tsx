@@ -164,6 +164,7 @@ export default function App() {
         />
         <Step3BoxWidths
           active={form.step === 3}
+          numberOfBoxes={form.numberOfBoxes}
           boxes={form.boxes}
           splitEqually={form.splitEqually}
           onSplitEquallyChange={form.setSplitEqually}
@@ -172,6 +173,17 @@ export default function App() {
           validationMessage={validation.validationMessage}
           validationValid={validation.validationValid}
           shelvesPreview={shelvesPreview}
+          nicheWidthMm={form.nicheWidthMm}
+          nicheHeightMm={form.nicheHeightMm}
+          outerMaskingLeft={form.outerMaskingLeft}
+          outerMaskingRight={form.outerMaskingRight}
+          hasSideNiches={form.hasSideNiches}
+          leftBlendMm={form.leftBlendMm}
+          rightBlendMm={form.rightBlendMm}
+          leftNicheHeightMm={form.leftNicheHeightMm}
+          rightNicheHeightMm={form.rightNicheHeightMm}
+          topBlendMm={form.topBlendMm}
+          bottomBlendMm={form.bottomBlendMm}
         />
         <Step4BoardColor
           active={form.step === 4}

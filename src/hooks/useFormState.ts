@@ -205,7 +205,7 @@ export function useFormState() {
   );
 
   const onBoxChange = useCallback(
-    (index: number, field: keyof BoxForm, value: number | string | boolean) => {
+    (index: number, field: keyof BoxForm, value: number | string | boolean | number[]) => {
       setBoxes((prev) => {
         const next = [...prev];
         const current = next[index];

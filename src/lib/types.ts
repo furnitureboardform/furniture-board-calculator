@@ -38,6 +38,8 @@ export interface Parameters {
   outerMaskingRight: boolean;
   outerMaskingLeftFullCover: boolean;
   outerMaskingRightFullCover: boolean;
+  boxSlupki: number[][];
+  boxShelvesMm: number[][];
 }
 
 /** Wymiary szafy po odjęciu blendów. */
@@ -168,8 +170,10 @@ export interface BoxForm {
   width: number;
   doubleDoor: boolean;
   shelves: number;
+  shelvesMm: number[];
   rods: number;
   drawers: number;
+  slupki: number[];
 }
 
 /** Nazwy pól wnęki do onNicheChange. */

@@ -57,5 +57,7 @@ export function buildParameters(state: FormStateForParameters): Parameters {
     outerMaskingRight: state.outerMaskingRight,
     outerMaskingLeftFullCover: state.outerMaskingLeftFullCover,
     outerMaskingRightFullCover: state.outerMaskingRightFullCover,
+    boxSlupki: boxes.map((b) => b.slupki ?? []),
+    boxShelvesMm: boxes.map((b) => b.shelvesMm ?? []),
   };
 }

@@ -8,6 +8,21 @@
 /** Grubość płyty bocznej szuflady (odjęcie z szerokości wnętrza po obu stronach). */
 export const sideMatThicknessMm = 42;
 
+/** Szerokość jednej płyty separatora szuflady (prowadnica montowana po obu stronach). */
+export const separatorWidthMm = 40;
+
+/** Luz między frontem szuflady a obudową (odjęcie od szerokości frontu). */
+export const drawerFrontClearanceMm = 8;
+
+/** Grubość płyty używana w obliczeniach szuflady (18mm). */
+export const boardThicknessMm = 18;
+
+/**
+ * Łączne odjęcie ze szerokości boxa dla przodu i tyłu szuflady:
+ * 2× grubość płyty + 2× grubość płyty + grubość płyty = 5 × 18mm = 90mm.
+ */
+export const drawerInternalWallDeductionMm = 5 * boardThicknessMm; // 90mm
+
 /** Wysokość boku szuflady (lewy + prawy). */
 export const drawerSideHeightMm = 145;
 

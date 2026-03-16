@@ -11,6 +11,7 @@ const COST_PER_BRACKET_SET_PLN = 8;
 const COST_PER_HANDLE_PLN = 10;
 const COST_PER_LEG_PLN = 6;
 const COST_PER_LEG_CLIP_PLN = 1;
+const COST_PER_ROD_PLN = 15;
 
 const BOARD_PIECE_WIDTH_MM = 2800;
 const BOARD_PIECE_HEIGHT_MM = 1045;
@@ -109,14 +110,16 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
   for (const box of elementsData.boxes) {
-    if (box.shelves && box.shelves.quantity > 0) {
-      boards.push({
-        dim1: box.shelves.widthMm,
-        dim2: box.shelves.depthMm,
-        edgeBanding: `Obrzeże na szerokości ${box.shelves.widthMm} mm (1 bok)`,
-        edgeBandingMm: box.shelves.widthMm,
-        qty: box.shelves.quantity,
-      });
+    if (box.shelves) {
+      for (const g of box.shelves.groups) {
+        boards.push({
+          dim1: g.widthMm,
+          dim2: box.shelves.depthMm,
+          edgeBanding: `Obrzeże na szerokości ${g.widthMm} mm (1 bok)`,
+          edgeBandingMm: g.widthMm,
+          qty: g.qty,
+        });
+      }
     }
 
     if (box.panels) {
@@ -146,6 +149,18 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, edgeBandingMm: d.internalWall2.widthMm, qty: d.count * s });
       boards.push({ dim1: d.separator.heightMm, dim2: d.separator.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: d.separator.qty });
       boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, edgeBandingMm: d.drawerRail.widthMm, qty: 2 });
+    }
+
+    if (box.slupki && box.slupki.length > 0) {
+      for (const s of box.slupki) {
+        boards.push({
+          dim1: s.heightMm,
+          dim2: s.depthMm,
+          edgeBanding: `Obrzeże na wysokości ${s.heightMm} mm (1 bok)`,
+          edgeBandingMm: s.heightMm,
+          qty: 1,
+        });
+      }
     }
   }
 
@@ -197,7 +212,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
         .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 })),
       ...elementsData.boxes
         .filter((b) => b.drawerBoards)
-        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: b.drawerBoards!.count * b.drawerBoards!.sets })),
+        .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: b.drawerBoards!.count })),
     ]) : [],
     [elementsData]
   );
@@ -283,21 +298,35 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                         </span>
                       </div>
                     )}
-                    {box.shelves && (
-                      <div className="element-card__row">
-                        <span className="element-card__label">Półki ({box.shelves.quantity} szt.)</span>
+                    {box.shelves && box.shelves.groups.map((g, gi) => (
+                      <div key={gi} className="element-card__row">
+                        <span className="element-card__label">Półki ({g.qty} szt.)</span>
                         <span className="element-card__value">
-                          {box.shelves.widthMm} × {box.shelves.depthMm} mm
+                          {g.widthMm} × {box.shelves!.depthMm} mm
                         </span>
                         <span className="element-card__meta">
-                          Obrzeże na szerokości {box.shelves.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                          Obrzeże na szerokości {g.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
                         </span>
                       </div>
-                    )}
+                    ))}
                     {box.rods && box.rods > 0 && (
                       <div className="element-card__row">
                         <span className="element-card__label">Drążki ({box.rods} szt.)</span>
                       </div>
+                    )}
+                    {box.slupki && box.slupki.length > 0 && (
+                      <>
+                        <div className="element-card__divider" />
+                        {box.slupki.map((s, si) => (
+                          <div key={si} className="element-card__row">
+                            <span className="element-card__label">Słupek {si + 1} (1 szt.)</span>
+                            <span className="element-card__value">{s.heightMm} × {s.depthMm} mm</span>
+                            <span className="element-card__meta">
+                              Obrzeże na wysokości {s.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                            </span>
+                          </div>
+                        ))}
+                      </>
                     )}
                     {box.hdf && (
                       <div className="element-card__row">
@@ -367,7 +396,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Ściana wew. 1 ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
+                          <span className="element-card__label">Przód szuflady ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.internalWall1.heightMm} × {box.drawerBoards.internalWall1.widthMm} mm
                           </span>
@@ -376,7 +405,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Ściana wew. 2 ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
+                          <span className="element-card__label">Tył szuflady ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.internalWall2.heightMm} × {box.drawerBoards.internalWall2.widthMm} mm
                           </span>
@@ -385,7 +414,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           </span>
                         </div>
                         <div className="element-card__row">
-                          <span className="element-card__label">Dno szuflady HDF ({box.drawerBoards.count * box.drawerBoards.sets} szt.)</span>
+                          <span className="element-card__label">Dno szuflady HDF ({box.drawerBoards.count} szt.)</span>
                           <span className="element-card__value">
                             {box.drawerBoards.hdfBottom.depthMm} × {box.drawerBoards.hdfBottom.widthMm} mm
                           </span>
@@ -527,6 +556,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const handlesCost = hardwareSummary.totalHandles * COST_PER_HANDLE_PLN;
             const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
             const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
+            const rodsCost = totalRods * COST_PER_ROD_PLN;
             const szaryPieces = calcBoardPieces(szaryBoards);
             const kolorPieces = calcBoardPieces(kolorBoards);
             const szaryBoardCost = szaryPieces * COST_PER_SZARY_PIECE_PLN;
@@ -537,7 +567,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
             const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
             const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
-            const totalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
+            const totalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
             const colGroup = (
               <colgroup>
                 <col style={{ width: '45%' }} />
@@ -687,6 +717,14 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                         <td>{COST_PER_LEG_CLIP_PLN} zł</td>
                         <td>{clipsCost} zł</td>
                       </tr>
+                      {totalRods > 0 && (
+                        <tr>
+                          <td>Drążki</td>
+                          <td>{totalRods} szt.</td>
+                          <td>{COST_PER_ROD_PLN} zł</td>
+                          <td>{rodsCost} zł</td>
+                        </tr>
+                      )}
                       <tr style={{ fontWeight: 'bold', borderTop: '2px solid currentColor' }}>
                         <td colSpan={3}>Suma całkowita (koszt własny)</td>
                         <td>{totalCost} zł</td>

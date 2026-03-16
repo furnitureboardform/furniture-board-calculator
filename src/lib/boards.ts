@@ -25,7 +25,7 @@ export function getWoodenBoards(parameters: Parameters): WoodenBoard[] {
     },
     {
       nr: 3,
-      name: 'Ściana wewnętrzna 1',
+      name: 'Przód szuflady',
       dimensions: `${specs.internalWallHeight1Mm} × ${dims.internalWallsWidth}`,
       dimensionsTuple: [specs.internalWallHeight1Mm, dims.internalWallsWidth],
       qtyPerDrawer: 1,
@@ -34,7 +34,7 @@ export function getWoodenBoards(parameters: Parameters): WoodenBoard[] {
     },
     {
       nr: 4,
-      name: 'Ściana wewnętrzna 2',
+      name: 'Tył szuflady',
       dimensions: `${specs.internalWallHeight2Mm} × ${dims.internalWallsWidth}`,
       dimensionsTuple: [specs.internalWallHeight2Mm, dims.internalWallsWidth],
       qtyPerDrawer: 1,

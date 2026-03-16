@@ -433,6 +433,123 @@ main {
   margin: 4px 0;
 }
 
+/* ── Wardrobe schematic ── */
+
+.schematic-toggle-btn {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.wardrobe-schematic {
+  margin-top: 16px;
+  background: #fff;
+  border: 1px solid #dde1ea;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.wardrobe-schematic__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #f4f6fb;
+  border-bottom: 1px solid #e4e8f0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2c3550;
+}
+
+/* ── Palette toolbar ── */
+
+.schematic-palette {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: #f8f9fc;
+  border-bottom: 1px solid #e4e8f0;
+}
+
+.schematic-palette__hint {
+  font-size: 0.78rem;
+  color: #888;
+  margin-right: 4px;
+}
+
+.schematic-palette__tip {
+  font-size: 0.72rem;
+  color: #aaa;
+  margin-left: auto;
+  font-style: italic;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--item-stroke, #ccc);
+  background: var(--item-fill, rgba(0,0,0,0.03));
+  color: var(--item-stroke-dark, var(--item-stroke, #444));
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: grab;
+  user-select: none;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.palette-item:hover {
+  opacity: 0.85;
+  box-shadow: 0 2px 8px var(--item-stroke, rgba(0,0,0,0.1));
+}
+
+.palette-item:active,
+.palette-item--dragging {
+  cursor: grabbing;
+  opacity: 0.6;
+  transform: scale(0.95);
+}
+
+.palette-item__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.palette-item__count {
+  font-size: 0.72rem;
+  padding: 1px 5px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.06);
+}
+
+/* ── SVG wrapper + drop zones ── */
+
+.schematic-svg-wrapper {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+.schematic-drop-zone {
+  border-radius: 2px;
+  transition: background 0.12s;
+}
+
+.schematic-drop-zone--over {
+  background: rgba(59, 125, 216, 0.08) !important;
+  outline: 2px dashed rgba(59, 125, 216, 0.5);
+  outline-offset: -2px;
+}
+
+.btn--small {
+  padding: 3px 10px;
+  font-size: 0.78rem;
+}
+
 /* ── Summary tab ── */
 
 .summary-tab {

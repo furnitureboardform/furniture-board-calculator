@@ -1,4 +1,5 @@
 import type { BoxForm } from '../lib/types';
+import WardrobeSchematic from './WardrobeSchematic';
 
 export interface Step3BoxWidthsProps {
   boxes: BoxForm[];
@@ -10,6 +11,19 @@ export interface Step3BoxWidthsProps {
   validationValid: boolean;
   shelvesPreview: string | null;
   active: boolean;
+  numberOfBoxes: number;
+  nicheWidthMm: number;
+  nicheHeightMm: number;
+  outerMaskingLeft: boolean;
+  outerMaskingRight: boolean;
+  hasSideNiches: boolean;
+  leftBlendMm: number;
+  rightBlendMm: number;
+  leftNicheHeightMm: number;
+  rightNicheHeightMm: number;
+  topBlendMm: number;
+  bottomBlendMm: number;
+  // onBoxChange is already in the interface above — WardrobeSchematic receives it directly
 }
 
 export default function Step3BoxWidths({
@@ -22,6 +36,18 @@ export default function Step3BoxWidths({
   validationValid,
   shelvesPreview,
   active,
+  numberOfBoxes,
+  nicheWidthMm,
+  nicheHeightMm,
+  outerMaskingLeft,
+  outerMaskingRight,
+  hasSideNiches,
+  leftBlendMm,
+  rightBlendMm,
+  leftNicheHeightMm,
+  rightNicheHeightMm,
+  topBlendMm,
+  bottomBlendMm,
 }: Step3BoxWidthsProps) {
   return (
     <div className={`step ${active ? 'active' : ''}`}>
@@ -99,6 +125,22 @@ export default function Step3BoxWidths({
           <div className="preview-box" dangerouslySetInnerHTML={{ __html: shelvesPreview }} />
         )}
       </div>
+      <WardrobeSchematic
+        nicheWidthMm={nicheWidthMm}
+        nicheHeightMm={nicheHeightMm}
+        outerMaskingLeft={outerMaskingLeft}
+        outerMaskingRight={outerMaskingRight}
+        hasSideNiches={hasSideNiches}
+        leftBlendMm={leftBlendMm}
+        rightBlendMm={rightBlendMm}
+        leftNicheHeightMm={leftNicheHeightMm}
+        rightNicheHeightMm={rightNicheHeightMm}
+        topBlendMm={topBlendMm}
+        bottomBlendMm={bottomBlendMm}
+        boxes={boxes}
+        numberOfBoxes={numberOfBoxes}
+        onBoxChange={onBoxChange}
+      />
       <button type="button" className="btn btn-outline" onClick={() => onGoToStep(2)}>
         ← Wróć
       </button>

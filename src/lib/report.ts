@@ -13,10 +13,11 @@ import type {
 export interface BoxElement {
   boxNumber: number;
   door?: { doubleDoor: boolean; heightMm: number; widthMm: number; hinges: number };
-  shelves?: { quantity: number; widthMm: number; depthMm: number };
+  shelves?: { depthMm: number; groups: { widthMm: number; qty: number }[] };
   rods?: number;
   hdf?: { widthMm: number; heightMm: number };
   panels?: { sideHeightMm: number; topBottomWidthMm: number; depthMm: number };
+  slupki?: { heightMm: number; depthMm: number }[];
   drawerBoards?: {
     count: number;
     sidePanel: { heightMm: number; depthMm: number };
@@ -268,10 +269,19 @@ export function buildReport(
               })(),
             }
           : undefined,
-        shelves:
-          shelf && shelf.quantity > 0
-            ? { quantity: shelf.quantity, widthMm: shelf.widthMm, depthMm: shelf.depthMm }
-            : undefined,
+        shelves: (() => {
+          if (!shelf || shelf.quantity === 0) return undefined;
+          const depthMm = shelf.depthMm;
+          const perShelfMm = parameters.boxShelvesMm?.[i] ?? [];
+          if (perShelfMm.length > 0) {
+            // grup według szerokości (ze schematu — uwzględnia słupki)
+            const map = new Map<number, number>();
+            for (const w of perShelfMm) map.set(w, (map.get(w) ?? 0) + 1);
+            return { depthMm, groups: [...map.entries()].map(([widthMm, qty]) => ({ widthMm, qty })) };
+          }
+          // fallback: wszystkie półki na pełną szerokość boxa
+          return { depthMm, groups: [{ widthMm: shelf.widthMm, qty: shelf.quantity }] };
+        })(),
         rods: (parameters.boxRods?.[i] ?? 0) > 0 ? (parameters.boxRods![i]) : undefined,
         hdf: {
           widthMm: (boxWidthsForPanels[i] ?? parameters.boxWidthMm) + 32,
@@ -282,6 +292,12 @@ export function buildReport(
           topBottomWidthMm: boxWidthsForPanels[i] ?? parameters.boxWidthMm,
           depthMm: panelDepthMm,
         },
+        slupki: (() => {
+          const heights = parameters.boxSlupki?.[i] ?? [];
+          if (heights.length === 0) return undefined;
+          const slupDepth = parameters.cabinetDepthMm - 23; // głębokość = głębokość półki
+          return heights.map((h) => ({ heightMm: h, depthMm: slupDepth }));
+        })(),
         drawerBoards: (() => {
           const drawerCount = parameters.boxDrawers?.[i] ?? 0;
           if (drawerCount === 0) return undefined;
@@ -291,14 +307,20 @@ export function buildReport(
           const unitW = isDouble ? halfBoxW : boxW;
           const internalW = unitW - 2 * specs.sideMatThicknessMm;
           const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm;
-          const sets = isDouble ? 2 : 1;
+          const sets = 1; // szuflady są zawsze 1 zestaw na box, niezależnie od drzwi
+          // Front szuflady: boxW - (80mm podwójne / 40mm pojedyncze) - luz 8mm
+          const separatorDeductionMm = isDouble ? 2 * specs.separatorWidthMm : specs.separatorWidthMm;
+          const frontW = boxW - separatorDeductionMm - specs.drawerFrontClearanceMm;
+          // Przód/Tył szuflady: boxW - (80/40) - 2×18 - 2×18 - 18 = boxW - separatorDeduction - 90mm
+          const internalWallW = boxW - separatorDeductionMm - specs.drawerInternalWallDeductionMm;
           return {
             count: drawerCount,
             sidePanel: { heightMm: specs.drawerSideHeightMm, depthMm: internalD },
-            frontPanel: { heightMm: specs.drawerFrontHeightMm, widthMm: internalW },
-            internalWall1: { heightMm: specs.internalWallHeight1Mm, widthMm: internalW - specs.internalWallMarginMm },
-            internalWall2: { heightMm: specs.internalWallHeight2Mm, widthMm: internalW - specs.internalWallMarginMm },
-            hdfBottom: { depthMm: internalD - specs.bottomDepthMarginMm, widthMm: internalW - specs.bottomWidthMarginMm },
+            frontPanel: { heightMm: specs.drawerFrontHeightMm, widthMm: frontW },
+            internalWall1: { heightMm: specs.internalWallHeight1Mm, widthMm: internalWallW },
+            internalWall2: { heightMm: specs.internalWallHeight2Mm, widthMm: internalWallW },
+            // HDF: głębokość = bok szuflady - 4mm; szerokość = przód/tył + 18mm
+            hdfBottom: { depthMm: internalD - 4, widthMm: internalWallW + 18 },
             sets,
             separator: {
               heightMm: drawerCount * 200,
@@ -306,8 +328,9 @@ export function buildReport(
               qty: sets,
             },
             drawerRail: {
-              heightMm: drawerCount * 20,
-              widthMm: parameters.cabinetDepthMm - 2 - 3 - 400,
+              // wysokość = liczba szuflad × 200mm; głębokość = głębokość półki - 35mm
+              heightMm: drawerCount * 200,
+              widthMm: parameters.cabinetDepthMm - 23 - 35,
             },
           };
         })(),
