@@ -4,14 +4,19 @@ import Step1Niche from './components/Step1Niche';
 import Step2Boxes from './components/Step2Boxes';
 import Step3BoxWidths from './components/Step3BoxWidths';
 import { Step4BoardColor } from './components/Step4BoardColor';
+import { ContractView } from './components/ContractView';
 import { ALL_FINISH_OPTIONS } from './lib/finishOptions';
+import { ALL_HANDLE_OPTIONS } from './lib/handleOptions';
 import ReportView from './components/ReportView';
 import { runReport } from './lib';
 import { useFormState, useBoxValidation, usePreviews } from './hooks';
 import { buildParameters } from './utils/buildParameters';
 
+type FinalView = 'report' | 'contract';
+
 export default function App() {
   const [showReport, setShowReport] = useState(false);
+  const [finalView, setFinalView] = useState<FinalView>('report');
   const [reportParametersData, setReportParametersData] = useState<import('./lib/report').ParametersData | null>(null);
   const [reportText, setReportText] = useState('');
   const [reportSummaryText, setReportSummaryText] = useState('');
@@ -71,6 +76,7 @@ export default function App() {
     });
     const { parametersData, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
     const selectedFinish = ALL_FINISH_OPTIONS.get(form.boardFinish.optionId);
+    const selectedHandle = ALL_HANDLE_OPTIONS.get(form.doorHandle.optionId);
     const enrichedParametersData = {
       ...parametersData,
       groups: [
@@ -81,6 +87,8 @@ export default function App() {
             { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat kolor' : form.boardFinish.type === 'akryl' ? 'Okleina akryl kolor' : 'Okleina laminat drewniana' },
             { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
             { label: 'Cena arkusza', value: selectedFinish ? `${selectedFinish.pricePerSheetPln.toFixed(2)} zł` : '—' },
+            { label: 'Uchwyt', value: selectedHandle?.label ?? form.doorHandle.optionId },
+            { label: 'Cena uchwytu', value: selectedHandle ? `${selectedHandle.pricePln.toFixed(2)} zł/szt.` : '—' },
           ],
         },
       ],
@@ -90,12 +98,24 @@ export default function App() {
     setReportSummaryText(summaryText);
     setReportElementsData(elementsData);
     setReportHardwareSummary(hardwareSummary);
+    setFinalView('report');
     setShowReport(true);
     window.scrollTo(0, 0);
   }
 
   function handleBackToConfig() {
+    setFinalView('report');
     setShowReport(false);
+  }
+
+  function handleOpenContract() {
+    setFinalView('contract');
+    window.scrollTo(0, 0);
+  }
+
+  function handleBackToReport() {
+    setFinalView('report');
+    window.scrollTo(0, 0);
   }
 
   if (showReport) {
@@ -103,15 +123,39 @@ export default function App() {
       <>
         <Header />
         <main>
-          <ReportView
-            parametersData={reportParametersData}
-            reportText={reportText}
-            summaryText={reportSummaryText}
-            elementsData={reportElementsData}
-            hardwareSummary={reportHardwareSummary}
-            boardFinish={form.boardFinish}
-            onBackToConfig={handleBackToConfig}
-          />
+          {finalView === 'report' ? (
+            <ReportView
+              parametersData={reportParametersData}
+              reportText={reportText}
+              summaryText={reportSummaryText}
+              elementsData={reportElementsData}
+              hardwareSummary={reportHardwareSummary}
+              boardFinish={form.boardFinish}
+              doorHandle={form.doorHandle}
+              onBackToConfig={handleBackToConfig}
+              onOpenContract={handleOpenContract}
+            />
+          ) : (
+            <ContractView
+              elementsData={reportElementsData}
+              hardwareSummary={reportHardwareSummary}
+              boardFinish={form.boardFinish}
+              doorHandle={form.doorHandle}
+              boxes={form.boxes}
+              numberOfBoxes={form.numberOfBoxes}
+              nicheWidthMm={form.nicheWidthMm}
+              nicheHeightMm={form.nicheHeightMm}
+              cabinetDepthMm={form.cabinetDepthMm}
+              hasSideNiches={form.hasSideNiches}
+              leftBlendMm={form.leftBlendMm}
+              rightBlendMm={form.rightBlendMm}
+              topBlendMm={form.topBlendMm}
+              bottomBlendMm={form.bottomBlendMm}
+              outerMaskingLeft={form.outerMaskingLeft}
+              outerMaskingRight={form.outerMaskingRight}
+              onBackToReport={handleBackToReport}
+            />
+          )}
         </main>
       </>
     );
@@ -189,6 +233,8 @@ export default function App() {
           active={form.step === 4}
           finish={form.boardFinish}
           onFinishChange={form.setBoardFinish}
+          handleSelection={form.doorHandle}
+          onHandleChange={form.setDoorHandle}
           onGoToStep={form.setStep}
           onSubmit={handleSubmit}
         />

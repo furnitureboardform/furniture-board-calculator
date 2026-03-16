@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import type { BoxForm } from '../lib/types';
 
 export interface WardrobeSchematicProps {
@@ -218,7 +218,6 @@ export default function WardrobeSchematic({
   boxes, numberOfBoxes,
   onBoxChange,
 }: WardrobeSchematicProps) {
-  const [open, setOpen]                 = useState(false);
   const [draggingType, setDraggingType] = useState<ItemType | null>(null);
   const [dragOverBox, setDragOverBox]   = useState<number | null>(null);
   const [dragHoverPos, setDragHoverPos] = useState<DragHoverPos | null>(null);
@@ -226,46 +225,6 @@ export default function WardrobeSchematic({
   const [tooltip, setTooltip]           = useState<TooltipState | null>(null);
 
   const mainH = nicheHeightMm - topBlendMm - bottomBlendMm;
-
-  const latestRef = useRef({ boxes, numberOfBoxes, mainH });
-  useEffect(() => { latestRef.current = { boxes, numberOfBoxes, mainH }; }, [boxes, numberOfBoxes, mainH]);
-
-  useEffect(() => {
-    if (!open) return;
-    const { boxes: b, numberOfBoxes: n, mainH: mh } = latestRef.current;
-    const init: Record<number, PositionedItem[]> = {};
-    b.slice(0, n).forEach((box, i) => {
-      const items: PositionedItem[] = [];
-      const sc = box.shelves || 0, rc = box.rods || 0, dc = box.drawers || 0;
-      for (let k = 0; k < sc; k++)
-        items.push({
-          id: uid(),
-          type: 'shelves',
-          yMm: Math.round(mh / (sc + 1) * (k + 1)),
-          startMm: 0,
-          endMm: box.width,
-        });
-      for (let k = 0; k < rc; k++)
-        items.push({
-          id: uid(),
-          type: 'rods',
-          yMm: Math.max(0, Math.round(mh * 0.2) + k * 300),
-          startMm: 0,
-          endMm: box.width,
-        });
-      for (let k = 0; k < dc; k++)
-        items.push({
-          id: uid(),
-          type: 'drawers',
-          yMm: Math.max(0, mh - 160 * (dc - k)),
-          startMm: 0,
-          endMm: box.width,
-        });
-      init[i] = items;
-    });
-    setPlacedItems(init);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   // ── Mutators ─────────────────────────────────────────────────────────────
   function addItem(boxIdx: number, item: Omit<PositionedItem, 'id'>) {
@@ -359,14 +318,6 @@ export default function WardrobeSchematic({
   const totalByType = (type: ItemType) =>
     Object.values(placedItems).flat().filter((it) => it.type === type).length;
 
-  if (!open) {
-    return (
-      <button type="button" className="btn btn-outline schematic-toggle-btn" onClick={() => setOpen(true)}>
-        📐 Podgląd graficzny szafy
-      </button>
-    );
-  }
-
   function clearAll() {
     setPlacedItems((prev) => {
       const cleared: Record<number, PositionedItem[]> = {};
@@ -384,10 +335,9 @@ export default function WardrobeSchematic({
   return (
     <div className="wardrobe-schematic">
       <div className="wardrobe-schematic__header">
-        <span>📐 Zamknij podgląd graficzny szafy</span>
+        <span>📐 Podgląd graficzny szafy</span>
         <div style={{ display: 'flex', gap: 8 }}>
           <button type="button" className="btn btn-outline btn--small" onClick={clearAll}>🗑 Wyczyść</button>
-          <button type="button" className="btn btn-outline btn--small" onClick={() => setOpen(false)}>✕</button>
         </div>
       </div>
 

@@ -86,33 +86,6 @@ export default function Step3BoxWidths({
                 />
                 <label htmlFor={`double-door-${i}`}>Podwójne drzwi</label>
               </div>
-              <div className="field">
-                <label>Liczba półek</label>
-                <input
-                  type="number"
-                  value={box.shelves}
-                  onChange={(e) => onBoxChange(i, 'shelves', parseInt(e.target.value, 10) || 0)}
-                  min={0}
-                />
-              </div>
-              <div className="field">
-                <label>Liczba drążków</label>
-                <input
-                  type="number"
-                  value={box.rods}
-                  onChange={(e) => onBoxChange(i, 'rods', parseInt(e.target.value, 10) || 0)}
-                  min={0}
-                />
-              </div>
-              <div className="field">
-                <label>Liczba szuflad</label>
-                <input
-                  type="number"
-                  value={box.drawers}
-                  onChange={(e) => onBoxChange(i, 'drawers', parseInt(e.target.value, 10) || 0)}
-                  min={0}
-                />
-              </div>
             </div>
           ))}
         </div>

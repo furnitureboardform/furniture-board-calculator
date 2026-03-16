@@ -1,14 +1,16 @@
 import { useState, useMemo } from 'react';
 import type { ElementsData, HardwareSummary, ParametersData } from '../lib/report';
-import type { BoardFinish } from '../lib/types';
+import type { BoardFinish, DoorHandleSelection } from '../lib/types';
 import { ALL_FINISH_OPTIONS } from '../lib/finishOptions';
+import { ALL_HANDLE_OPTIONS } from '../lib/handleOptions';
+import { calculatePricingSummary } from '../lib/pricing';
 
 type ReportTab = 'parameters' | 'elements' | 'summary' | 'costs';
 
 const COST_PER_HINGE_PLN = 13;
 const COST_PER_GUIDE_SET_PLN = 104;
 const COST_PER_BRACKET_SET_PLN = 8;
-const COST_PER_HANDLE_PLN = 10;
+const DEFAULT_HANDLE_PRICE_PLN = 25;
 const COST_PER_LEG_PLN = 6;
 const COST_PER_LEG_CLIP_PLN = 1;
 const COST_PER_ROD_PLN = 15;
@@ -36,6 +38,14 @@ function calcEdgeBandingLengthM(boards: { edgeBandingMm: number; qty: number }[]
   return Math.round(totalMm) / 1000;
 }
 
+function roundUpToCents(value: number): number {
+  return Math.ceil(value * 100) / 100;
+}
+
+function roundUpToHundreds(value: number): number {
+  return Math.ceil(value / 100) * 100;
+}
+
 export interface ReportViewProps {
   parametersData: ParametersData | null;
   reportText: string;
@@ -43,7 +53,9 @@ export interface ReportViewProps {
   elementsData: ElementsData | null;
   hardwareSummary: HardwareSummary | null;
   boardFinish: BoardFinish;
+  doorHandle: DoorHandleSelection;
   onBackToConfig: () => void;
+  onOpenContract: () => void;
 }
 
 interface BoardEntry {
@@ -194,8 +206,16 @@ function BoardsSection({ title, colorClass, boards }: { title: string; colorClas
   );
 }
 
-export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, onBackToConfig }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, onBackToConfig, onOpenContract }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
+  const selectedHandle = useMemo(
+    () => ALL_HANDLE_OPTIONS.get(doorHandle.optionId),
+    [doorHandle.optionId]
+  );
+  const pricingSummary = useMemo(
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle),
+    [elementsData, hardwareSummary, boardFinish, doorHandle]
+  );
 
   const kolorBoards = useMemo(
     () => elementsData ? groupBoards(getKolorBoards(elementsData)) : [],
@@ -532,7 +552,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                           <td>1 zestaw na szuflądę</td>
                         </tr>
                         <tr>
-                          <td>Uchwyty</td>
+                          <td>Uchwyty{selectedHandle ? ` — ${selectedHandle.label}` : ''}</td>
                           <td>{hardwareSummary.totalHandles} szt.</td>
                           <td>1 na drzwi</td>
                         </tr>
@@ -553,7 +573,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const hingesCost = totalHinges * COST_PER_HINGE_PLN;
             const guidesCost = hardwareSummary.totalGuides * COST_PER_GUIDE_SET_PLN;
             const bracketsCost = hardwareSummary.totalBrackets * COST_PER_BRACKET_SET_PLN;
-            const handlesCost = hardwareSummary.totalHandles * COST_PER_HANDLE_PLN;
+            const handleUnitPrice = selectedHandle?.pricePln ?? DEFAULT_HANDLE_PRICE_PLN;
+            const handlesCost = hardwareSummary.totalHandles * handleUnitPrice;
             const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
             const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
             const rodsCost = totalRods * COST_PER_ROD_PLN;
@@ -567,7 +588,9 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
             const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
             const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
-            const totalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
+            const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
+            const totalCost = pricingSummary.totalCost || roundUpToCents(rawTotalCost);
+            const clientPrice = pricingSummary.clientPrice || (roundUpToHundreds(totalCost) * 2);
             const colGroup = (
               <colgroup>
                 <col style={{ width: '45%' }} />
@@ -700,9 +723,9 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                         <td>{bracketsCost} zł</td>
                       </tr>
                       <tr>
-                        <td>Uchwyty</td>
+                        <td>Uchwyty{selectedHandle ? ` — ${selectedHandle.label}` : ''}</td>
                         <td>{hardwareSummary.totalHandles} szt.</td>
-                        <td>{COST_PER_HANDLE_PLN} zł</td>
+                        <td>{handleUnitPrice} zł</td>
                         <td>{handlesCost} zł</td>
                       </tr>
                       <tr>
@@ -727,11 +750,11 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                       )}
                       <tr style={{ fontWeight: 'bold', borderTop: '2px solid currentColor' }}>
                         <td colSpan={3}>Suma całkowita (koszt własny)</td>
-                        <td>{totalCost} zł</td>
+                        <td>{totalCost.toFixed(2)} zł</td>
                       </tr>
                       <tr style={{ fontWeight: 'bold', color: 'var(--color-kolor, #c0392b)' }}>
                         <td colSpan={3}>Cena dla klienta (×2)</td>
-                        <td>{totalCost * 2} zł</td>
+                        <td>{clientPrice} zł</td>
                       </tr>
                     </tbody>
                   </table>
@@ -741,9 +764,14 @@ export default function ReportView({ parametersData, reportText: _reportText, su
           })()}
         </div>
       </div>
-      <button type="button" className="btn btn-outline" onClick={onBackToConfig}>
-        ← Wróć do konfiguracji
-      </button>
+      <div className="report-actions">
+        <button type="button" className="btn btn-outline" onClick={onBackToConfig}>
+          ← Wróć do konfiguracji
+        </button>
+        <button type="button" className="btn" onClick={onOpenContract}>
+          Umowa
+        </button>
+      </div>
     </>
   );
 }

@@ -5,6 +5,10 @@ export interface BoardFinish {
   optionId: string;
 }
 
+export interface DoorHandleSelection {
+  optionId: string;
+}
+
 /**
  * Parametry wejściowe do obliczeń (raport, prowadnice, płyty, drzwi, półki).
  */

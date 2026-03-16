@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import type { BoxForm, NicheFieldName, BoardFinish } from '../lib/types';
+import type { BoxForm, NicheFieldName, BoardFinish, DoorHandleSelection } from '../lib/types';
 import {
   SIDE_PANEL_THICKNESS_MM,
   OUTER_MASKING_SIDE_MM,
@@ -10,9 +10,8 @@ import {
 } from '../constants';
 
 const INITIAL_BOXES: BoxForm[] = [
-  { ...defaultBox(), width: 952, shelves: 4, rods: 1 },
-  { ...defaultBox(), width: 952, shelves: 2, rods: 0 },
-  { ...defaultBox(), width: 952, shelves: 2, rods: 0 },
+  { ...defaultBox(), width: 952 },
+  { ...defaultBox(), width: 952 },
 ];
 
 export function useFormState() {
@@ -32,7 +31,7 @@ export function useFormState() {
   const [topNicheWidthMm, setTopNicheWidthMm] = useState(0);
   const [bottomNicheWidthMm, setBottomNicheWidthMm] = useState(0);
 
-  const [numberOfBoxes, setNumberOfBoxes] = useState(3);
+  const [numberOfBoxes, setNumberOfBoxes] = useState(2);
   const [boxes, setBoxes] = useState<BoxForm[]>(INITIAL_BOXES);
   const [splitEqually, setSplitEquallyState] = useState(getStoredSplitEqually);
   const [outerMaskingLeft, setOuterMaskingLeft] = useState(true);
@@ -40,6 +39,7 @@ export function useFormState() {
   const [outerMaskingLeftFullCover, setOuterMaskingLeftFullCover] = useState(false);
   const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
   const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'laminat', optionId: 'U156' });
+  const [doorHandle, setDoorHandle] = useState<DoorHandleSelection>({ optionId: 'UZ_NYXA_320' });
 
   useEffect(() => {
     localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(splitEqually));
@@ -254,5 +254,7 @@ export function useFormState() {
     onBoxChange,
     boardFinish,
     setBoardFinish,
+    doorHandle,
+    setDoorHandle,
   };
 }

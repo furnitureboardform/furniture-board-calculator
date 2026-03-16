@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import type { BoardFinish, FinishType } from '../lib/types';
+import type { BoardFinish, DoorHandleSelection, FinishType } from '../lib/types';
 import { COLOR_OPTIONS, VENEER_OPTIONS, ACRYLIC_OPTIONS } from '../lib/finishOptions';
-import type { FinishOption } from '../lib/finishOptions';
+import { HANDLE_OPTIONS } from '../lib/handleOptions';
 
 export interface Step4BoardColorProps {
   finish: BoardFinish;
   onFinishChange: (finish: BoardFinish) => void;
+  handleSelection: DoorHandleSelection;
+  onHandleChange: (handleSelection: DoorHandleSelection) => void;
   onGoToStep: (step: number) => void;
   onSubmit: () => void;
   active: boolean;
 }
 
-function Lightbox({ option, onClose }: { option: FinishOption; onClose: () => void }) {
+function Lightbox({ option, onClose }: { option: { label: string; imageUrl: string }; onClose: () => void }) {
   return (
     <div className="lightbox" onClick={onClose}>
       <div className="lightbox__content" onClick={(e) => e.stopPropagation()}>
@@ -25,7 +27,7 @@ function Lightbox({ option, onClose }: { option: FinishOption; onClose: () => vo
   );
 }
 
-function FinishCard({ option, selected, onSelect, onZoom }: { option: FinishOption; selected: boolean; onSelect: () => void; onZoom?: () => void }) {
+function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option: { label: string; imageUrl?: string; swatchColor?: string }; selected: boolean; onSelect: () => void; onZoom?: () => void; priceLabel: string }) {
   return (
     <button
       type="button"
@@ -52,14 +54,14 @@ function FinishCard({ option, selected, onSelect, onZoom }: { option: FinishOpti
       </div>
       <div className="finish-card__info">
         <span className="finish-card__label">{option.label}</span>
-        <span className="finish-card__price">{(option.pricePerSheetPln / 2).toFixed(2)} zł/arkusz</span>
+        <span className="finish-card__price">{priceLabel}</span>
       </div>
     </button>
   );
 }
 
-export function Step4BoardColor({ finish, onFinishChange, onGoToStep, onSubmit, active }: Step4BoardColorProps) {
-  const [zoomedOption, setZoomedOption] = useState<FinishOption | null>(null);
+export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHandleChange, onGoToStep, onSubmit, active }: Step4BoardColorProps) {
+  const [zoomedOption, setZoomedOption] = useState<{ label: string; imageUrl: string } | null>(null);
   const options = finish.type === 'laminat' ? COLOR_OPTIONS : finish.type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS;
 
   function handleTypeChange(type: FinishType) {
@@ -86,12 +88,28 @@ export function Step4BoardColor({ finish, onFinishChange, onGoToStep, onSubmit, 
         </div>
         <div className="finish-cards">
           {options.map((opt) => (
-            <FinishCard
+            <OptionCard
               key={opt.id}
               option={opt}
               selected={finish.optionId === opt.id}
               onSelect={() => onFinishChange({ ...finish, optionId: opt.id })}
-              onZoom={opt.imageUrl ? () => setZoomedOption(opt) : undefined}
+              onZoom={opt.imageUrl ? () => setZoomedOption({ label: opt.label, imageUrl: opt.imageUrl! }) : undefined}
+              priceLabel={`${(opt.pricePerSheetPln / 2).toFixed(2)} zł/arkusz`}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="card">
+        <h2>Uchwyt</h2>
+        <div className="finish-cards">
+          {HANDLE_OPTIONS.map((handle) => (
+            <OptionCard
+              key={handle.id}
+              option={handle}
+              selected={handleSelection.optionId === handle.id}
+              onSelect={() => onHandleChange({ optionId: handle.id })}
+              onZoom={() => setZoomedOption({ label: handle.label, imageUrl: handle.imageUrl })}
+              priceLabel={`${handle.pricePln} zł/szt.`}
             />
           ))}
         </div>
