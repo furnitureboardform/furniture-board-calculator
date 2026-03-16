@@ -76,9 +76,9 @@ export default function App() {
       groups: [
         ...parametersData.groups,
         {
-          title: 'Wykończenie drzwi',
+          title: 'Wykończenie',
           rows: [
-            { label: 'Typ', value: form.boardFinish.type === 'kolor' ? 'Kolor' : 'Okleina drewniana' },
+            { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat kolor' : form.boardFinish.type === 'akryl' ? 'Okleina akryl kolor' : 'Okleina laminat drewniana' },
             { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
             { label: 'Cena arkusza', value: selectedFinish ? `${selectedFinish.pricePerSheetPln.toFixed(2)} zł` : '—' },
           ],

@@ -538,11 +538,20 @@ export default function ReportView({ parametersData, reportText: _reportText, su
             const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
             const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
             const totalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost;
+            const colGroup = (
+              <colgroup>
+                <col style={{ width: '45%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '19%' }} />
+              </colgroup>
+            );
             return (
               <div className="summary-tab">
                 <div className="boards-summary-section">
                   <div className="boards-summary-section__header boards-summary-section__header--szary">Płyty szare (2800 × 1045 mm)</div>
                   <table className="boards-summary-table">
+                    {colGroup}
                     <thead>
                       <tr>
                         <th>Element</th>
@@ -566,6 +575,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                     Płyty kolor — {selectedFinish?.label ?? 'nieokreślony'} (2800 × 1045 mm)
                   </div>
                   <table className="boards-summary-table">
+                    {colGroup}
                     <thead>
                       <tr>
                         <th>Element</th>
@@ -587,6 +597,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 <div className="boards-summary-section">
                   <div className="boards-summary-section__header boards-summary-section__header--dodatki">Cięcie płyt</div>
                   <table className="boards-summary-table">
+                    {colGroup}
                     <thead>
                       <tr>
                         <th>Element</th>
@@ -608,6 +619,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 <div className="boards-summary-section">
                   <div className="boards-summary-section__header boards-summary-section__header--dodatki">Oklejanie płyt</div>
                   <table className="boards-summary-table">
+                    {colGroup}
                     <thead>
                       <tr>
                         <th>Element</th>
@@ -629,6 +641,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 <div className="boards-summary-section">
                   <div className="boards-summary-section__header boards-summary-section__header--dodatki">Koszty sprzętu</div>
                   <table className="boards-summary-table">
+                    {colGroup}
                     <thead>
                       <tr>
                         <th>Element</th>

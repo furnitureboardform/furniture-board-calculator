@@ -489,6 +489,7 @@ main {
 
 .boards-summary-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.85rem;
   color: #fff;
@@ -511,6 +512,32 @@ main {
 
 .boards-summary-table tr:last-child td {
   border-bottom: none;
+}
+
+.costs-section-header td {
+  padding: 6px 16px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.costs-section-header--szary td {
+  background: rgba(176, 190, 197, 0.1);
+  color: #b0bec5;
+  border-bottom: 1px solid rgba(176, 190, 197, 0.15);
+}
+
+.costs-section-header--kolor td {
+  background: rgba(255, 213, 79, 0.12);
+  color: #ffd54f;
+  border-bottom: 1px solid rgba(255, 213, 79, 0.2);
+}
+
+.costs-section-header--dodatki td {
+  background: rgba(144, 202, 249, 0.1);
+  color: #90caf9;
+  border-bottom: 1px solid rgba(144, 202, 249, 0.15);
 }
 
 .boards-summary-table tr:hover td {

@@ -39,7 +39,7 @@ export function useFormState() {
   const [outerMaskingRight, setOuterMaskingRight] = useState(true);
   const [outerMaskingLeftFullCover, setOuterMaskingLeftFullCover] = useState(false);
   const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
-  const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'kolor', optionId: 'U156' });
+  const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'laminat', optionId: 'U156' });
 
   useEffect(() => {
     localStorage.setItem(SPLIT_EQUALLY_STORAGE_KEY, String(splitEqually));

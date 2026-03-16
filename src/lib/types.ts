@@ -1,4 +1,4 @@
-export type FinishType = 'kolor' | 'okleina';
+export type FinishType = 'laminat' | 'okleina' | 'akryl';
 
 export interface BoardFinish {
   type: FinishType;

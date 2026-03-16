@@ -18,6 +18,10 @@ export const VENEER_OPTIONS: readonly FinishOption[] = [
   { id: 'H1386', label: 'Egger H1386 Dąb Casella brązowy', pricePerSheetPln: 565.12, swatchColor: '#7A5534', imageUrl: '/finishes/veneer/H1386.jpg' },
 ];
 
+export const ACRYLIC_OPTIONS: readonly FinishOption[] = [
+  { id: 'REHAU1918L', label: 'REHAU 1918L Cappuccino', pricePerSheetPln: 930.68, swatchColor: '#7B5B3A', imageUrl: '/finishes/acrylic/1918L.jpg' },
+];
+
 export const ALL_FINISH_OPTIONS: ReadonlyMap<string, FinishOption> = new Map(
-  [...COLOR_OPTIONS, ...VENEER_OPTIONS].map((o) => [o.id, o])
+  [...COLOR_OPTIONS, ...VENEER_OPTIONS, ...ACRYLIC_OPTIONS].map((o) => [o.id, o])
 );

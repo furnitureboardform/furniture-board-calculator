@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { BoardFinish, FinishType } from '../lib/types';
-import { COLOR_OPTIONS, VENEER_OPTIONS } from '../lib/finishOptions';
+import { COLOR_OPTIONS, VENEER_OPTIONS, ACRYLIC_OPTIONS } from '../lib/finishOptions';
 import type { FinishOption } from '../lib/finishOptions';
 
 export interface Step4BoardColorProps {
@@ -60,10 +60,10 @@ function FinishCard({ option, selected, onSelect, onZoom }: { option: FinishOpti
 
 export function Step4BoardColor({ finish, onFinishChange, onGoToStep, onSubmit, active }: Step4BoardColorProps) {
   const [zoomedOption, setZoomedOption] = useState<FinishOption | null>(null);
-  const options = finish.type === 'kolor' ? COLOR_OPTIONS : VENEER_OPTIONS;
+  const options = finish.type === 'laminat' ? COLOR_OPTIONS : finish.type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS;
 
   function handleTypeChange(type: FinishType) {
-    const defaultOption = (type === 'kolor' ? COLOR_OPTIONS : VENEER_OPTIONS)[0]!;
+    const defaultOption = (type === 'laminat' ? COLOR_OPTIONS : type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS)[0]!;
     onFinishChange({ type, optionId: defaultOption.id });
   }
 
@@ -79,8 +79,9 @@ export function Step4BoardColor({ finish, onFinishChange, onGoToStep, onSubmit, 
             value={finish.type}
             onChange={(e) => handleTypeChange(e.target.value as FinishType)}
           >
-            <option value="kolor">Kolor</option>
-            <option value="okleina">Okleina drewniana</option>
+            <option value="laminat">Okleina laminat kolor</option>
+            <option value="okleina">Okleina laminat drewniana</option>
+            <option value="akryl">Okleina akryl kolor</option>
           </select>
         </div>
         <div className="finish-cards">
