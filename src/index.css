@@ -868,6 +868,102 @@ main {
   font-size: 0.92rem;
 }
 
+.contract-parties {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.contract-parties__intro {
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: #2d3648;
+  text-align: justify;
+}
+
+.contract-inline-line {
+  display: inline-block;
+  vertical-align: baseline;
+  height: 1rem;
+  border-bottom: 1px solid #98a2b3;
+  margin: 0 0.45rem;
+}
+
+.contract-inline-line--date {
+  width: 120px;
+}
+
+.contract-inline-line--place {
+  width: 180px;
+}
+
+.contract-party-card {
+  border: 1px solid #e1e6ef;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fcfdff;
+}
+
+.contract-party-card h3 {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1a1a2e;
+}
+
+.contract-party-card__rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+
+.contract-party-card__rows p {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #2d3648;
+  text-align: left;
+}
+
+.contract-party-card__rows strong {
+  color: #1a1a2e;
+}
+
+.contract-party-card__suffix {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #475467;
+}
+
+.contract-parties__separator {
+  align-self: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.contract-party-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.contract-party-field--half {
+  min-width: 0;
+}
+
+.contract-party-field span {
+  display: block;
+  font-size: 0.8rem;
+  color: #667085;
+  margin-top: 0;
+}
+
+.contract-party-field .contract-line {
+  margin-top: 18px;
+}
+
 .contract-price-card {
   min-width: 180px;
   padding: 14px 16px;
@@ -914,6 +1010,30 @@ main {
   font-size: 0.95rem;
   line-height: 1.65;
   color: #2d3648;
+  text-align: justify;
+}
+
+.contract-copy__paragraph {
+  text-indent: 1.5rem;
+}
+
+.contract-section .contract-copy__paragraph + .contract-copy__paragraph {
+  margin-top: 0.45rem;
+}
+
+.contract-copy__list {
+  margin: 4px 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #2d3648;
+  list-style-position: outside;
+}
+
+.contract-copy__list li {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  padding-left: 6px;
   text-align: justify;
 }
 
@@ -1034,6 +1154,7 @@ main {
 }
 
 @media (max-width: 900px) {
+  .contract-party-card__rows,
   .contract-data-grid {
     grid-template-columns: 1fr;
   }

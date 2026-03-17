@@ -43,7 +43,7 @@ export function useContractView({
     [elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent]
   );
 
-  const contractSections = buildContractTemplate({
+  const contractPages = buildContractTemplate({
     finishTypeLabel: getFinishTypeLabel(boardFinish.type),
     finishLabel: selectedFinish?.label ?? boardFinish.optionId,
     handleLabel: selectedHandle?.label ?? doorHandle.optionId,
@@ -107,7 +107,7 @@ export function useContractView({
     selectedFinish,
     selectedHandle,
     pricing,
-    contractSections,
+    contractPages,
     handleGeneratePdf,
   };
 }
