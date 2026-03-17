@@ -2,21 +2,20 @@ import type { ElementsData, HardwareSummary } from './report';
 import type { BoardFinish, DoorHandleSelection } from './types';
 import { ALL_FINISH_OPTIONS } from './finishOptions';
 import { ALL_HANDLE_OPTIONS } from './handleOptions';
-
-const COST_PER_HINGE_PLN = 13;
-const COST_PER_GUIDE_SET_PLN = 104;
-const COST_PER_BRACKET_SET_PLN = 8;
-const DEFAULT_HANDLE_PRICE_PLN = 25;
-const COST_PER_LEG_PLN = 6;
-const COST_PER_LEG_CLIP_PLN = 1;
-const COST_PER_ROD_PLN = 15;
-const BOARD_PIECE_WIDTH_MM = 2800;
-const BOARD_PIECE_HEIGHT_MM = 1045;
-const BOARD_PIECE_AREA_MM2 = BOARD_PIECE_WIDTH_MM * BOARD_PIECE_HEIGHT_MM;
-const COST_PER_SZARY_PIECE_PLN = 120;
-const COST_PER_KOLOR_PIECE_PLN = 205;
-const COST_PER_METER_CUTTING_PLN = 5;
-const COST_PER_METER_BANDING_PLN = 6;
+import {
+  COST_PER_HINGE_PLN,
+  COST_PER_GUIDE_SET_PLN,
+  COST_PER_BRACKET_SET_PLN,
+  DEFAULT_HANDLE_PRICE_PLN,
+  COST_PER_LEG_PLN,
+  COST_PER_LEG_CLIP_PLN,
+  COST_PER_ROD_PLN,
+  BOARD_PIECE_AREA_MM2,
+  COST_PER_SZARY_PIECE_PLN,
+  COST_PER_KOLOR_PIECE_PLN,
+  COST_PER_METER_CUTTING_PLN,
+  COST_PER_METER_BANDING_PLN,
+} from './constants';
 
 interface BoardEntry {
   dim1: number;
