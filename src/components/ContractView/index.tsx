@@ -79,12 +79,6 @@ export function ContractView({
                     <h2>Umowa</h2>
                     <p>Dokument roboczy do akceptacji projektu i warunków realizacji.</p>
                   </div>
-                  <div className="contract-price-card">
-                    <span>Kwota całkowita</span>
-                    <strong>{pricing.clientPriceAfterDiscount} zł</strong>
-                    <span>Zaliczka</span>
-                    <strong>{pricing.materialsDeposit} zł</strong>
-                  </div>
                 </div>
                 <div className="contract-parties">
                   <p className="contract-parties__intro">
