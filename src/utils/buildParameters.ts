@@ -34,6 +34,7 @@ export function buildParameters(state: FormStateForParameters): Parameters {
     boxShelves: boxes.map((b) => b.shelves ?? 0),
     boxRods: boxes.map((b) => b.rods ?? 0),
     boxDrawers: boxes.map((b) => b.drawers ?? 0),
+    boxNadstawkaMm: boxes.map((b) => b.nadstawkaMm ?? []),
     boxDoubleDoors: boxes.map((b) => b.doubleDoor),
     boxWidthMm,
     numberOfLeftDoors: 0,

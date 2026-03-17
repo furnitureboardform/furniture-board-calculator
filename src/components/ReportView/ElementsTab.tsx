@@ -66,36 +66,40 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                 </span>
               </div>
             )}
-            {box.panels && (
+            {box.panels && box.panels.length > 0 && (
               <>
                 <div className="element-card__divider" />
-                <div className="element-card__row">
-                  <span className="element-card__label">Płyta boczna boxa (2 szt.)</span>
-                  <span className="element-card__value">
-                    {box.panels.sideHeightMm} × {box.panels.depthMm} mm
-                  </span>
-                  <span className="element-card__meta">
-                    Obrzeże na wysokości {box.panels.sideHeightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
-                  </span>
-                </div>
-                <div className="element-card__row">
-                  <span className="element-card__label">Płyta górna boxa (1 szt.)</span>
-                  <span className="element-card__value">
-                    {box.panels.topBottomWidthMm} × {box.panels.depthMm} mm
-                  </span>
-                  <span className="element-card__meta">
-                    Obrzeże na szerokości {box.panels.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
-                  </span>
-                </div>
-                <div className="element-card__row">
-                  <span className="element-card__label">Płyta dolna boxa (1 szt.)</span>
-                  <span className="element-card__value">
-                    {box.panels.topBottomWidthMm} × {box.panels.depthMm} mm
-                  </span>
-                  <span className="element-card__meta">
-                    Obrzeże na szerokości {box.panels.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
-                  </span>
-                </div>
+                {box.panels.map((panel, panelIndex) => (
+                  <div key={`${panel.label}-${panelIndex}`}>
+                    <div className="element-card__row">
+                      <span className="element-card__label">Płyta boczna {panel.label.toLowerCase()} (2 szt.)</span>
+                      <span className="element-card__value">
+                        {panel.sideHeightMm} × {panel.depthMm} mm
+                      </span>
+                      <span className="element-card__meta">
+                        Obrzeże na wysokości {panel.sideHeightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                      </span>
+                    </div>
+                    <div className="element-card__row">
+                      <span className="element-card__label">Płyta górna {panel.label.toLowerCase()} (1 szt.)</span>
+                      <span className="element-card__value">
+                        {panel.topBottomWidthMm} × {panel.depthMm} mm
+                      </span>
+                      <span className="element-card__meta">
+                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                      </span>
+                    </div>
+                    <div className="element-card__row">
+                      <span className="element-card__label">Płyta dolna {panel.label.toLowerCase()} (1 szt.)</span>
+                      <span className="element-card__value">
+                        {panel.topBottomWidthMm} × {panel.depthMm} mm
+                      </span>
+                      <span className="element-card__meta">
+                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </>
             )}
             {box.drawerBoards && (

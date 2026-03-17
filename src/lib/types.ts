@@ -19,6 +19,7 @@ export interface Parameters {
   boxShelves: number[];
   boxRods: number[];
   boxDrawers: number[];
+  boxNadstawkaMm: number[][];
   boxWidthMm: number;
   cabinetDepthMm: number;
   nicheWidthMm: number;

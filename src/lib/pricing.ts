@@ -164,18 +164,20 @@ function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
     }
 
     if (box.panels) {
-      boards.push({
-        dim1: box.panels.sideHeightMm,
-        dim2: box.panels.depthMm,
-        edgeBandingMm: box.panels.sideHeightMm,
-        qty: 2,
-      });
-      boards.push({
-        dim1: box.panels.topBottomWidthMm,
-        dim2: box.panels.depthMm,
-        edgeBandingMm: box.panels.topBottomWidthMm,
-        qty: 2,
-      });
+      for (const panel of box.panels) {
+        boards.push({
+          dim1: panel.sideHeightMm,
+          dim2: panel.depthMm,
+          edgeBandingMm: panel.sideHeightMm,
+          qty: 2,
+        });
+        boards.push({
+          dim1: panel.topBottomWidthMm,
+          dim2: panel.depthMm,
+          edgeBandingMm: panel.topBottomWidthMm,
+          qty: 2,
+        });
+      }
     }
 
     if (box.drawerBoards) {
