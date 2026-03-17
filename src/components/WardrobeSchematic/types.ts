@@ -1,6 +1,6 @@
 import type { BoxForm } from '../../lib/types';
 
-export type ItemType = 'shelves' | 'rods' | 'drawers' | 'partition';
+export type ItemType = 'shelves' | 'rods' | 'drawers' | 'partition' | 'nadstawka';
 
 export interface PositionedItem {
   id: string;

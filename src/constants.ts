@@ -21,6 +21,7 @@ export const defaultBox = (): BoxForm => ({
   rods: 0,
   drawers: 0,
   partitions: [],
+  nadstawkaMm: [],
 });
 
 export function getStoredSplitEqually(): boolean {

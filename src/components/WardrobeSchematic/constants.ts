@@ -5,6 +5,7 @@ export const PALETTE: PaletteConfig[] = [
   { type: 'rods',      label: 'Drążek',     icon: '◎', fill: 'rgba(217,119,6,0.10)',   stroke: '#c97c10', heightMm: 50,  boardMm: 0   },
   { type: 'drawers',   label: 'Szuflada',   icon: '▭', fill: 'rgba(22,163,74,0.10)',   stroke: '#16a34a', heightMm: 160, boardMm: 160 },
   { type: 'partition', label: 'Przegroda',  icon: '┃', fill: 'rgba(147,51,234,0.10)',  stroke: '#9333ea', heightMm: 0,   boardMm: 0   },
+  { type: 'nadstawka', label: 'Nadstawka',  icon: '═', fill: 'rgba(180,83,9,0.18)',    stroke: '#b45309', heightMm: 18,  boardMm: 18  },
 ];
 
 export const PANEL_MM = 18;

@@ -12,11 +12,17 @@ export function clamp(v: number, min: number, max: number): number {
 export function calcDropY(e: React.DragEvent<HTMLDivElement>, mainH: number, itemHeightMm = 0): number {
   const rect = e.currentTarget.getBoundingClientRect();
   const relY = Math.max(0, Math.min(0.999, (e.clientY - rect.top) / rect.height));
-  const rawTopFromCeiling = relY * mainH;
-  // snap the BOTTOM EDGE of the item (from floor) to multiples of SNAP_MM
-  const rawBottomFromFloor = mainH - rawTopFromCeiling - itemHeightMm;
-  const snappedBottomFromFloor = Math.round(rawBottomFromFloor / SNAP_MM) * SNAP_MM;
-  return Math.max(0, mainH - snappedBottomFromFloor - itemHeightMm);
+  /*
+   * Snap the TOP EDGE of the item to multiples of SNAP_MM.
+   * This means "od dołu X mm" always refers to the top surface of an item
+   * (the surface a partition would rest on / the reference carpenters use).
+   * The partition calculation in getPartitionSpan uses spanBotMm = shelf.yMm
+   * (top edge), so the stated position is directly the partition floor — no
+   * extra 18 mm needs to be added by the user.
+   */
+  const rawTopFromFloor = mainH - relY * mainH;
+  const snappedTopFromFloor = Math.round(rawTopFromFloor / SNAP_MM) * SNAP_MM;
+  return clamp(mainH - snappedTopFromFloor, 0, mainH - itemHeightMm);
 }
 
 export function calcDropX(e: React.DragEvent<HTMLDivElement>, boxWidthMm: number): number {
@@ -67,10 +73,24 @@ export function getPartitionSpan(
   mainH: number
 ): { spanTopMm: number; spanBotMm: number } {
   const boundaries = (placed[boxIdx] || [])
-    .filter((it) => it.type === 'shelves' || it.type === 'drawers')
+    .filter((it) => it.type === 'shelves' || it.type === 'drawers' || it.type === 'nadstawka')
     .map((it) => {
-      // Use actual board thickness for shelves, palette height for drawers
-      const h = it.type === 'shelves' ? PANEL_MM : (PALETTE.find((p) => p.type === it.type)?.heightMm ?? PANEL_MM);
+      let h: number;
+      if (it.type === 'nadstawka') {
+        /*
+         * The nadstawka plate (18 mm, shown in the SVG) is the bottom panel
+         * of the top sub-box. The bottom sub-box has its own top panel (18 mm)
+         * sitting directly below. Together they form a 36 mm zone that neither
+         * sub-box interior can enter. Using 2×PANEL_MM makes:
+         *   top = it.yMm             → floor of the top sub-box interior
+         *   bot = it.yMm + 2×PANEL_MM → ceiling of the bottom sub-box interior
+         */
+        h = 2 * PANEL_MM;
+      } else if (it.type === 'shelves') {
+        h = PANEL_MM;
+      } else {
+        h = PALETTE.find((p) => p.type === it.type)?.heightMm ?? PANEL_MM;
+      }
       return { top: it.yMm, bot: it.yMm + h };
     })
     .sort((a, b) => a.top - b.top);
@@ -78,9 +98,20 @@ export function getPartitionSpan(
   const above = boundaries.filter((s) => s.bot <= cursorYMm);
   const below = boundaries.filter((s) => s.top >= cursorYMm);
 
+  /*
+   * When there is no item above/below, the partition is bounded by the box
+   * panel (top or bottom plate, each PANEL_MM thick). This gives the correct
+   * interior height: mainH - 2 * PANEL_MM for a full-height box, or the
+   * interior of a sub-box created by a nadstawka.
+   *
+   * The nadstawka itself is already in `boundaries` (added in the filter
+   * above), so sub-box ceilings/floors are handled automatically:
+   *   – top sub-box floor  = nadstawka.top  (set via below[0].top)
+   *   – bot sub-box ceiling = nadstawka.bot  (set via above[last].bot)
+   */
   return {
-    spanTopMm: above.length > 0 ? above[above.length - 1].bot : 0,
-    spanBotMm: below.length > 0 ? below[0].top : mainH,
+    spanTopMm: above.length > 0 ? above[above.length - 1].bot : PANEL_MM,
+    spanBotMm: below.length > 0 ? below[0].top : mainH - PANEL_MM,
   };
 }
 
@@ -140,6 +171,13 @@ export function buildDragHoverPos(
     const rawY = calcDropY(e, mainH, 0);
     const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, boxIdx, placedItems, mainH);
     return { boxIdx, yMm: rawY, xMm: rawX, spanTopMm, spanBotMm };
+  }
+
+  // Nadstawka always spans the full box width — no horizontal segmentation needed.
+  if (draggingType === 'nadstawka') {
+    const rawY = calcDropY(e, mainH, PANEL_MM);
+    const snappedY = getSnappedY(rawY, boxIdx, draggingType, placedItems, mainH);
+    return { boxIdx, yMm: snappedY };
   }
 
   const dragItemH = PALETTE.find((p) => p.type === draggingType)?.boardMm ?? 0;

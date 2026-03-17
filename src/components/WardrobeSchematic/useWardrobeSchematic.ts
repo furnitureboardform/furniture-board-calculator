@@ -56,6 +56,13 @@ export function useWardrobeSchematic({
         const shelveItems = updated.filter((it) => it.type === 'shelves');
         const widths = shelveItems.map((it) => Math.round((it.endMm ?? 0) - (it.startMm ?? 0)));
         setTimeout(() => { onBoxChange(boxIdx, 'shelves', shelveItems.length); onBoxChange(boxIdx, 'shelvesMm', widths); }, 0);
+      } else if (item.type === 'nadstawka') {
+        // height = distance from the bottom of the main area to the top edge of the nadstawka plate
+        const heights = updated
+          .filter((it) => it.type === 'nadstawka')
+          .map((it) => Math.round(mainH - it.yMm))
+          .sort((a, b) => b - a);
+        setTimeout(() => onBoxChange(boxIdx, 'nadstawkaMm', heights), 0);
       } else {
         const count = updated.filter((it) => it.type === item.type).length;
         const field = item.type as Extract<keyof BoxForm, 'rods' | 'drawers'>;
@@ -79,6 +86,12 @@ export function useWardrobeSchematic({
         const shelveItems = updated.filter((it) => it.type === 'shelves');
         const widths = shelveItems.map((it) => Math.round((it.endMm ?? 0) - (it.startMm ?? 0)));
         setTimeout(() => { onBoxChange(boxIdx, 'shelves', shelveItems.length); onBoxChange(boxIdx, 'shelvesMm', widths); }, 0);
+      } else if (type === 'nadstawka') {
+        const heights = updated
+          .filter((it) => it.type === 'nadstawka')
+          .map((it) => Math.round(mainH - it.yMm))
+          .sort((a, b) => b - a);
+        setTimeout(() => onBoxChange(boxIdx, 'nadstawkaMm', heights), 0);
       } else {
         const count = updated.filter((it) => it.type === type).length;
         const field = type as Extract<keyof BoxForm, 'rods' | 'drawers'>;
@@ -95,8 +108,8 @@ export function useWardrobeSchematic({
       Object.keys(prev).forEach((k) => { cleared[Number(k)] = []; });
       Object.keys(prev).forEach((k) => {
         const idx = Number(k);
-        (['shelves', 'rods', 'drawers'] as const).forEach((t) => {
-          setTimeout(() => onBoxChange(idx, t, 0), 0);
+        (['shelves', 'rods', 'drawers', 'nadstawka'] as const).forEach((t) => {
+          setTimeout(() => onBoxChange(idx, t === 'nadstawka' ? 'nadstawkaMm' : t, t === 'nadstawka' ? [] : 0), 0);
         });
       });
       return cleared;
@@ -187,6 +200,11 @@ export function useWardrobeSchematic({
       const rawY = calcDropY(e, mainH, 0);
       const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, seg.boxIdx, placedItems, mainH);
       addItem(seg.boxIdx, { type: 'partition', yMm: rawY, xMm: rawX, spanTopMm, spanBotMm });
+    } else if (type === 'nadstawka') {
+      // Nadstawka always spans the full box width — no horizontal segmentation.
+      const rawY = calcDropY(e, mainH, PANEL_MM);
+      const yMm  = getSnappedY(rawY, seg.boxIdx, type, placedItems, mainH);
+      addItem(seg.boxIdx, { type: 'nadstawka', yMm });
     } else {
       const dropItemH = PALETTE.find((p) => p.type === type)?.boardMm ?? 0;
       const rawY = calcDropY(e, mainH, dropItemH);

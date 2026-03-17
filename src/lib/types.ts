@@ -178,6 +178,8 @@ export interface BoxForm {
   rods: number;
   drawers: number;
   partitions: number[];
+  /** Heights from the bottom of the main area to the top edge of each nadstawka plate (mm). */
+  nadstawkaMm: number[];
 }
 
 /** Nazwy pól wnęki do onNicheChange. */
