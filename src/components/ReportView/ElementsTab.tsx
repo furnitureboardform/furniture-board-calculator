@@ -55,17 +55,17 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                 ))}
               </>
             )}
-            {box.hdf && (
-              <div className="element-card__row">
-                <span className="element-card__label">Płyta HDF (1 szt.)</span>
+            {box.hdf && box.hdf.map((hdfSection, hdfIndex) => (
+              <div key={`${hdfSection.label}-${hdfIndex}`} className="element-card__row">
+                <span className="element-card__label">Płyta HDF {hdfSection.label.toLowerCase()} (1 szt.)</span>
                 <span className="element-card__value">
-                  {box.hdf.widthMm} × {box.hdf.heightMm} mm
+                  {hdfSection.widthMm} × {hdfSection.heightMm} mm
                 </span>
                 <span className="element-card__meta">
                   <span className="element-card__color element-card__color--szary">szary</span>
                 </span>
               </div>
-            )}
+            ))}
             {box.panels && box.panels.length > 0 && (
               <>
                 <div className="element-card__divider" />

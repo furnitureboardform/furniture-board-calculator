@@ -125,8 +125,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
   const hdfBoards = useMemo(
     () => elementsData ? groupBoards([
       ...elementsData.boxes
-        .filter((b) => b.hdf)
-        .map((b) => ({ dim1: b.hdf!.widthMm, dim2: b.hdf!.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 })),
+        .flatMap((b) => (b.hdf ?? [])
+          .map((section) => ({ dim1: section.widthMm, dim2: section.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 }))),
       ...elementsData.boxes
         .filter((b) => b.drawerBoards)
         .map((b) => ({ dim1: b.drawerBoards!.hdfBottom.depthMm, dim2: b.drawerBoards!.hdfBottom.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: b.drawerBoards!.count })),

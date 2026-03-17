@@ -199,16 +199,6 @@ export function BoxSegments({
               <rect x={sx} y={itemYpx} width={segW} height={Math.max(4, sh(PANEL_MM))} fill={pc.fill} stroke={pc.stroke} strokeWidth={2} />
               {/* Double-line detail to suggest a structural divider */}
               <line x1={sx + 2} y1={itemYpx + Math.max(4, sh(PANEL_MM)) / 2} x2={sx + segW - 2} y2={itemYpx + Math.max(4, sh(PANEL_MM)) / 2} stroke={pc.stroke} strokeWidth={0.7} strokeDasharray="4,3" />
-              {/* Label */}
-              {segW > 40 && (
-                <text
-                  x={sx + segW / 2} y={itemYpx + Math.max(4, sh(PANEL_MM)) / 2}
-                  fill={pc.stroke} fontSize={clamp(segW * 0.09, 6, 9)}
-                  textAnchor="middle" dominantBaseline="middle" fontWeight="600"
-                >
-                  Nadstawka
-                </text>
-              )}
             </g>
           );
         }

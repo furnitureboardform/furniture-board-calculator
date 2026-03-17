@@ -15,7 +15,7 @@ export interface BoxElement {
   door?: { doubleDoor: boolean; heightMm: number; widthMm: number; hinges: number };
   shelves?: { depthMm: number; groups: { widthMm: number; qty: number }[] };
   rods?: number;
-  hdf?: { widthMm: number; heightMm: number };
+  hdf?: { label: string; widthMm: number; heightMm: number }[];
   panels?: {
     label: string;
     sideHeightMm: number;
@@ -92,19 +92,23 @@ export interface ReportResult {
 
 const PANEL_THICKNESS_MM = 18;
 
-function getBoxPanelSections(
-  totalHeightMm: number,
-  topBottomWidthMm: number,
-  depthMm: number,
-  nadstawkaHeights: number[]
-): NonNullable<BoxElement['panels']> {
-  const normalizedHeights = Array.from(
+function normalizeNadstawkaHeights(totalHeightMm: number, nadstawkaHeights: number[]): number[] {
+  return Array.from(
     new Set(
       nadstawkaHeights
         .map((height) => Math.round(height))
         .filter((height) => height > PANEL_THICKNESS_MM && height < totalHeightMm)
     )
   ).sort((left, right) => left - right);
+}
+
+function getBoxPanelSections(
+  totalHeightMm: number,
+  topBottomWidthMm: number,
+  depthMm: number,
+  nadstawkaHeights: number[]
+): NonNullable<BoxElement['panels']> {
+  const normalizedHeights = normalizeNadstawkaHeights(totalHeightMm, nadstawkaHeights);
 
   if (normalizedHeights.length === 0) {
     return [
@@ -153,6 +157,56 @@ function getBoxPanelSections(
       topBottomWidthMm,
       depthMm,
       isNadstawka: true,
+    });
+  }
+
+  return sections;
+}
+
+function getBoxHdfSections(
+  totalHeightMm: number,
+  widthMm: number,
+  nadstawkaHeights: number[]
+): NonNullable<BoxElement['hdf']> {
+  const normalizedHeights = normalizeNadstawkaHeights(totalHeightMm, nadstawkaHeights);
+
+  if (normalizedHeights.length === 0) {
+    return [{
+      label: 'Box główny',
+      widthMm,
+      heightMm: Math.max(0, totalHeightMm - 4),
+    }];
+  }
+
+  const sections: NonNullable<BoxElement['hdf']> = [];
+  const mainBoxHeightMm = normalizedHeights[0] - 4;
+
+  if (mainBoxHeightMm > 0) {
+    sections.push({
+      label: 'Box główny',
+      widthMm,
+      heightMm: mainBoxHeightMm,
+    });
+  }
+
+  for (let index = 1; index < normalizedHeights.length; index += 1) {
+    const sectionHeightMm = normalizedHeights[index] - normalizedHeights[index - 1] - 4;
+    if (sectionHeightMm <= 0) {
+      continue;
+    }
+    sections.push({
+      label: `Nadstawka ${index}`,
+      widthMm,
+      heightMm: sectionHeightMm,
+    });
+  }
+
+  const topSectionHeightMm = totalHeightMm - normalizedHeights[normalizedHeights.length - 1] - 4;
+  if (topSectionHeightMm > 0) {
+    sections.push({
+      label: `Nadstawka ${normalizedHeights.length}`,
+      widthMm,
+      heightMm: topSectionHeightMm,
     });
   }
 
@@ -294,6 +348,14 @@ export function buildReport(
       lines.push(`   • Półki: ${shelf.quantity} szt. (${shelf.widthMm} × ${shelf.depthMm} mm) - Obrzeże na szerokości ${shelf.widthMm} mm (1 bok)`);
     }
 
+    for (const hdfSection of getBoxHdfSections(
+      sideHeightMm,
+      (boxWidthsForPanels[boxNum - 1] ?? parameters.boxWidthMm) + 32,
+      parameters.boxNadstawkaMm?.[boxNum - 1] ?? []
+    )) {
+      lines.push(`   • ${hdfSection.label}: płyta HDF (1 szt.) ${hdfSection.widthMm} × ${hdfSection.heightMm} mm - Bez obrzeży`);
+    }
+
     for (const panelSection of panelSections) {
       lines.push(`   • ${panelSection.label}: płyta boczna (2 szt.) ${panelSection.sideHeightMm} × ${panelSection.depthMm} mm - Obrzeże na wysokości ${panelSection.sideHeightMm} mm (1 bok)`);
       lines.push(`   • ${panelSection.label}: płyta górna (1 szt.) ${panelSection.topBottomWidthMm} × ${panelSection.depthMm} mm - Obrzeże na szerokości ${panelSection.topBottomWidthMm} mm (1 bok)`);
@@ -341,6 +403,12 @@ export function buildReport(
       const boxNum = i + 1;
       const door = doorRequirements.doors.find((d) => d.boxNumber === boxNum);
       const shelf = shelvesRequirements.shelvesByBox.find((s) => s.boxNumber === boxNum);
+      const panels = getBoxPanelSections(
+        sideHeightMm,
+        boxWidthsForPanels[i] ?? parameters.boxWidthMm,
+        panelDepthMm,
+        parameters.boxNadstawkaMm?.[i] ?? []
+      );
       return {
         boxNumber: boxNum,
         door: door
@@ -368,16 +436,12 @@ export function buildReport(
           return { depthMm, groups: [{ widthMm: shelf.widthMm, qty: shelf.quantity }] };
         })(),
         rods: (parameters.boxRods?.[i] ?? 0) > 0 ? (parameters.boxRods![i]) : undefined,
-        hdf: {
-          widthMm: (boxWidthsForPanels[i] ?? parameters.boxWidthMm) + 32,
-          heightMm: doorRequirements.doorHeightMm,
-        },
-        panels: getBoxPanelSections(
+        hdf: getBoxHdfSections(
           sideHeightMm,
-          boxWidthsForPanels[i] ?? parameters.boxWidthMm,
-          panelDepthMm,
+          (boxWidthsForPanels[i] ?? parameters.boxWidthMm) + 32,
           parameters.boxNadstawkaMm?.[i] ?? []
         ),
+        panels,
         partitions: (() => {
           const heights = parameters.boxPartitions?.[i] ?? [];
           if (heights.length === 0) return undefined;
