@@ -31,6 +31,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
   const [discountInput, setDiscountInput] = useState<string>('0');
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('0');
+  const [transportCostPln, setTransportCostPln] = useState<number>(0);
+  const [transportInput, setTransportInput] = useState<string>('0');
 
   const parsedDiscountPln = useMemo(() => {
     if (!Number.isFinite(discountPln)) return 0;
@@ -110,8 +112,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     [doorHandle.optionId]
   );
   const pricingSummary = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent),
-    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln]
   );
 
   const kolorBoards = useMemo(
@@ -213,6 +215,18 @@ export default function ReportView({ parametersData, reportText: _reportText, su
               onDiscountPercentInput={handleDiscountPercentInput}
               onCommitDiscountPln={commitDiscountPlnInput}
               onCommitDiscountPercent={commitDiscountPercentInput}
+              transportInput={transportInput}
+              onTransportInput={(value) => {
+                setTransportInput(value);
+                const parsed = Number(value.trim().replace(',', '.'));
+                setTransportCostPln(Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0);
+              }}
+              onCommitTransport={() => {
+                const parsed = Number(transportInput.trim().replace(',', '.'));
+                const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
+                setTransportCostPln(safe);
+                setTransportInput(String(safe));
+              }}
             />
           )}
         </div>

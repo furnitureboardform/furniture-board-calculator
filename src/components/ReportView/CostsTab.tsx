@@ -34,6 +34,9 @@ interface CostsTabProps {
   onDiscountPercentInput: (value: string) => void;
   onCommitDiscountPln: () => void;
   onCommitDiscountPercent: () => void;
+  transportInput: string;
+  onTransportInput: (value: string) => void;
+  onCommitTransport: () => void;
 }
 
 export function CostsTab({
@@ -51,6 +54,9 @@ export function CostsTab({
   onDiscountPercentInput,
   onCommitDiscountPln,
   onCommitDiscountPercent,
+  transportInput,
+  onTransportInput,
+  onCommitTransport,
 }: CostsTabProps) {
   const hingesCost = totalHinges * COST_PER_HINGE_PLN;
   const guidesCost = hardwareSummary.totalGuides * COST_PER_GUIDE_SET_PLN;
@@ -235,6 +241,21 @@ export function CostsTab({
                 <td>{rodsCost} zł</td>
               </tr>
             )}
+            <tr>
+              <td colSpan={3}>Transport</td>
+              <td>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  className="report-discount-input"
+                  value={transportInput}
+                  onChange={(e) => onTransportInput(e.target.value)}
+                  onBlur={onCommitTransport}
+                  onKeyDown={(e) => { if (e.key === 'Enter') onCommitTransport(); }}
+                />
+              </td>
+            </tr>
             <tr style={{ fontWeight: 'bold', borderTop: '2px solid currentColor' }}>
               <td colSpan={3}>Suma całkowita (koszt własny)</td>
               <td>{totalCost.toFixed(2)} zł</td>
