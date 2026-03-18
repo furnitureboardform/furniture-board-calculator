@@ -108,7 +108,7 @@ function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   }
 
   const { left, right, top, bottom } = elementsData.niches;
-  for (const niche of [left, right, top, bottom]) {
+  for (const niche of [left, right, top]) {
     const { widthMm, heightMm } = niche;
     if (widthMm <= 0 || heightMm <= 0) continue;
     if (widthMm > 2800) {
@@ -117,6 +117,21 @@ function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: widthMm, dim2: Math.ceil(heightMm / 2), edgeBandingMm: 0, qty: 2 });
     } else {
       boards.push({ dim1: widthMm, dim2: heightMm, edgeBandingMm: 0, qty: 1 });
+    }
+  }
+
+  const { widthMm: bottomW, heightMm: bottomH } = bottom;
+  if (bottomW > 0 && bottomH > 0) {
+    if (bottomW > 2800) {
+      const firstBoxHdfWidth = elementsData.boxes[0]?.hdf?.[0]?.widthMm ?? 0;
+      const splitPoint = firstBoxHdfWidth > 0 ? firstBoxHdfWidth + 4 : Math.ceil(bottomW / 2);
+      const secondPieceWidth = bottomW - splitPoint;
+      boards.push({ dim1: splitPoint - 4, dim2: bottomH, edgeBandingMm: 0, qty: 1 });
+      boards.push({ dim1: secondPieceWidth - 4, dim2: bottomH, edgeBandingMm: 0, qty: 1 });
+    } else if (bottomH > 2800) {
+      boards.push({ dim1: bottomW - 4, dim2: Math.ceil(bottomH / 2), edgeBandingMm: 0, qty: 2 });
+    } else {
+      boards.push({ dim1: bottomW - 4, dim2: bottomH, edgeBandingMm: 0, qty: 1 });
     }
   }
 

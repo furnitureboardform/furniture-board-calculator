@@ -182,29 +182,35 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
       <div className="element-card">
         <div className="element-card__header">Blendy / Wnęki</div>
         <div className="element-card__body">
-          {[
-            { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm },
-            { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm },
-            { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm },
-            { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm },
-          ].flatMap(({ label, w, h }) => {
-            if (w <= 0 || h <= 0) return [];
-            if (w > 2800) {
-              const half = Math.ceil(w / 2);
-              return [
-                { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: half, displayH: h },
-                { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: half, displayH: h },
-              ];
-            }
-            if (h > 2800) {
-              const half = Math.ceil(h / 2);
-              return [
-                { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: w, displayH: half },
-                { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: w, displayH: half },
-              ];
-            }
-            return [{ key: label, label, displayW: w, displayH: h }];
-          }).map(({ key, label, displayW, displayH }) => (
+          {(() => {
+            const firstBoxHdfWidth = elementsData.boxes[0]?.hdf?.[0]?.widthMm ?? 0;
+            const firstBoxSplitPoint = firstBoxHdfWidth > 0 ? firstBoxHdfWidth + 4 : undefined;
+            return [
+              { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm, isBottom: false },
+              { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm, isBottom: false },
+              { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm, isBottom: false },
+              { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm, isBottom: true },
+            ].flatMap(({ label, w, h, isBottom }) => {
+              if (w <= 0 || h <= 0) return [];
+              if (w > 2800) {
+                const part1W = isBottom && firstBoxSplitPoint ? firstBoxSplitPoint : Math.ceil(w / 2);
+                const part2W = w - part1W;
+                const clearance = isBottom ? 4 : 0;
+                return [
+                  { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: part1W - clearance, displayH: h },
+                  { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: part2W - clearance, displayH: h },
+                ];
+              }
+              if (h > 2800) {
+                const half = Math.ceil(h / 2);
+                return [
+                  { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
+                  { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
+                ];
+              }
+              return [{ key: label, label, displayW: isBottom ? w - 4 : w, displayH: h }];
+            });
+          })().map(({ key, label, displayW, displayH }) => (
             <div key={key} className="element-card__row">
               <span className="element-card__label">{label}</span>
               <span className="element-card__value">{displayW} × {displayH} mm</span>

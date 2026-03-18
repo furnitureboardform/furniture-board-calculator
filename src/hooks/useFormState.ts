@@ -88,7 +88,7 @@ export function useFormState() {
       (outerMaskingLeft ? OUTER_MASKING_SIDE_MM : 0) +
       (outerMaskingRight ? OUTER_MASKING_SIDE_MM : 0);
     const sideNichesDeduction = hasSideNiches ? leftBlendMm + rightBlendMm : 0;
-    const autoWidth = Math.max(0, nicheWidthMm - maskingDeduction - sideNichesDeduction - 2);
+    const autoWidth = Math.max(0, nicheWidthMm - maskingDeduction - sideNichesDeduction);
     setBottomNicheWidthMm(autoWidth);
   }, [nicheWidthMm, outerMaskingLeft, outerMaskingRight, hasSideNiches, leftBlendMm, rightBlendMm]);
 

@@ -27,7 +27,7 @@ function Lightbox({ option, onClose }: { option: { label: string; imageUrl: stri
   );
 }
 
-function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option: { label: string; imageUrl?: string; swatchColor?: string }; selected: boolean; onSelect: () => void; onZoom?: () => void; priceLabel: string }) {
+function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option: { label: string; brand?: string; imageUrl?: string; swatchColor?: string }; selected: boolean; onSelect: () => void; onZoom?: () => void; priceLabel: string }) {
   return (
     <button
       type="button"
@@ -53,6 +53,7 @@ function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option
         }
       </div>
       <div className="finish-card__info">
+        {option.brand && <span className="finish-card__brand">{option.brand}</span>}
         <span className="finish-card__label">{option.label}</span>
         <span className="finish-card__price">{priceLabel}</span>
       </div>
