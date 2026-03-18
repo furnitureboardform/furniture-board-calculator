@@ -87,7 +87,7 @@ export default function App() {
           rows: [
             { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat kolor' : form.boardFinish.type === 'akryl' ? 'Okleina akryl kolor' : 'Okleina laminat drewniana' },
             { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
-            { label: 'Cena arkusza', value: selectedFinish ? `${selectedFinish.pricePerSheetPln.toFixed(2)} zł` : '—' },
+            { label: 'Cena za m²', value: selectedFinish ? `${selectedFinish.pricePerSqmPln.toFixed(2)} zł/m²` : '—' },
             { label: 'Uchwyt', value: selectedHandle?.label ?? form.doorHandle.optionId },
             { label: 'Cena uchwytu', value: selectedHandle ? `${selectedHandle.pricePln.toFixed(2)} zł/szt.` : '—' },
           ],

@@ -94,7 +94,7 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
               selected={finish.optionId === opt.id}
               onSelect={() => onFinishChange({ ...finish, optionId: opt.id })}
               onZoom={opt.imageUrl ? () => setZoomedOption({ label: opt.label, imageUrl: opt.imageUrl! }) : undefined}
-              priceLabel={`${(opt.pricePerSheetPln / 2).toFixed(2)} zł/arkusz`}
+              priceLabel={`${opt.pricePerSqmPln.toFixed(2)} zł/m²`}
             />
           ))}
         </div>

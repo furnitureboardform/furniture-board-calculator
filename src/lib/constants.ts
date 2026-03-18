@@ -15,10 +15,12 @@ export const COST_PER_LEG_CLIP_PLN = 1;
 export const COST_PER_ROD_PLN = 15;
 
 /** Board sheet dimensions and unit costs (from pricing.ts) */
-export const BOARD_PIECE_WIDTH_MM = 2800;
-export const BOARD_PIECE_HEIGHT_MM = 1045;
+export const BOARD_PIECE_WIDTH_MM = 2070;
+export const BOARD_PIECE_HEIGHT_MM = 2800;
 export const BOARD_PIECE_AREA_MM2 = BOARD_PIECE_WIDTH_MM * BOARD_PIECE_HEIGHT_MM;
 export const COST_PER_SZARY_PIECE_PLN = 120;
+export const COST_PER_SZARY_SQM_PLN = 37.85;
 export const COST_PER_KOLOR_PIECE_PLN = 205;
-export const COST_PER_METER_CUTTING_PLN = 5;
+export const COST_PER_KOLOR_SQM_PLN = 70;
+export const COST_PER_METER_CUTTING_PLN = 6;
 export const COST_PER_METER_BANDING_PLN = 6;

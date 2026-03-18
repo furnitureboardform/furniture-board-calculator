@@ -488,7 +488,7 @@ export function buildReport(
       left: { widthMm: leftBlendFinal > 0 ? leftBlendFinal + 50 : 0, heightMm: parameters.leftNicheHeightMm || 0 },
       right: { widthMm: rightBlendFinal > 0 ? rightBlendFinal + 50 : 0, heightMm: parameters.rightNicheHeightMm || 0 },
       top: { widthMm: parameters.topNicheWidthMm || 0, heightMm: topBlendFinal > 0 ? topBlendFinal + 50 : 0 },
-      bottom: { widthMm: parameters.bottomNicheWidthMm || 0, heightMm: parameters.bottomBlendMm || 0 },
+      bottom: { widthMm: parameters.bottomNicheWidthMm || 0, heightMm: parameters.bottomBlendMm ? parameters.bottomBlendMm + 50 : 0 },
     },
     maskings:
       parameters.outerMaskingLeft || parameters.outerMaskingRight

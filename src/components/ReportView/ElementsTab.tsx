@@ -187,10 +187,27 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
             { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm },
             { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm },
             { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm },
-          ].map(({ label, w, h }) => (
-            <div key={label} className="element-card__row">
+          ].flatMap(({ label, w, h }) => {
+            if (w <= 0 || h <= 0) return [];
+            if (w > 2800) {
+              const half = Math.ceil(w / 2);
+              return [
+                { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: half, displayH: h },
+                { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: half, displayH: h },
+              ];
+            }
+            if (h > 2800) {
+              const half = Math.ceil(h / 2);
+              return [
+                { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: w, displayH: half },
+                { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: w, displayH: half },
+              ];
+            }
+            return [{ key: label, label, displayW: w, displayH: h }];
+          }).map(({ key, label, displayW, displayH }) => (
+            <div key={key} className="element-card__row">
               <span className="element-card__label">{label}</span>
-              <span className="element-card__value">{w} × {h} mm</span>
+              <span className="element-card__value">{displayW} × {displayH} mm</span>
               <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--kolor">kolor</span></span>
             </div>
           ))}

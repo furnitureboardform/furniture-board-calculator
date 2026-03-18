@@ -4,7 +4,7 @@ import type { PricingSummary } from '../../lib/pricing';
 import type { BoardFinish } from '../../lib/types';
 import { ALL_FINISH_OPTIONS } from '../../lib/finishOptions';
 import type { BoardEntry } from './utils';
-import { calcBoardPieces, calcCuttingLengthM, calcEdgeBandingLengthM, roundUpToCents, roundUpToHundreds } from './utils';
+import { calcCuttingLengthM, calcEdgeBandingLengthM, roundUpToCents, roundUpToHundreds } from './utils';
 import {
   COST_PER_HINGE_PLN,
   COST_PER_GUIDE_SET_PLN,
@@ -13,8 +13,8 @@ import {
   COST_PER_LEG_PLN,
   COST_PER_LEG_CLIP_PLN,
   COST_PER_ROD_PLN,
-  COST_PER_SZARY_PIECE_PLN,
-  COST_PER_KOLOR_PIECE_PLN,
+  COST_PER_SZARY_SQM_PLN,
+  COST_PER_KOLOR_SQM_PLN,
   COST_PER_METER_CUTTING_PLN,
   COST_PER_METER_BANDING_PLN,
 } from './constants';
@@ -60,12 +60,14 @@ export function CostsTab({
   const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
   const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
   const rodsCost = totalRods * COST_PER_ROD_PLN;
-  const szaryPieces = calcBoardPieces(szaryBoards);
-  const kolorPieces = calcBoardPieces(kolorBoards);
-  const szaryBoardCost = szaryPieces * COST_PER_SZARY_PIECE_PLN;
+  const szaryAreaMm2 = szaryBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
+  const szaryAreaSqm = Math.round(szaryAreaMm2 / 10000) / 100;
+  const szaryBoardCost = Math.round(szaryAreaSqm * COST_PER_SZARY_SQM_PLN * 100) / 100;
   const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
-  const kolorPricePerSheet = (selectedFinish?.pricePerSheetPln ?? COST_PER_KOLOR_PIECE_PLN * 2) / 2;
-  const kolorBoardCost = kolorPieces * kolorPricePerSheet;
+  const kolorAreaMm2 = kolorBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
+  const kolorAreaSqm = Math.round(kolorAreaMm2 / 10000) / 100;
+  const kolorPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_KOLOR_SQM_PLN;
+  const kolorBoardCost = Math.round(kolorAreaSqm * kolorPricePerSqm * 100) / 100;
   const cuttingLengthM = Math.round((calcCuttingLengthM(szaryBoards) + calcCuttingLengthM(kolorBoards)) * 100) / 100;
   const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
   const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
@@ -87,7 +89,7 @@ export function CostsTab({
   return (
     <div className="summary-tab">
       <div className="boards-summary-section">
-        <div className="boards-summary-section__header boards-summary-section__header--szary">Płyty szare (2800 × 1045 mm)</div>
+        <div className="boards-summary-section__header boards-summary-section__header--szary">Płyty szare (2800 × 2070 mm)</div>
         <table className="boards-summary-table">
           {colGroup}
           <thead>
@@ -101,16 +103,16 @@ export function CostsTab({
           <tbody>
             <tr>
               <td>Płyta szara</td>
-              <td>{szaryPieces} szt.</td>
-              <td>{COST_PER_SZARY_PIECE_PLN} zł</td>
-              <td>{szaryBoardCost} zł</td>
+              <td>{szaryAreaSqm} m²</td>
+              <td>{COST_PER_SZARY_SQM_PLN} zł/m²</td>
+              <td>{szaryBoardCost.toFixed(2)} zł</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div className="boards-summary-section">
         <div className="boards-summary-section__header boards-summary-section__header--kolor">
-          Płyty kolor — {selectedFinish?.label ?? 'nieokreślony'} (2800 × 1045 mm)
+          Płyty kolor — {selectedFinish?.label ?? 'nieokreślony'} (2800 × 2070 mm)
         </div>
         <table className="boards-summary-table">
           {colGroup}
@@ -125,8 +127,8 @@ export function CostsTab({
           <tbody>
             <tr>
               <td>Płyta kolor</td>
-              <td>{kolorPieces} szt.</td>
-              <td>{kolorPricePerSheet.toFixed(2)} zł</td>
+              <td>{kolorAreaSqm} m²</td>
+              <td>{kolorPricePerSqm.toFixed(2)} zł/m²</td>
               <td>{kolorBoardCost.toFixed(2)} zł</td>
             </tr>
           </tbody>

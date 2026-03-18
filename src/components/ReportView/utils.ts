@@ -46,6 +46,19 @@ export function groupBoards(boards: BoardEntry[]): BoardEntry[] {
   return Array.from(map.values());
 }
 
+const MAX_BOARD_DIM_MM = 2800;
+
+function pushNicheBoard(boards: BoardEntry[], widthMm: number, heightMm: number): void {
+  if (widthMm <= 0 || heightMm <= 0) return;
+  if (widthMm > MAX_BOARD_DIM_MM) {
+    boards.push({ dim1: Math.ceil(widthMm / 2), dim2: heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 2 });
+  } else if (heightMm > MAX_BOARD_DIM_MM) {
+    boards.push({ dim1: widthMm, dim2: Math.ceil(heightMm / 2), edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 2 });
+  } else {
+    boards.push({ dim1: widthMm, dim2: heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
+  }
+}
+
 export function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
@@ -57,18 +70,10 @@ export function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   }
 
   const { left, right, top, bottom } = elementsData.niches;
-  if (left.widthMm > 0 && left.heightMm > 0) {
-    boards.push({ dim1: left.widthMm, dim2: left.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
-  }
-  if (right.widthMm > 0 && right.heightMm > 0) {
-    boards.push({ dim1: right.widthMm, dim2: right.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
-  }
-  if (top.widthMm > 0 && top.heightMm > 0) {
-    boards.push({ dim1: top.widthMm, dim2: top.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
-  }
-  if (bottom.widthMm > 0 && bottom.heightMm > 0) {
-    boards.push({ dim1: bottom.widthMm, dim2: bottom.heightMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
-  }
+  pushNicheBoard(boards, left.widthMm, left.heightMm);
+  pushNicheBoard(boards, right.widthMm, right.heightMm);
+  pushNicheBoard(boards, top.widthMm, top.heightMm);
+  pushNicheBoard(boards, bottom.widthMm, bottom.heightMm);
 
   if (elementsData.maskings) {
     if (elementsData.maskings.left) {

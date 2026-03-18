@@ -11,8 +11,8 @@ import {
   COST_PER_LEG_CLIP_PLN,
   COST_PER_ROD_PLN,
   BOARD_PIECE_AREA_MM2,
-  COST_PER_SZARY_PIECE_PLN,
-  COST_PER_KOLOR_PIECE_PLN,
+  COST_PER_SZARY_SQM_PLN,
+  COST_PER_KOLOR_SQM_PLN,
   COST_PER_METER_CUTTING_PLN,
   COST_PER_METER_BANDING_PLN,
 } from './constants';
@@ -114,17 +114,16 @@ function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   }
 
   const { left, right, top, bottom } = elementsData.niches;
-  if (left.widthMm > 0 && left.heightMm > 0) {
-    boards.push({ dim1: left.widthMm, dim2: left.heightMm, edgeBandingMm: 0, qty: 1 });
-  }
-  if (right.widthMm > 0 && right.heightMm > 0) {
-    boards.push({ dim1: right.widthMm, dim2: right.heightMm, edgeBandingMm: 0, qty: 1 });
-  }
-  if (top.widthMm > 0 && top.heightMm > 0) {
-    boards.push({ dim1: top.widthMm, dim2: top.heightMm, edgeBandingMm: 0, qty: 1 });
-  }
-  if (bottom.widthMm > 0 && bottom.heightMm > 0) {
-    boards.push({ dim1: bottom.widthMm, dim2: bottom.heightMm, edgeBandingMm: 0, qty: 1 });
+  for (const niche of [left, right, top, bottom]) {
+    const { widthMm, heightMm } = niche;
+    if (widthMm <= 0 || heightMm <= 0) continue;
+    if (widthMm > 2800) {
+      boards.push({ dim1: Math.ceil(widthMm / 2), dim2: heightMm, edgeBandingMm: 0, qty: 2 });
+    } else if (heightMm > 2800) {
+      boards.push({ dim1: widthMm, dim2: Math.ceil(heightMm / 2), edgeBandingMm: 0, qty: 2 });
+    } else {
+      boards.push({ dim1: widthMm, dim2: heightMm, edgeBandingMm: 0, qty: 1 });
+    }
   }
 
   if (elementsData.maskings?.left) {
@@ -245,11 +244,11 @@ export function calculatePricingSummary(
   const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
   const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
   const rodsCost = totalRods * COST_PER_ROD_PLN;
-  const szaryPieces = calcBoardPieces(szaryBoards);
-  const kolorPieces = calcBoardPieces(kolorBoards);
-  const szaryBoardCost = szaryPieces * COST_PER_SZARY_PIECE_PLN;
-  const kolorPricePerSheet = (selectedFinish?.pricePerSheetPln ?? COST_PER_KOLOR_PIECE_PLN * 2) / 2;
-  const kolorBoardCost = kolorPieces * kolorPricePerSheet;
+  const szaryAreaSqm = szaryBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
+  const szaryBoardCost = Math.round(szaryAreaSqm * COST_PER_SZARY_SQM_PLN * 100) / 100;
+  const kolorAreaSqm = kolorBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
+  const kolorPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_KOLOR_SQM_PLN;
+  const kolorBoardCost = Math.round(kolorAreaSqm * kolorPricePerSqm * 100) / 100;
   const cuttingLengthM = Math.round((calcCuttingLengthM(szaryBoards) + calcCuttingLengthM(kolorBoards)) * 100) / 100;
   const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
   const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
