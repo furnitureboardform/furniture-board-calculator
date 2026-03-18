@@ -417,7 +417,7 @@ export function buildReport(
               heightMm: door.heightMm,
               widthMm: door.widthMm,
               hinges: (() => {
-                const perPanel = Math.max(2, Math.ceil(door.heightMm / 520));
+                const perPanel = Math.min(5, Math.max(2, Math.ceil(door.heightMm / 520)));
                 return door.doubleDoor ? perPanel * 2 : perPanel;
               })(),
             }
