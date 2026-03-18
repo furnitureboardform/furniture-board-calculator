@@ -10,7 +10,6 @@ import {
   COST_PER_LEG_PLN,
   COST_PER_LEG_CLIP_PLN,
   COST_PER_ROD_PLN,
-  BOARD_PIECE_AREA_MM2,
   COST_PER_SZARY_SQM_PLN,
   COST_PER_KOLOR_SQM_PLN,
   COST_PER_METER_CUTTING_PLN,
@@ -59,11 +58,6 @@ export function applyFixedDiscountToPln(amountPln: number, discountPln: number):
     discountAmount: appliedDiscount,
     discountedAmount: amountPln - appliedDiscount,
   };
-}
-
-function calcBoardPieces(boards: BoardEntry[]): number {
-  const totalArea = boards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
-  return Math.ceil(totalArea / BOARD_PIECE_AREA_MM2);
 }
 
 function calcCuttingLengthM(boards: BoardEntry[]): number {
@@ -213,6 +207,7 @@ export function calculatePricingSummary(
   discountPln = 0,
   discountPercent = 0,
   transportCostPln = 0,
+  customElementsCostPln = 0,
 ): PricingSummary {
   if (!elementsData || !hardwareSummary) {
     const safePercent = clampDiscountPercent(discountPercent);
@@ -254,7 +249,7 @@ export function calculatePricingSummary(
   const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
   const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
   const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
-  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost + (transportCostPln > 0 ? transportCostPln : 0);
+  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost + (transportCostPln > 0 ? transportCostPln : 0) + (customElementsCostPln > 0 ? customElementsCostPln : 0);
   const totalCost = roundUpToCents(rawTotalCost);
   const roundedBaseForClient = roundUpToHundreds(totalCost);
   const materialsDeposit = roundedBaseForClient;

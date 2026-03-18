@@ -37,6 +37,9 @@ interface CostsTabProps {
   transportInput: string;
   onTransportInput: (value: string) => void;
   onCommitTransport: () => void;
+  customElementsInput: string;
+  onCustomElementsInput: (value: string) => void;
+  onCommitCustomElements: () => void;
 }
 
 export function CostsTab({
@@ -57,6 +60,9 @@ export function CostsTab({
   transportInput,
   onTransportInput,
   onCommitTransport,
+  customElementsInput,
+  onCustomElementsInput,
+  onCommitCustomElements,
 }: CostsTabProps) {
   const hingesCost = totalHinges * COST_PER_HINGE_PLN;
   const guidesCost = hardwareSummary.totalGuides * COST_PER_GUIDE_SET_PLN;
@@ -253,6 +259,21 @@ export function CostsTab({
                   onChange={(e) => onTransportInput(e.target.value)}
                   onBlur={onCommitTransport}
                   onKeyDown={(e) => { if (e.key === 'Enter') onCommitTransport(); }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={3}>Koszt elementów niestandardowych</td>
+              <td>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  className="report-discount-input"
+                  value={customElementsInput}
+                  onChange={(e) => onCustomElementsInput(e.target.value)}
+                  onBlur={onCommitCustomElements}
+                  onKeyDown={(e) => { if (e.key === 'Enter') onCommitCustomElements(); }}
                 />
               </td>
             </tr>

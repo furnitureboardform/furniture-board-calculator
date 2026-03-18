@@ -33,6 +33,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('0');
   const [transportCostPln, setTransportCostPln] = useState<number>(0);
   const [transportInput, setTransportInput] = useState<string>('0');
+  const [customElementsCostPln, setCustomElementsCostPln] = useState<number>(0);
+  const [customElementsInput, setCustomElementsInput] = useState<string>('0');
 
   const parsedDiscountPln = useMemo(() => {
     if (!Number.isFinite(discountPln)) return 0;
@@ -112,8 +114,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     [doorHandle.optionId]
   );
   const pricingSummary = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln),
-    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln]
   );
 
   const kolorBoards = useMemo(
@@ -226,6 +228,18 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
                 setTransportCostPln(safe);
                 setTransportInput(String(safe));
+              }}
+              customElementsInput={customElementsInput}
+              onCustomElementsInput={(value) => {
+                setCustomElementsInput(value);
+                const parsed = Number(value.trim().replace(',', '.'));
+                setCustomElementsCostPln(Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0);
+              }}
+              onCommitCustomElements={() => {
+                const parsed = Number(customElementsInput.trim().replace(',', '.'));
+                const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
+                setCustomElementsCostPln(safe);
+                setCustomElementsInput(String(safe));
               }}
             />
           )}
