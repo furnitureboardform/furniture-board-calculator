@@ -20,6 +20,9 @@ export const MB = 32;
 export const SNAP_MM = 10;
 export const GAP_MM  = 3;
 
+/** Threshold in mm within which a partition snaps to the center of a segment. */
+export const CENTER_SNAP_MM = 50;
+
 export const COLORS = {
   mask:     '#bcc3d0',
   niche:    '#2e7a50',

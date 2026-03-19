@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { BoxForm } from '../../lib/types';
 import type { ItemType, PositionedItem, TooltipState, DragHoverPos, WardrobeSegment, BoxSeg } from './types';
 import { PALETTE, PANEL_MM, SVG_W, SVG_H, ML, MT, MR, MB } from './constants';
-import { uid, buildDragHoverPos, getHorizontalSegmentForItem, getPartitionSpan, calcDropY, calcDropX, getSnappedY } from './utils';
+import { uid, buildDragHoverPos, getHorizontalSegmentForItem, getPartitionSpan, calcDropY, calcDropX, getSnappedY, snapPartitionX } from './utils';
 
 interface UseWardrobeSchematicParams {
   nicheWidthMm: number;
@@ -199,7 +199,8 @@ export function useWardrobeSchematic({
     if (type === 'partition') {
       const rawY = calcDropY(e, mainH, 0);
       const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, seg.boxIdx, placedItems, mainH);
-      addItem(seg.boxIdx, { type: 'partition', yMm: rawY, xMm: rawX, spanTopMm, spanBotMm });
+      const snappedX = snapPartitionX(rawX, 0, seg.wMm);
+      addItem(seg.boxIdx, { type: 'partition', yMm: rawY, xMm: snappedX, spanTopMm, spanBotMm });
     } else if (type === 'nadstawka') {
       // Nadstawka always spans the full box width — no horizontal segmentation.
       const rawY = calcDropY(e, mainH, PANEL_MM);

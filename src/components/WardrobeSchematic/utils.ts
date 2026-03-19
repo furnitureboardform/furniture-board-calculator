@@ -1,5 +1,5 @@
 import type { ItemType, PositionedItem, DragHoverPos } from './types';
-import { PALETTE, SNAP_MM, GAP_MM, PANEL_MM } from './constants';
+import { PALETTE, SNAP_MM, GAP_MM, PANEL_MM, CENTER_SNAP_MM } from './constants';
 
 export function uid(): string {
   return `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
@@ -29,6 +29,24 @@ export function calcDropX(e: React.DragEvent<HTMLDivElement>, boxWidthMm: number
   const rect = e.currentTarget.getBoundingClientRect();
   const relX = Math.max(0, Math.min(0.999, (e.clientX - rect.left) / rect.width));
   return Math.round((relX * boxWidthMm) / SNAP_MM) * SNAP_MM;
+}
+
+/**
+ * For a partition, snap its left edge to the horizontal center of a given
+ * segment [segStartMm, segEndMm] when the cursor is within CENTER_SNAP_MM.
+ * The "centered" position places the partition mid-panel so its visual centre
+ * aligns with the segment centre.
+ */
+export function snapPartitionX(
+  rawXMm: number,
+  segStartMm: number,
+  segEndMm: number
+): number {
+  const centeredX = segStartMm + (segEndMm - segStartMm - PANEL_MM) / 2;
+  if (Math.abs(rawXMm - centeredX) <= CENTER_SNAP_MM) {
+    return centeredX;
+  }
+  return rawXMm;
 }
 
 /** Snap Y: if cursor lands inside an existing item, snap above or below it. */
@@ -170,7 +188,8 @@ export function buildDragHoverPos(
   if (draggingType === 'partition') {
     const rawY = calcDropY(e, mainH, 0);
     const { spanTopMm, spanBotMm } = getPartitionSpan(rawY, boxIdx, placedItems, mainH);
-    return { boxIdx, yMm: rawY, xMm: rawX, spanTopMm, spanBotMm };
+    const snappedX = snapPartitionX(rawX, 0, boxWidthMm);
+    return { boxIdx, yMm: rawY, xMm: snappedX, spanTopMm, spanBotMm };
   }
 
   // Nadstawka always spans the full box width — no horizontal segmentation needed.
