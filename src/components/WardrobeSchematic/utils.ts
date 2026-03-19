@@ -49,6 +49,8 @@ export function snapPartitionX(
   return rawXMm;
 }
 
+const STRUCTURAL_TYPES: ItemType[] = ['drawers', 'shelves', 'nadstawka'];
+
 /** Snap Y: if cursor lands inside an existing item, snap above or below it. */
 export function getSnappedY(
   rawYMm: number,
@@ -59,22 +61,62 @@ export function getSnappedY(
   segmentStartMm?: number,
   segmentEndMm?: number
 ): number {
-  const newH = PALETTE.find((p) => p.type === newItemType)?.heightMm ?? 22;
-  for (const item of (placed[boxIdx] || [])) {
-    if (item.type === 'partition') continue;
+  const newPalette = PALETTE.find((p) => p.type === newItemType);
+  const newH = newPalette?.boardMm ?? newPalette?.heightMm ?? 22;
+
+  const relevantItems = (placed[boxIdx] || []).filter((it) => {
+    if (it.type === 'partition') return false;
     if (segmentStartMm !== undefined && segmentEndMm !== undefined) {
-      const s = item.startMm ?? 0;
-      const e = item.endMm ?? segmentEndMm;
-      if (e <= segmentStartMm || s >= segmentEndMm) continue;
+      const s = it.startMm ?? 0;
+      const e = it.endMm ?? segmentEndMm;
+      if (e <= segmentStartMm || s >= segmentEndMm) return false;
     }
+    return true;
+  });
+
+  if (STRUCTURAL_TYPES.includes(newItemType)) {
+    /*
+     * For structural items (drawers, shelves, nadstawka), merge all touching/
+     * overlapping occupied zones before snapping. This prevents a scenario
+     * where the cursor is inside item A but the snap-above result would
+     * overlap item B sitting directly on top of A.
+     */
+    const zones = relevantItems
+      .map((it) => {
+        const pc = PALETTE.find((p) => p.type === it.type);
+        return { top: it.yMm, bot: it.yMm + (pc?.boardMm || pc?.heightMm || 0) };
+      })
+      .sort((a, b) => a.top - b.top);
+
+    const merged: { top: number; bot: number }[] = [];
+    for (const z of zones) {
+      if (merged.length && z.top <= merged[merged.length - 1].bot) {
+        merged[merged.length - 1].bot = Math.max(merged[merged.length - 1].bot, z.bot);
+      } else {
+        merged.push({ ...z });
+      }
+    }
+
+    const zone = merged.find((z) => rawYMm >= z.top && rawYMm <= z.bot);
+    if (zone) {
+      const candidateAbove = Math.max(0, zone.top - newH);
+      const candidateBelow = Math.min(mainH - newH, zone.bot);
+      return rawYMm <= (zone.top + zone.bot) / 2 ? candidateAbove : candidateBelow;
+    }
+    return rawYMm;
+  }
+
+  // Original per-item snap for non-structural items (rods, etc.)
+  for (const item of relevantItems) {
     const pc = PALETTE.find((p) => p.type === item.type);
     if (!pc) continue;
     const top = item.yMm;
-    const bot = item.yMm + pc.heightMm;
+    const bot = item.yMm + (pc.boardMm || pc.heightMm);
     if (rawYMm >= top && rawYMm <= bot) {
+      const gap = STRUCTURAL_TYPES.includes(item.type) ? 0 : GAP_MM;
       return rawYMm <= (top + bot) / 2
-        ? Math.max(0, top - newH - GAP_MM)
-        : Math.min(mainH - newH, bot + GAP_MM);
+        ? Math.max(0, top - newH - gap)
+        : Math.min(mainH - newH, bot + gap);
     }
   }
   return rawYMm;

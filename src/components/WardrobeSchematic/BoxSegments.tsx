@@ -157,7 +157,7 @@ export function BoxSegments({
               key={item.id}
               clipPath={`url(#clip-box-${boxIdx})`}
               onClick={() => onRemoveItem(boxIdx, item.id, item.type)}
-              onMouseEnter={(e) => onTooltipChange({ x: e.clientX + 10, y: e.clientY + 10, text: `Szuflada\nSzerokość: ${widthMm} mm\nWysokość: ${heightMm} mm\nOd dołu: ${mainH - item.yMm - heightMm} mm` })}
+              onMouseEnter={(e) => onTooltipChange({ x: e.clientX + 10, y: e.clientY + 10, text: `Szuflada\nSzerokość: ${widthMm} mm\nWysokość: ${heightMm} mm\nOd dołu (góra szuflady): ${mainH - item.yMm} mm` })}
               onMouseLeave={() => onTooltipChange(null)}
               style={{ cursor: 'pointer' }}
             >

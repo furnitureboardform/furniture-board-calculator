@@ -23,6 +23,12 @@ export const boardThicknessMm = 18;
  */
 export const drawerInternalWallDeductionMm = 5 * boardThicknessMm; // 90mm
 
+/**
+ * Stałe odjęcie (niezależne od separatora) dla szerokości przodu/tyłu szuflady:
+ * drawerInternalWallDeductionMm - drawerSideDepthReductionMm = 90 - 3 = 87 mm.
+ */
+export const drawerInternalWallFixedDeductionMm = drawerInternalWallDeductionMm - 3; // 87mm
+
 /** Wysokość boku szuflady (lewy + prawy). */
 export const drawerSideHeightMm = 145;
 
@@ -37,6 +43,9 @@ export const internalWallHeight2Mm = 130;
 
 /** Odjęcie z głębokości na montaż prowadnic. */
 export const guidesMarginMm = 60;
+
+/** Dodatkowe odjęcie z głębokości boku szuflady (grubość tylnej płyty HDF). */
+export const drawerSideDepthReductionMm = 3;
 
 /** Odjęcie ze szerokości na ściany wewnętrzne szuflady. */
 export const internalWallMarginMm = 83;

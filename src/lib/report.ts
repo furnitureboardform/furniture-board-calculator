@@ -453,13 +453,14 @@ export function buildReport(
           if (drawerCount === 0) return undefined;
           const isDouble = parameters.boxDoubleDoors?.[i] ?? false;
           const boxW = boxWidthsForPanels[i] ?? parameters.boxWidthMm;
-          const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm;
+          // Głębokość boku szuflady = głębokość szafki - margines prowadnic - grubość tylnej płyty
+          const internalD = parameters.cabinetDepthMm - specs.guidesMarginMm - specs.drawerSideDepthReductionMm;
           const sets = 1; // szuflady są zawsze 1 zestaw na box, niezależnie od drzwi
           // Front szuflady: boxW - (80mm podwójne / 40mm pojedyncze) - luz 8mm
           const separatorDeductionMm = isDouble ? 2 * specs.separatorWidthMm : specs.separatorWidthMm;
           const frontW = boxW - separatorDeductionMm - specs.drawerFrontClearanceMm;
-          // Przód/Tył szuflady: boxW - (80/40) - 2×18 - 2×18 - 18 = boxW - separatorDeduction - 90mm
-          const internalWallW = boxW - separatorDeductionMm - specs.drawerInternalWallDeductionMm;
+          // Przód/Tył szuflady: boxW - separator - 87 (stałe odjęcie)
+          const internalWallW = boxW - separatorDeductionMm - specs.drawerInternalWallFixedDeductionMm;
           return {
             count: drawerCount,
             sidePanel: { heightMm: specs.drawerSideHeightMm, depthMm: internalD },
