@@ -4,8 +4,8 @@ import type { BoardEntry } from './utils';
 import { BoardsSection } from './BoardsSection';
 
 interface SummaryTabProps {
-  kolorBoards: BoardEntry[];
-  szaryBoards: BoardEntry[];
+  coverBoards: BoardEntry[];
+  carcassBoards: BoardEntry[];
   hdfBoards: BoardEntry[];
   totalRods: number;
   totalHinges: number;
@@ -13,11 +13,11 @@ interface SummaryTabProps {
   selectedHandle: HandleOption | undefined;
 }
 
-export function SummaryTab({ kolorBoards, szaryBoards, hdfBoards, totalRods, totalHinges, hardwareSummary, selectedHandle }: SummaryTabProps) {
+export function SummaryTab({ coverBoards, carcassBoards, hdfBoards, totalRods, totalHinges, hardwareSummary, selectedHandle }: SummaryTabProps) {
   return (
     <div className="summary-tab">
-      <BoardsSection title="Płyty kolor" colorClass="boards-summary-section__header--kolor" boards={kolorBoards} />
-      <BoardsSection title="Płyty szare" colorClass="boards-summary-section__header--szary" boards={szaryBoards} />
+      <BoardsSection title="Płyty obicie" colorClass="boards-summary-section__header--cover" boards={coverBoards} />
+      <BoardsSection title="Płyty korpus" colorClass="boards-summary-section__header--carcass" boards={carcassBoards} />
       {hdfBoards.length > 0 && (
         <BoardsSection title="Płyta HDF" colorClass="boards-summary-section__header--hdf" boards={hdfBoards} />
       )}

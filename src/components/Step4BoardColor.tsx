@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { BoardFinish, DoorHandleSelection, FinishType } from '../lib/types';
-import { COLOR_OPTIONS, VENEER_OPTIONS, ACRYLIC_OPTIONS } from '../lib/finishOptions';
+import { COVER_OPTIONS, VENEER_OPTIONS, ACRYLIC_OPTIONS } from '../lib/finishOptions';
 import { HANDLE_OPTIONS } from '../lib/handleOptions';
 
 export interface Step4BoardColorProps {
@@ -63,10 +63,10 @@ function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option
 
 export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHandleChange, onGoToStep, onSubmit, active }: Step4BoardColorProps) {
   const [zoomedOption, setZoomedOption] = useState<{ label: string; imageUrl: string } | null>(null);
-  const options = finish.type === 'laminat' ? COLOR_OPTIONS : finish.type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS;
+  const options = finish.type === 'laminat' ? COVER_OPTIONS : finish.type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS;
 
   function handleTypeChange(type: FinishType) {
-    const defaultOption = (type === 'laminat' ? COLOR_OPTIONS : type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS)[0]!;
+    const defaultOption = (type === 'laminat' ? COVER_OPTIONS : type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS)[0]!;
     onFinishChange({ type, optionId: defaultOption.id });
   }
 
@@ -74,7 +74,7 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
     <div className={`step ${active ? 'active' : ''}`}>
       <div className="step-label">Krok 4 z 4</div>
       <div className="card">
-        <h2>Kolor płyty</h2>
+        <h2>Okleina płyty</h2>
         <div className="field">
           <label htmlFor="finish-type">Typ wykończenia</label>
           <select
@@ -82,9 +82,9 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
             value={finish.type}
             onChange={(e) => handleTypeChange(e.target.value as FinishType)}
           >
-            <option value="laminat">Okleina laminat kolor</option>
+            <option value="laminat">Okleina laminat obicie</option>
             <option value="okleina">Okleina laminat drewniana</option>
-            <option value="akryl">Okleina akryl kolor</option>
+            <option value="akryl">Okleina akryl obicie</option>
           </select>
         </div>
         <div className="finish-cards">

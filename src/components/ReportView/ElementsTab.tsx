@@ -21,7 +21,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                   {box.door.heightMm} × {box.door.widthMm} mm
                 </span>
                 <span className="element-card__meta">
-                  Wszystkie obrzeża (4 strony) · zawiasy: {box.door.hinges} szt. · <span className="element-card__color element-card__color--kolor">kolor</span>
+                  Wszystkie obrzeża (4 strony) · zawiasy: {box.door.hinges} szt. · <span className="element-card__color element-card__color--cover">obicie</span>
                 </span>
               </div>
             )}
@@ -32,7 +32,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                   {g.widthMm} × {box.shelves!.depthMm} mm
                 </span>
                 <span className="element-card__meta">
-                  Obrzeże na szerokości {g.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                  Obrzeże na szerokości {g.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                 </span>
               </div>
             ))}
@@ -49,7 +49,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     <span className="element-card__label">Przegroda {si + 1} (1 szt.)</span>
                     <span className="element-card__value">{s.heightMm} × {s.depthMm} mm</span>
                     <span className="element-card__meta">
-                      Obrzeże na wysokości {s.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                      Obrzeże na wysokości {s.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                     </span>
                   </div>
                 ))}
@@ -62,7 +62,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                   {hdfSection.widthMm} × {hdfSection.heightMm} mm
                 </span>
                 <span className="element-card__meta">
-                  <span className="element-card__color element-card__color--szary">szary</span>
+                  <span className="element-card__color element-card__color--carcass">korpus</span>
                 </span>
               </div>
             ))}
@@ -77,7 +77,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                         {panel.sideHeightMm} × {panel.depthMm} mm
                       </span>
                       <span className="element-card__meta">
-                        Obrzeże na wysokości {panel.sideHeightMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                        Obrzeże na wysokości {panel.sideHeightMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                       </span>
                     </div>
                     <div className="element-card__row">
@@ -86,7 +86,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                         {panel.topBottomWidthMm} × {panel.depthMm} mm
                       </span>
                       <span className="element-card__meta">
-                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                       </span>
                     </div>
                     <div className="element-card__row">
@@ -95,7 +95,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                         {panel.topBottomWidthMm} × {panel.depthMm} mm
                       </span>
                       <span className="element-card__meta">
-                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                        Obrzeże na szerokości {panel.topBottomWidthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                       </span>
                     </div>
                   </div>
@@ -116,7 +116,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.sidePanel.heightMm} × {box.drawerBoards.sidePanel.depthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Obrzeże na długości {box.drawerBoards.sidePanel.depthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                    Obrzeże na długości {box.drawerBoards.sidePanel.depthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -125,7 +125,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.frontPanel.heightMm} × {box.drawerBoards.frontPanel.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Wszystkie obrzeża (4 strony) · <span className="element-card__color element-card__color--szary">szary</span>
+                    Wszystkie obrzeża (4 strony) · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -134,7 +134,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.internalWall1.heightMm} × {box.drawerBoards.internalWall1.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Obrzeże na długości {box.drawerBoards.internalWall1.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                    Obrzeże na długości {box.drawerBoards.internalWall1.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -143,7 +143,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.internalWall2.heightMm} × {box.drawerBoards.internalWall2.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Obrzeże na długości {box.drawerBoards.internalWall2.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--szary">szary</span>
+                    Obrzeże na długości {box.drawerBoards.internalWall2.widthMm} mm (1 bok) · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -152,7 +152,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.hdfBottom.depthMm} × {box.drawerBoards.hdfBottom.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Bez obrzeży · <span className="element-card__color element-card__color--szary">szary</span>
+                    Bez obrzeży · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -161,7 +161,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.separator.heightMm} × {box.drawerBoards.separator.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Bez obrzeży · <span className="element-card__color element-card__color--szary">szary</span>
+                    Bez obrzeży · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
                 <div className="element-card__row">
@@ -170,7 +170,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.drawerRail.heightMm} × {box.drawerBoards.drawerRail.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Jedno obrzeże na długości {box.drawerBoards.drawerRail.widthMm} mm · <span className="element-card__color element-card__color--szary">szary</span>
+                    Jedno obrzeże na długości {box.drawerBoards.drawerRail.widthMm} mm · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
               </>
@@ -214,7 +214,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
             <div key={key} className="element-card__row">
               <span className="element-card__label">{label}</span>
               <span className="element-card__value">{displayW} × {displayH} mm</span>
-              <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--kolor">kolor</span></span>
+              <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--cover">obicie</span></span>
             </div>
           ))}
         </div>
@@ -231,7 +231,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                   {elementsData.maskings.left.heightMm} × {elementsData.maskings.left.widthMm} mm
                 </span>
                 <span className="element-card__meta">
-                  Obrzeże na wysokości {elementsData.maskings.left.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--kolor">kolor</span>
+                  Obrzeże na wysokości {elementsData.maskings.left.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--cover">obicie</span>
                 </span>
               </div>
             )}
@@ -242,7 +242,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                   {elementsData.maskings.right.heightMm} × {elementsData.maskings.right.widthMm} mm
                 </span>
                 <span className="element-card__meta">
-                  Obrzeże na wysokości {elementsData.maskings.right.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--kolor">kolor</span>
+                  Obrzeże na wysokości {elementsData.maskings.right.heightMm} mm (1 bok) · <span className="element-card__color element-card__color--cover">obicie</span>
                 </span>
               </div>
             )}

@@ -85,7 +85,7 @@ function getNicheShelfBoard(parameters: Parameters): NicheBoard {
     dimensionsTuple: [nicheDims.shelfHeight, nicheDims.shelfWidth],
     qty: 1,
     material: 'Płyta meblowa',
-    color: 'Kolor A (inny niż standard)',
+    color: 'Obicie A (inny niż standard)',
     edgeBanding: 'Wszystkie obrzeża (4 strony)',
   };
 }
@@ -99,7 +99,7 @@ function getNicheBlendBoard(parameters: Parameters): NicheBoard {
     dimensionsTuple: [nicheDims.blendHeight, nicheDims.blendWidth],
     qty: 1,
     material: 'Płyta meblowa',
-    color: 'Kolor A (ten sam co półka)',
+    color: 'Obicie A (ten sam co półka)',
     edgeBanding: 'Obrzeża na krótszych bokach (2) + jeden długszy bok',
   };
 }

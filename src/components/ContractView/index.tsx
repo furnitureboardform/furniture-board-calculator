@@ -186,7 +186,7 @@ export function ContractView({
 
           <div className="contract-data-grid">
             <div className="contract-data-card">
-              <span>Okleina / kolor</span>
+              <span>Okleina / obicie</span>
               <strong>{selectedFinish?.label ?? boardFinish.optionId}</strong>
             </div>
             <div className="contract-data-card">

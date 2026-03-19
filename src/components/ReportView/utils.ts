@@ -59,7 +59,7 @@ function pushNicheBoard(boards: BoardEntry[], widthMm: number, heightMm: number)
   }
 }
 
-export function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
+export function getCoverBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
   for (const box of elementsData.boxes) {
@@ -89,7 +89,7 @@ export function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   return boards;
 }
 
-export function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
+export function getCarcassBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
   for (const box of elementsData.boxes) {

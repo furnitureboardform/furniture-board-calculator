@@ -302,7 +302,7 @@ export function buildReport(
     ],
   };
 
-  lines.push('📦 PŁYTY MEBLOWE KORPUS SZARY');
+  lines.push('📦 PŁYTY MEBLOWE KORPUS');
   lines.push('─'.repeat(80));
   for (const board of woodenBoards) {
     const totalQty = board.qtyPerDrawer * parameters.numberOfDrawers;
@@ -319,7 +319,7 @@ export function buildReport(
       ? parameters.boxWidths.slice(0, parameters.numberOfBoxes)
       : Array(parameters.numberOfBoxes).fill(parameters.boxWidthMm) as number[];
 
-  lines.push('📦 PŁYTY MEBLOWE OBICIE KOLOR');
+  lines.push('📦 PŁYTY MEBLOWE OBICIE');
   lines.push('═'.repeat(80));
   lines.push('');
 

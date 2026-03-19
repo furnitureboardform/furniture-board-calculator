@@ -404,12 +404,12 @@ main {
   border-radius: 3px;
 }
 
-.element-card__color--kolor {
+.element-card__color--cover {
   color: #ffd54f;
   background: rgba(255, 213, 79, 0.12);
 }
 
-.element-card__color--szary {
+.element-card__color--carcass {
   color: #b0bec5;
   background: rgba(176, 190, 197, 0.12);
 }
@@ -575,13 +575,13 @@ main {
   text-transform: uppercase;
 }
 
-.boards-summary-section__header--kolor {
+.boards-summary-section__header--cover {
   background: rgba(255, 213, 79, 0.12);
   color: #ffd54f;
   border-bottom: 1px solid rgba(255, 213, 79, 0.2);
 }
 
-.boards-summary-section__header--szary {
+.boards-summary-section__header--carcass {
   background: rgba(176, 190, 197, 0.1);
   color: #b0bec5;
   border-bottom: 1px solid rgba(176, 190, 197, 0.15);
@@ -597,6 +597,88 @@ main {
   background: rgba(144, 202, 249, 0.1);
   color: #90caf9;
   border-bottom: 1px solid rgba(144, 202, 249, 0.15);
+}
+
+.boards-summary-section__header--podsumowanie {
+  background: rgba(129, 199, 132, 0.1);
+  color: #81c784;
+  border-bottom: 1px solid rgba(129, 199, 132, 0.15);
+}
+
+.costs-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.costs-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.costs-summary-card--editable {
+  border-color: rgba(144, 202, 249, 0.2);
+}
+
+.costs-summary-card--total {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.costs-summary-card--client-price {
+  border-color: rgba(239, 83, 80, 0.4);
+  background: rgba(239, 83, 80, 0.08);
+}
+
+.costs-summary-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.costs-summary-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.costs-summary-card--total .costs-summary-card__value {
+  color: #fff;
+}
+
+.costs-summary-card--client-price .costs-summary-card__value {
+  color: #ef5350;
+  font-size: 1.4rem;
+}
+
+.costs-summary-card__input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 2px 0;
+  width: 100%;
+  outline: none;
+}
+
+.costs-summary-card__input:focus {
+  border-bottom-color: #90caf9;
+}
+
+.costs-summary-card__unit {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .boards-summary-table {
@@ -634,13 +716,13 @@ main {
   text-transform: uppercase;
 }
 
-.costs-section-header--szary td {
+.costs-section-header--carcass td {
   background: rgba(176, 190, 197, 0.1);
   color: #b0bec5;
   border-bottom: 1px solid rgba(176, 190, 197, 0.15);
 }
 
-.costs-section-header--kolor td {
+.costs-section-header--cover td {
   background: rgba(255, 213, 79, 0.12);
   color: #ffd54f;
   border-bottom: 1px solid rgba(255, 213, 79, 0.2);

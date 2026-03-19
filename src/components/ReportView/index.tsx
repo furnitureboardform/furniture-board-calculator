@@ -3,7 +3,7 @@ import type { ElementsData, HardwareSummary, ParametersData } from '../../lib/re
 import type { BoardFinish, DoorHandleSelection } from '../../lib/types';
 import { ALL_HANDLE_OPTIONS } from '../../lib/handleOptions';
 import { calculatePricingSummary } from '../../lib/pricing';
-import { groupBoards, getKolorBoards, getSzaryBoards } from './utils';
+import { groupBoards, getCoverBoards, getCarcassBoards } from './utils';
 import { ParametersTab } from './ParametersTab';
 import { ElementsTab } from './ElementsTab';
 import { SummaryTab } from './SummaryTab';
@@ -118,12 +118,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln]
   );
 
-  const kolorBoards = useMemo(
-    () => elementsData ? groupBoards(getKolorBoards(elementsData)) : [],
+  const coverBoards = useMemo(
+    () => elementsData ? groupBoards(getCoverBoards(elementsData)) : [],
     [elementsData]
   );
-  const szaryBoards = useMemo(
-    () => elementsData ? groupBoards(getSzaryBoards(elementsData)) : [],
+  const carcassBoards = useMemo(
+    () => elementsData ? groupBoards(getCarcassBoards(elementsData)) : [],
     [elementsData]
   );
   const hdfBoards = useMemo(
@@ -191,8 +191,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
 
           {activeTab === 'summary' && (
             <SummaryTab
-              kolorBoards={kolorBoards}
-              szaryBoards={szaryBoards}
+              coverBoards={coverBoards}
+              carcassBoards={carcassBoards}
               hdfBoards={hdfBoards}
               totalRods={totalRods}
               totalHinges={totalHinges}
@@ -203,8 +203,8 @@ export default function ReportView({ parametersData, reportText: _reportText, su
 
           {activeTab === 'costs' && hardwareSummary && (
             <CostsTab
-              kolorBoards={kolorBoards}
-              szaryBoards={szaryBoards}
+              coverBoards={coverBoards}
+              carcassBoards={carcassBoards}
               totalRods={totalRods}
               totalHinges={totalHinges}
               hardwareSummary={hardwareSummary}

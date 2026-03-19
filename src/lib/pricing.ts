@@ -10,10 +10,12 @@ import {
   COST_PER_LEG_PLN,
   COST_PER_LEG_CLIP_PLN,
   COST_PER_ROD_PLN,
-  COST_PER_SZARY_SQM_PLN,
-  COST_PER_KOLOR_SQM_PLN,
+  COST_PER_CARCASS_SQM_PLN,
+  COST_PER_COVER_SQM_PLN,
   COST_PER_METER_CUTTING_PLN,
   COST_PER_METER_BANDING_PLN,
+  COST_PER_METER_VENEER_CARCASS_PLN,
+  COST_PER_METER_VENEER_COVER_PLN,
 } from './constants';
 
 interface BoardEntry {
@@ -92,7 +94,7 @@ function groupBoards(boards: BoardEntry[]): BoardEntry[] {
   return Array.from(map.values());
 }
 
-function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
+function getCoverBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
   for (const box of elementsData.boxes) {
@@ -156,7 +158,7 @@ function getKolorBoards(elementsData: ElementsData): BoardEntry[] {
   return boards;
 }
 
-function getSzaryBoards(elementsData: ElementsData): BoardEntry[] {
+function getCarcassBoards(elementsData: ElementsData): BoardEntry[] {
   const boards: BoardEntry[] = [];
 
   for (const box of elementsData.boxes) {
@@ -243,8 +245,8 @@ export function calculatePricingSummary(
 
   const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
   const handleUnitPrice = ALL_HANDLE_OPTIONS.get(doorHandle.optionId)?.pricePln ?? DEFAULT_HANDLE_PRICE_PLN;
-  const kolorBoards = groupBoards(getKolorBoards(elementsData));
-  const szaryBoards = groupBoards(getSzaryBoards(elementsData));
+  const coverBoards = groupBoards(getCoverBoards(elementsData));
+  const carcassBoards = groupBoards(getCarcassBoards(elementsData));
   const totalHinges = elementsData.boxes.reduce((sum, box) => sum + (box.door?.hinges ?? 0), 0);
   const totalRods = elementsData.boxes.reduce((sum, box) => sum + (box.rods ?? 0), 0);
 
@@ -255,16 +257,20 @@ export function calculatePricingSummary(
   const legsCost = hardwareSummary.totalLegs * COST_PER_LEG_PLN;
   const clipsCost = hardwareSummary.totalLegs * COST_PER_LEG_CLIP_PLN;
   const rodsCost = totalRods * COST_PER_ROD_PLN;
-  const szaryAreaSqm = szaryBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
-  const szaryBoardCost = Math.round(szaryAreaSqm * COST_PER_SZARY_SQM_PLN * 100) / 100;
-  const kolorAreaSqm = kolorBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
-  const kolorPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_KOLOR_SQM_PLN;
-  const kolorBoardCost = Math.round(kolorAreaSqm * kolorPricePerSqm * 100) / 100;
-  const cuttingLengthM = Math.round((calcCuttingLengthM(szaryBoards) + calcCuttingLengthM(kolorBoards)) * 100) / 100;
+  const carcassAreaSqm = carcassBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
+  const carcassBoardCost = Math.round(carcassAreaSqm * COST_PER_CARCASS_SQM_PLN * 100) / 100;
+  const coverAreaSqm = coverBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
+  const coverPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_COVER_SQM_PLN;
+  const coverBoardCost = Math.round(coverAreaSqm * coverPricePerSqm * 100) / 100;
+  const cuttingLengthM = Math.round((calcCuttingLengthM(carcassBoards) + calcCuttingLengthM(coverBoards)) * 100) / 100;
   const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
-  const bandingLengthM = Math.round((calcEdgeBandingLengthM(szaryBoards) + calcEdgeBandingLengthM(kolorBoards)) * 100) / 100;
+  const carcassBandingLengthM = Math.round(calcEdgeBandingLengthM(carcassBoards) * 100) / 100;
+  const coverBandingLengthM = Math.round(calcEdgeBandingLengthM(coverBoards) * 100) / 100;
+  const bandingLengthM = Math.round((carcassBandingLengthM + coverBandingLengthM) * 100) / 100;
   const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
-  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + szaryBoardCost + kolorBoardCost + cuttingCost + bandingCost + (transportCostPln > 0 ? transportCostPln : 0) + (customElementsCostPln > 0 ? customElementsCostPln : 0);
+  const carcassVeneerCost = Math.round(carcassBandingLengthM * COST_PER_METER_VENEER_CARCASS_PLN * 100) / 100;
+  const coverVeneerCost = Math.round(coverBandingLengthM * COST_PER_METER_VENEER_COVER_PLN * 100) / 100;
+  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + carcassBoardCost + coverBoardCost + cuttingCost + bandingCost + carcassVeneerCost + coverVeneerCost + (transportCostPln > 0 ? transportCostPln : 0) + (customElementsCostPln > 0 ? customElementsCostPln : 0);
   const totalCost = roundUpToCents(rawTotalCost);
   const roundedBaseForClient = roundUpToHundreds(totalCost);
   const materialsDeposit = roundedBaseForClient;

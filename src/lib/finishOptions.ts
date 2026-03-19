@@ -7,7 +7,7 @@ export interface FinishOption {
   readonly imageUrl?: string;
 }
 
-export const COLOR_OPTIONS: readonly FinishOption[] = [
+export const COVER_OPTIONS: readonly FinishOption[] = [
   { id: 'U156', label: 'U156 Beż piaskowy', brand: 'Egger', pricePerSqmPln: 52.30, swatchColor: '#D6C0A8', imageUrl: '/finishes/laminate/U156.jpg' },
   { id: 'U963', label: 'U963 Szary diamentowy', brand: 'Egger', pricePerSqmPln: 61.80, swatchColor: '#7E8FA0', imageUrl: '/finishes/laminate/U963.jpg' },
   { id: 'U104', label: 'U104 Alabaster', brand: 'Egger', pricePerSqmPln: 48.75, swatchColor: '#EFEDE6', imageUrl: '/finishes/laminate/U104.jpg' },
@@ -26,5 +26,5 @@ export const ACRYLIC_OPTIONS: readonly FinishOption[] = [
 ];
 
 export const ALL_FINISH_OPTIONS: ReadonlyMap<string, FinishOption> = new Map(
-  [...COLOR_OPTIONS, ...VENEER_OPTIONS, ...ACRYLIC_OPTIONS].map((o) => [o.id, o])
+  [...COVER_OPTIONS, ...VENEER_OPTIONS, ...ACRYLIC_OPTIONS].map((o) => [o.id, o])
 );

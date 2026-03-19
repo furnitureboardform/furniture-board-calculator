@@ -85,7 +85,7 @@ export default function App() {
         {
           title: 'Wykończenie',
           rows: [
-            { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat kolor' : form.boardFinish.type === 'akryl' ? 'Okleina akryl kolor' : 'Okleina laminat drewniana' },
+            { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat obicie' : form.boardFinish.type === 'akryl' ? 'Okleina akryl obicie' : 'Okleina laminat drewniana' },
             { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
             { label: 'Cena za m²', value: selectedFinish ? `${selectedFinish.pricePerSqmPln.toFixed(2)} zł/m²` : '—' },
             { label: 'Uchwyt', value: selectedHandle?.label ?? form.doorHandle.optionId },
