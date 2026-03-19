@@ -472,7 +472,7 @@ export function buildReport(
             separator: {
               heightMm: drawerCount * 200,
               widthMm: 40,
-              qty: sets,
+              qty: isDouble ? 2 : 1,
             },
             drawerRail: {
               // wysokość = liczba szuflad × 200mm; głębokość = głębokość półki - 35mm
