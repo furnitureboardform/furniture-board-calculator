@@ -108,15 +108,14 @@ export function calculateDoorRequirements(parameters: Parameters): DoorRequireme
     wardrobe.effectiveHeightMm - topClearanceMm - bottomClearanceMm;
   const doors: DoorInfo[] = boxWidths.map((boxInteriorWidthMm, index) => {
     const doubleDoor = boxDoubleDoors[index] ?? false;
-    const fullWidthMm =
-      boxInteriorWidthMm +
-      2 * sidePanelThicknessMm -
-      leftClearanceMm -
-      rightClearanceMm;
+    const totalWidthMm = boxInteriorWidthMm + 2 * sidePanelThicknessMm;
+    const fullWidthMm = totalWidthMm - leftClearanceMm - rightClearanceMm;
+    // For double doors: divide the full opening first, then subtract clearances per panel
+    const doublePanelWidthMm = Math.floor(totalWidthMm / 2) - leftClearanceMm - rightClearanceMm;
     return {
       boxNumber: index + 1,
       doubleDoor,
-      widthMm: doubleDoor ? Math.floor(fullWidthMm / 2) : fullWidthMm,
+      widthMm: doubleDoor ? doublePanelWidthMm : fullWidthMm,
       heightMm: doorHeightMm,
     };
   });

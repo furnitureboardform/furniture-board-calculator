@@ -25,7 +25,7 @@ export function useFormState() {
   const [leftBlendMm, setLeftBlendMm] = useState(0);
   const [rightBlendMm, setRightBlendMm] = useState(0);
   const [topBlendMm, setTopBlendMm] = useState(0);
-  const [bottomBlendMm, setBottomBlendMm] = useState(50);
+  const [bottomBlendMm, setBottomBlendMm] = useState(100);
   const [leftNicheHeightMm, setLeftNicheHeightMm] = useState(0);
   const [rightNicheHeightMm, setRightNicheHeightMm] = useState(0);
   const [topNicheWidthMm, setTopNicheWidthMm] = useState(0);

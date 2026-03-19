@@ -55,6 +55,8 @@ const BOX2_HDF_WIDTH_MM = BOX2_WIDTH_MM + 32; // 982
 
 // Single door width: boxWidth + 2×sidePanel(18) - leftClearance(2) - rightClearance(2)
 const BOX1_DOOR_WIDTH_MM = BOX1_WIDTH_MM + 2 * 18 - 2 - 2; // 932
+// Double door panel: (boxWidth + 2×sidePanel) / 2 - leftClearance(2) - rightClearance(2)
+const BOX2_DOOR_PANEL_WIDTH_MM = Math.floor((BOX2_WIDTH_MM + 2 * 18) / 2) - 2 - 2; // 489
 
 // Box2 drawer front: width - 2×separator(40) - clearance(8)
 const BOX2_DRAWER_FRONT_WIDTH_MM = BOX2_WIDTH_MM - 2 * 40 - 8; // 862
@@ -287,11 +289,10 @@ describe('E2E pipeline – 3-box wardrobe', () => {
       expect(box1.door?.widthMm).toBe(BOX1_DOOR_WIDTH_MM);
     });
 
-    it('each double door panel is half the width of single door equivalent', () => {
+    it(`each double door panel = floor((boxWidth + 36) / 2) - 4 = ${BOX2_DOOR_PANEL_WIDTH_MM} mm`, () => {
       const box2 = result.elementsData.boxes[1]!;
       expect(box2.door?.doubleDoor).toBe(true);
-      // width stored is per single panel in double-door mode
-      expect(box2.door?.widthMm).toBeGreaterThan(0);
+      expect(box2.door?.widthMm).toBe(BOX2_DOOR_PANEL_WIDTH_MM);
     });
   });
 
