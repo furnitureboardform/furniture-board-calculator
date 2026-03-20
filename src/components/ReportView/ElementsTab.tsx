@@ -170,7 +170,7 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
                     {box.drawerBoards.drawerRail.heightMm} × {box.drawerBoards.drawerRail.widthMm} mm
                   </span>
                   <span className="element-card__meta">
-                    Jedno obrzeże na długości {box.drawerBoards.drawerRail.widthMm} mm · <span className="element-card__color element-card__color--carcass">korpus</span>
+                    Jedno obrzeże na długości {box.drawerBoards.drawerRail.heightMm} mm · <span className="element-card__color element-card__color--carcass">korpus</span>
                   </span>
                 </div>
               </>
@@ -188,36 +188,45 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
             return (
               <>
                 {[
-                  { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm, isBottom: false },
-                  { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm, isBottom: false },
-                  { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm, isBottom: true },
-                  { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm, isBottom: true },
-                ].flatMap(({ label, w, h, isBottom }) => {
+                  { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm, isBottom: false, isBottomBlend: false, isSideBlend: true },
+                  { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm, isBottom: false, isBottomBlend: false, isSideBlend: true },
+                  { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm, isBottom: true, isBottomBlend: false, isSideBlend: false },
+                  { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm, isBottom: true, isBottomBlend: true, isSideBlend: false },
+                ].flatMap(({ label, w, h, isBottom, isBottomBlend, isSideBlend }) => {
                   if (w <= 0 || h <= 0) return [];
                   if (w > 2800) {
                     const part1W = isBottom && firstBoxSplitPoint ? firstBoxSplitPoint : Math.ceil(w / 2);
                     const part2W = w - part1W;
                     const clearance = isBottom ? 4 : 0;
                     return [
-                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: part1W - clearance, displayH: h },
-                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: part2W - clearance, displayH: h },
+                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: part1W - clearance, displayH: h, isBottomBlend, isSideBlend, isSplit: true },
+                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: part2W - clearance, displayH: h, isBottomBlend, isSideBlend, isSplit: true },
                     ];
                   }
                   if (h > 2800) {
                     const half = Math.ceil(h / 2);
                     return [
-                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
-                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
+                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: isBottom ? w - 4 : w, displayH: half, isBottomBlend, isSideBlend, isSplit: false },
+                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: isBottom ? w - 4 : w, displayH: half, isBottomBlend, isSideBlend, isSplit: false },
                     ];
                   }
-                  return [{ key: label, label, displayW: isBottom ? w - 4 : w, displayH: h }];
-                }).map(({ key, label, displayW, displayH }) => (
-                  <div key={key} className="element-card__row">
-                    <span className="element-card__label">{label}</span>
-                    <span className="element-card__value">{displayW} × {displayH} mm</span>
-                    <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--cover">obicie</span></span>
-                  </div>
-                ))}
+                  return [{ key: label, label, displayW: isBottom ? w - 4 : w, displayH: h, isBottomBlend, isSideBlend, isSplit: false }];
+                }).map(({ key, label, displayW, displayH, isBottomBlend, isSideBlend, isSplit }) => {
+                  const edgeMeta = isBottomBlend
+                    ? isSplit
+                      ? `Obrzeże na szerokości ${displayW} mm i na bokach ${displayH} mm (3 boki)`
+                      : `Obrzeże na szerokości ${displayW} mm i na boku ${displayH} mm (2 boki)`
+                    : isSideBlend
+                      ? `Obrzeże na wysokości ${displayH} mm (1 bok)`
+                      : 'Bez obrzeży';
+                  return (
+                    <div key={key} className="element-card__row">
+                      <span className="element-card__label">{label}</span>
+                      <span className="element-card__value">{displayW} × {displayH} mm</span>
+                      <span className="element-card__meta">{edgeMeta} · <span className="element-card__color element-card__color--cover">obicie</span></span>
+                    </div>
+                  );
+                })}
                 {elementsData.blindReinforcements.length > 0 && (
                   <>
                     <div className="element-card__divider" />

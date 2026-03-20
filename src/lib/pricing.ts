@@ -198,7 +198,7 @@ function getCarcassBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: drawerBoards.internalWall1.heightMm, dim2: drawerBoards.internalWall1.widthMm, edgeBandingMm: drawerBoards.internalWall1.widthMm, qty: drawerBoards.count * sets });
       boards.push({ dim1: drawerBoards.internalWall2.heightMm, dim2: drawerBoards.internalWall2.widthMm, edgeBandingMm: drawerBoards.internalWall2.widthMm, qty: drawerBoards.count * sets });
       boards.push({ dim1: drawerBoards.separator.heightMm, dim2: drawerBoards.separator.widthMm, edgeBandingMm: 0, qty: drawerBoards.separator.qty });
-      boards.push({ dim1: drawerBoards.drawerRail.heightMm, dim2: drawerBoards.drawerRail.widthMm, edgeBandingMm: drawerBoards.drawerRail.widthMm, qty: 2 });
+      boards.push({ dim1: drawerBoards.drawerRail.heightMm, dim2: drawerBoards.drawerRail.widthMm, edgeBandingMm: drawerBoards.drawerRail.heightMm, qty: 2 });
     }
 
     if (box.partitions && box.partitions.length > 0) {

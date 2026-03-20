@@ -379,10 +379,10 @@ export function buildReport(
   lines.push('  ── Blendy / Wnęki ──');
   lines.push('  ' + '─'.repeat(78));
   lines.push(`   • Czy są wnęki: ${parameters.hasNiches ? 'Tak' : 'Nie'}`);
-  lines.push(`   • Lewa: szer. ${leftBlend > 0 ? leftBlend + 50 : 0} mm, wys. ${parameters.leftNicheHeightMm || 0} mm - Bez obrzeży`);
-  lines.push(`   • Prawa: szer. ${rightBlend > 0 ? rightBlend + 50 : 0} mm, wys. ${parameters.rightNicheHeightMm || 0} mm - Bez obrzeży`);
+  lines.push(`   • Lewa: szer. ${leftBlend > 0 ? leftBlend + 50 : 0} mm, wys. ${parameters.leftNicheHeightMm || 0} mm - Obrzeże na wysokości ${parameters.leftNicheHeightMm || 0} mm (1 bok)`);
+  lines.push(`   • Prawa: szer. ${rightBlend > 0 ? rightBlend + 50 : 0} mm, wys. ${parameters.rightNicheHeightMm || 0} mm - Obrzeże na wysokości ${parameters.rightNicheHeightMm || 0} mm (1 bok)`);
   lines.push(`   • Górna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${topBlend > 0 ? topBlend + 50 : 0} mm - Bez obrzeży`);
-  lines.push(`   • Dolna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${parameters.bottomBlendMm || 0} mm - Bez obrzeży`);
+  lines.push(`   • Dolna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${parameters.bottomBlendMm || 0} mm - Obrzeże na szerokości i na boku`);
   if (leftBlend > 0 && (parameters.leftNicheHeightMm || 0) > 0) {
     lines.push(`   • Dodatkowa płyta blenda lewa: ${parameters.leftNicheHeightMm} × 80 mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
   }

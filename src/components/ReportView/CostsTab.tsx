@@ -82,15 +82,17 @@ export function CostsTab({
   const coverAreaSqm = Math.round(coverAreaMm2 / 10000) / 100;
   const coverPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_COVER_SQM_PLN;
   const coverBoardCost = Math.round(coverAreaSqm * coverPricePerSqm * 100) / 100;
-  const cuttingLengthM = Math.round((calcCuttingLengthM(carcassBoards) + calcCuttingLengthM(coverBoards)) * 100) / 100;
-  const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
+  const carcassCuttingLengthM = Math.round(calcCuttingLengthM(carcassBoards) * 100) / 100;
+  const coverCuttingLengthM = Math.round(calcCuttingLengthM(coverBoards) * 100) / 100;
+  const carcassCuttingCost = Math.round(carcassCuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
+  const coverCuttingCost = Math.round(coverCuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;
   const carcassBandingLengthM = Math.round(calcEdgeBandingLengthM(carcassBoards) * 100) / 100;
   const coverBandingLengthM = Math.round(calcEdgeBandingLengthM(coverBoards) * 100) / 100;
-  const bandingLengthM = Math.round((carcassBandingLengthM + coverBandingLengthM) * 100) / 100;
-  const bandingCost = Math.round(bandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
+  const carcassBandingCost = Math.round(carcassBandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
+  const coverBandingCost = Math.round(coverBandingLengthM * COST_PER_METER_BANDING_PLN * 100) / 100;
   const carcassVeneerCost = Math.round(carcassBandingLengthM * COST_PER_METER_VENEER_CARCASS_PLN * 100) / 100;
   const coverVeneerCost = Math.round(coverBandingLengthM * COST_PER_METER_VENEER_COVER_PLN * 100) / 100;
-  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + carcassBoardCost + coverBoardCost + cuttingCost + bandingCost + carcassVeneerCost + coverVeneerCost;
+  const rawTotalCost = hingesCost + guidesCost + bracketsCost + handlesCost + legsCost + clipsCost + rodsCost + carcassBoardCost + coverBoardCost + carcassCuttingCost + coverCuttingCost + carcassBandingCost + coverBandingCost + carcassVeneerCost + coverVeneerCost;
   const totalCost = pricingSummary.totalCost || roundUpToCents(rawTotalCost);
   const materialsDeposit = pricingSummary.materialsDeposit || roundUpToHundreds(totalCost);
   const clientPrice = pricingSummary.clientPriceAfterDiscount;
@@ -166,10 +168,16 @@ export function CostsTab({
           </thead>
           <tbody>
             <tr>
-              <td>Cięcie</td>
-              <td>{cuttingLengthM} m</td>
+              <td>Cięcie płyty korpus</td>
+              <td>{carcassCuttingLengthM} m</td>
               <td>{COST_PER_METER_CUTTING_PLN} zł/m</td>
-              <td>{cuttingCost} zł</td>
+              <td>{carcassCuttingCost} zł</td>
+            </tr>
+            <tr>
+              <td>Cięcie płyty obicie</td>
+              <td>{coverCuttingLengthM} m</td>
+              <td>{COST_PER_METER_CUTTING_PLN} zł/m</td>
+              <td>{coverCuttingCost} zł</td>
             </tr>
           </tbody>
         </table>
@@ -188,10 +196,16 @@ export function CostsTab({
           </thead>
           <tbody>
             <tr>
-              <td>Oklejanie</td>
-              <td>{bandingLengthM} m</td>
+              <td>Oklejanie płyty korpus</td>
+              <td>{carcassBandingLengthM} m</td>
               <td>{COST_PER_METER_BANDING_PLN} zł/m</td>
-              <td>{bandingCost} zł</td>
+              <td>{carcassBandingCost} zł</td>
+            </tr>
+            <tr>
+              <td>Oklejanie płyty obicie</td>
+              <td>{coverBandingLengthM} m</td>
+              <td>{COST_PER_METER_BANDING_PLN} zł/m</td>
+              <td>{coverBandingCost} zł</td>
             </tr>
             <tr>
               <td>Okleina korpus</td>

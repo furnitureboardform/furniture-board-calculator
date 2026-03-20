@@ -70,10 +70,40 @@ export function getCoverBoards(elementsData: ElementsData): BoardEntry[] {
   }
 
   const { left, right, top, bottom } = elementsData.niches;
-  pushNicheBoard(boards, left.widthMm, left.heightMm);
-  pushNicheBoard(boards, right.widthMm, right.heightMm);
+
+  for (const side of [left, right]) {
+    if (side.widthMm > 0 && side.heightMm > 0) {
+      const w = side.widthMm;
+      const h = side.heightMm;
+      if (h > MAX_BOARD_DIM_MM) {
+        const half = Math.ceil(h / 2);
+        boards.push({ dim1: w, dim2: half, edgeBanding: `Obrzeże na wysokości ${half} mm (1 bok)`, edgeBandingMm: half, qty: 2 });
+      } else {
+        boards.push({ dim1: w, dim2: h, edgeBanding: `Obrzeże na wysokości ${h} mm (1 bok)`, edgeBandingMm: h, qty: 1 });
+      }
+    }
+  }
+
   pushNicheBoard(boards, top.widthMm, top.heightMm);
-  pushNicheBoard(boards, bottom.widthMm, bottom.heightMm);
+
+  // Bottom blend: edging on the long side + short side(s)
+  if (bottom.widthMm > 0 && bottom.heightMm > 0) {
+    const firstBoxHdfWidth = elementsData.boxes[0]?.hdf?.[0]?.widthMm ?? 0;
+    const firstBoxSplitPoint = firstBoxHdfWidth > 0 ? firstBoxHdfWidth + 4 : undefined;
+    const w = bottom.widthMm;
+    const h = bottom.heightMm;
+    if (w > MAX_BOARD_DIM_MM) {
+      const part1W = firstBoxSplitPoint ?? Math.ceil(w / 2);
+      const part2W = w - part1W;
+      const d1 = part1W - 4;
+      const d2 = part2W - 4;
+      boards.push({ dim1: d1, dim2: h, edgeBanding: `Obrzeże na szerokości ${d1} mm i na bokach ${h} mm (3 boki)`, edgeBandingMm: d1 + 2 * h, qty: 1 });
+      boards.push({ dim1: d2, dim2: h, edgeBanding: `Obrzeże na szerokości ${d2} mm i na bokach ${h} mm (3 boki)`, edgeBandingMm: d2 + 2 * h, qty: 1 });
+    } else {
+      const displayW = w - 4;
+      boards.push({ dim1: displayW, dim2: h, edgeBanding: `Obrzeże na szerokości ${displayW} mm i na boku ${h} mm (2 boki)`, edgeBandingMm: displayW + h, qty: 1 });
+    }
+  }
 
   for (const reinforcement of elementsData.blindReinforcements) {
     if (reinforcement.side === 'top') {
@@ -153,7 +183,7 @@ export function getCarcassBoards(elementsData: ElementsData): BoardEntry[] {
       boards.push({ dim1: d.internalWall1.heightMm, dim2: d.internalWall1.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall1.widthMm} mm (1 bok)`, edgeBandingMm: d.internalWall1.widthMm, qty: d.count * s });
       boards.push({ dim1: d.internalWall2.heightMm, dim2: d.internalWall2.widthMm, edgeBanding: `Obrzeże na długości ${d.internalWall2.widthMm} mm (1 bok)`, edgeBandingMm: d.internalWall2.widthMm, qty: d.count * s });
       boards.push({ dim1: d.separator.heightMm, dim2: d.separator.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: d.separator.qty });
-      boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.widthMm} mm`, edgeBandingMm: d.drawerRail.widthMm, qty: 2 });
+      boards.push({ dim1: d.drawerRail.heightMm, dim2: d.drawerRail.widthMm, edgeBanding: `Jedno obrzeże na długości ${d.drawerRail.heightMm} mm`, edgeBandingMm: d.drawerRail.heightMm, qty: 2 });
     }
 
     if (box.partitions && box.partitions.length > 0) {
