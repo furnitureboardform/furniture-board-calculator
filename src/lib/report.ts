@@ -130,7 +130,7 @@ function getBoxPanelSections(
   }
 
   const sections: NonNullable<BoxElement['panels']> = [];
-  const mainBoxHeightMm = normalizedHeights[0] - PANEL_THICKNESS_MM;
+  const mainBoxHeightMm = normalizedHeights[0];
 
   if (mainBoxHeightMm > 0) {
     sections.push({
@@ -156,7 +156,7 @@ function getBoxPanelSections(
     });
   }
 
-  const topSectionHeightMm = totalHeightMm - normalizedHeights[normalizedHeights.length - 1] + PANEL_THICKNESS_MM;
+  const topSectionHeightMm = totalHeightMm - normalizedHeights[normalizedHeights.length - 1];
   if (topSectionHeightMm > 0) {
     sections.push({
       label: `Nadstawka ${normalizedHeights.length}`,

@@ -138,14 +138,20 @@ export function getPartitionSpan(
       let h: number;
       if (it.type === 'nadstawka') {
         /*
-         * The nadstawka plate (18 mm, shown in the SVG) is the bottom panel
-         * of the top sub-box. The bottom sub-box has its own top panel (18 mm)
-         * sitting directly below. Together they form a 36 mm zone that neither
-         * sub-box interior can enter. Using 2×PANEL_MM makes:
-         *   top = it.yMm             → floor of the top sub-box interior
-         *   bot = it.yMm + 2×PANEL_MM → ceiling of the bottom sub-box interior
+         * nadstawkaMm = distance from floor to the TOP surface of the main box's
+         * top board. At this transition there are TWO separate boards:
+         *   – main box top board:    occupies [nadstawkaMm − 18, nadstawkaMm]
+         *   – nadstawka bottom board: occupies [nadstawkaMm, nadstawkaMm + 18]
+         *
+         * In SVG coordinates (Y from top, it.yMm = mainH − nadstawkaMm):
+         *   zone.top = it.yMm − PANEL_MM  → real = nadstawkaMm + 18 (inner floor of nadstawka)
+         *   zone.bot = it.yMm + PANEL_MM  → real = nadstawkaMm − 18 (inner ceiling of main box)
+         *
+         * This yields correct partition heights:
+         *   – nadstawka interior: totalHeight − nadstawkaMm − 2×18
+         *   – main box interior:  nadstawkaMm − 2×18
          */
-        h = 2 * PANEL_MM;
+        return { top: it.yMm - PANEL_MM, bot: it.yMm + PANEL_MM };
       } else if (it.type === 'shelves') {
         h = PANEL_MM;
       } else {
