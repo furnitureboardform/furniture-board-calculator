@@ -55,10 +55,17 @@ export interface MaskingsElement {
   right?: MaskingItem;
 }
 
+export interface BlindReinforcement {
+  side: 'left' | 'right' | 'top';
+  heightMm: number;
+  widthMm: number;
+}
+
 export interface ElementsData {
   boxes: BoxElement[];
   niches: NichesElement;
   maskings: MaskingsElement | null;
+  blindReinforcements: BlindReinforcement[];
 }
 
 export interface HardwareSummary {
@@ -374,8 +381,24 @@ export function buildReport(
   lines.push(`   • Czy są wnęki: ${parameters.hasNiches ? 'Tak' : 'Nie'}`);
   lines.push(`   • Lewa: szer. ${leftBlend > 0 ? leftBlend + 50 : 0} mm, wys. ${parameters.leftNicheHeightMm || 0} mm - Bez obrzeży`);
   lines.push(`   • Prawa: szer. ${rightBlend > 0 ? rightBlend + 50 : 0} mm, wys. ${parameters.rightNicheHeightMm || 0} mm - Bez obrzeży`);
-  lines.push(`   • Górna: szer. ${parameters.topNicheWidthMm || 0} mm, wys. ${topBlend > 0 ? topBlend + 50 : 0} mm - Bez obrzeży`);
+  lines.push(`   • Górna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${topBlend > 0 ? topBlend + 50 : 0} mm - Bez obrzeży`);
   lines.push(`   • Dolna: szer. ${parameters.bottomNicheWidthMm || 0} mm, wys. ${parameters.bottomBlendMm || 0} mm - Bez obrzeży`);
+  if (leftBlend > 0 && (parameters.leftNicheHeightMm || 0) > 0) {
+    lines.push(`   • Dodatkowa płyta blenda lewa: ${parameters.leftNicheHeightMm} × 80 mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
+  }
+  if (rightBlend > 0 && (parameters.rightNicheHeightMm || 0) > 0) {
+    lines.push(`   • Dodatkowa płyta blenda prawa: ${parameters.rightNicheHeightMm} × 80 mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
+  }
+  if (topBlend > 0 && (parameters.topNicheWidthMm || 0) > 0) {
+    const topReinforcementWidthMm = parameters.bottomNicheWidthMm || 0;
+    if (topReinforcementWidthMm > 2800) {
+      const half = Math.ceil(topReinforcementWidthMm / 2);
+      lines.push(`   • Dodatkowa płyta blenda górna (cz. 1/2): 80 × ${half} mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
+      lines.push(`   • Dodatkowa płyta blenda górna (cz. 2/2): 80 × ${topReinforcementWidthMm - half} mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
+    } else {
+      lines.push(`   • Dodatkowa płyta blenda górna: 80 × ${topReinforcementWidthMm} mm (1 szt.) - Bez obrzeży [obicie, okleina]`);
+    }
+  }
   lines.push('');
 
   if (parameters.outerMaskingLeft || parameters.outerMaskingRight) {
@@ -488,7 +511,7 @@ export function buildReport(
       hasNiches: parameters.hasNiches,
       left: { widthMm: leftBlendFinal > 0 ? leftBlendFinal + 50 : 0, heightMm: parameters.leftNicheHeightMm || 0 },
       right: { widthMm: rightBlendFinal > 0 ? rightBlendFinal + 50 : 0, heightMm: parameters.rightNicheHeightMm || 0 },
-      top: { widthMm: parameters.topNicheWidthMm || 0, heightMm: topBlendFinal > 0 ? topBlendFinal + 50 : 0 },
+      top: { widthMm: parameters.bottomNicheWidthMm || 0, heightMm: topBlendFinal > 0 ? topBlendFinal + 50 : 0 },
       bottom: { widthMm: parameters.bottomNicheWidthMm || 0, heightMm: parameters.bottomBlendMm ? parameters.bottomBlendMm + 50 : 0 },
     },
     maskings:
@@ -502,6 +525,19 @@ export function buildReport(
               : undefined,
           }
         : null,
+    blindReinforcements: (() => {
+      const reinforcements: BlindReinforcement[] = [];
+      if (leftBlendFinal > 0 && (parameters.leftNicheHeightMm || 0) > 0) {
+        reinforcements.push({ side: 'left', heightMm: parameters.leftNicheHeightMm, widthMm: 80 });
+      }
+      if (rightBlendFinal > 0 && (parameters.rightNicheHeightMm || 0) > 0) {
+        reinforcements.push({ side: 'right', heightMm: parameters.rightNicheHeightMm, widthMm: 80 });
+      }
+      if (topBlendFinal > 0 && (parameters.topNicheWidthMm || 0) > 0) {
+        reinforcements.push({ side: 'top', heightMm: 80, widthMm: parameters.bottomNicheWidthMm || 0 });
+      }
+      return reinforcements;
+    })(),
   };
 
   return {

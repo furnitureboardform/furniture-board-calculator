@@ -185,38 +185,87 @@ export function ElementsTab({ elementsData }: ElementsTabProps) {
           {(() => {
             const firstBoxHdfWidth = elementsData.boxes[0]?.hdf?.[0]?.widthMm ?? 0;
             const firstBoxSplitPoint = firstBoxHdfWidth > 0 ? firstBoxHdfWidth + 4 : undefined;
-            return [
-              { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm, isBottom: false },
-              { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm, isBottom: false },
-              { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm, isBottom: false },
-              { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm, isBottom: true },
-            ].flatMap(({ label, w, h, isBottom }) => {
-              if (w <= 0 || h <= 0) return [];
-              if (w > 2800) {
-                const part1W = isBottom && firstBoxSplitPoint ? firstBoxSplitPoint : Math.ceil(w / 2);
-                const part2W = w - part1W;
-                const clearance = isBottom ? 4 : 0;
-                return [
-                  { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: part1W - clearance, displayH: h },
-                  { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: part2W - clearance, displayH: h },
-                ];
-              }
-              if (h > 2800) {
-                const half = Math.ceil(h / 2);
-                return [
-                  { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
-                  { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
-                ];
-              }
-              return [{ key: label, label, displayW: isBottom ? w - 4 : w, displayH: h }];
-            });
-          })().map(({ key, label, displayW, displayH }) => (
-            <div key={key} className="element-card__row">
-              <span className="element-card__label">{label}</span>
-              <span className="element-card__value">{displayW} × {displayH} mm</span>
-              <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--cover">obicie</span></span>
-            </div>
-          ))}
+            return (
+              <>
+                {[
+                  { label: 'Lewa', w: elementsData.niches.left.widthMm, h: elementsData.niches.left.heightMm, isBottom: false },
+                  { label: 'Prawa', w: elementsData.niches.right.widthMm, h: elementsData.niches.right.heightMm, isBottom: false },
+                  { label: 'Górna', w: elementsData.niches.top.widthMm, h: elementsData.niches.top.heightMm, isBottom: true },
+                  { label: 'Dolna', w: elementsData.niches.bottom.widthMm, h: elementsData.niches.bottom.heightMm, isBottom: true },
+                ].flatMap(({ label, w, h, isBottom }) => {
+                  if (w <= 0 || h <= 0) return [];
+                  if (w > 2800) {
+                    const part1W = isBottom && firstBoxSplitPoint ? firstBoxSplitPoint : Math.ceil(w / 2);
+                    const part2W = w - part1W;
+                    const clearance = isBottom ? 4 : 0;
+                    return [
+                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: part1W - clearance, displayH: h },
+                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: part2W - clearance, displayH: h },
+                    ];
+                  }
+                  if (h > 2800) {
+                    const half = Math.ceil(h / 2);
+                    return [
+                      { key: `${label}-1`, label: `${label} (cz. 1/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
+                      { key: `${label}-2`, label: `${label} (cz. 2/2)`, displayW: isBottom ? w - 4 : w, displayH: half },
+                    ];
+                  }
+                  return [{ key: label, label, displayW: isBottom ? w - 4 : w, displayH: h }];
+                }).map(({ key, label, displayW, displayH }) => (
+                  <div key={key} className="element-card__row">
+                    <span className="element-card__label">{label}</span>
+                    <span className="element-card__value">{displayW} × {displayH} mm</span>
+                    <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--cover">obicie</span></span>
+                  </div>
+                ))}
+                {elementsData.blindReinforcements.length > 0 && (
+                  <>
+                    <div className="element-card__divider" />
+                    {elementsData.blindReinforcements.flatMap((r) => {
+                      const sideLabel = r.side === 'left' ? 'lewa' : r.side === 'right' ? 'prawa' : 'górna';
+                      const meta = <span className="element-card__meta">Bez obrzeży · <span className="element-card__color element-card__color--cover">obicie</span></span>;
+                      if (r.side === 'top') {
+                        const w = r.widthMm;
+                        if (w > 2800) {
+                          const part1W = firstBoxSplitPoint ?? Math.ceil(w / 2);
+                          const part2W = w - part1W;
+                          const d1 = part1W - 4;
+                          const d2 = part2W - 4;
+                          return [
+                            <div key="top-1" className="element-card__row">
+                              <span className="element-card__label">Dodatkowa płyta blenda {sideLabel} (cz. 1/2)</span>
+                              <span className="element-card__value">{r.heightMm} × {d1} mm</span>
+                              {meta}
+                            </div>,
+                            <div key="top-2" className="element-card__row">
+                              <span className="element-card__label">Dodatkowa płyta blenda {sideLabel} (cz. 2/2)</span>
+                              <span className="element-card__value">{r.heightMm} × {d2} mm</span>
+                              {meta}
+                            </div>,
+                          ];
+                        }
+                        const displayW = w - 4;
+                        return [
+                          <div key="top" className="element-card__row">
+                            <span className="element-card__label">Dodatkowa płyta blenda {sideLabel} (1 szt.)</span>
+                            <span className="element-card__value">{r.heightMm} × {displayW} mm</span>
+                            {meta}
+                          </div>,
+                        ];
+                      }
+                      return [
+                        <div key={r.side} className="element-card__row">
+                          <span className="element-card__label">Dodatkowa płyta blenda {sideLabel} (1 szt.)</span>
+                          <span className="element-card__value">{r.heightMm} × {r.widthMm} mm</span>
+                          {meta}
+                        </div>,
+                      ];
+                    })}
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
 

@@ -75,6 +75,27 @@ export function getCoverBoards(elementsData: ElementsData): BoardEntry[] {
   pushNicheBoard(boards, top.widthMm, top.heightMm);
   pushNicheBoard(boards, bottom.widthMm, bottom.heightMm);
 
+  for (const reinforcement of elementsData.blindReinforcements) {
+    if (reinforcement.side === 'top') {
+      const firstBoxHdfWidth = elementsData.boxes[0]?.hdf?.[0]?.widthMm ?? 0;
+      const firstBoxSplitPoint = firstBoxHdfWidth > 0 ? firstBoxHdfWidth + 4 : undefined;
+      const w = reinforcement.widthMm;
+      if (w > 2800) {
+        const part1W = firstBoxSplitPoint ?? Math.ceil(w / 2);
+        const part2W = w - part1W;
+        const d1 = part1W - 4;
+        const d2 = part2W - 4;
+        boards.push({ dim1: reinforcement.heightMm, dim2: d1, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
+        boards.push({ dim1: reinforcement.heightMm, dim2: d2, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
+      } else {
+        const displayW = w - 4;
+        boards.push({ dim1: reinforcement.heightMm, dim2: displayW, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
+      }
+    } else {
+      boards.push({ dim1: reinforcement.heightMm, dim2: reinforcement.widthMm, edgeBanding: 'Bez obrzeży', edgeBandingMm: 0, qty: 1 });
+    }
+  }
+
   if (elementsData.maskings) {
     if (elementsData.maskings.left) {
       const { heightMm, widthMm } = elementsData.maskings.left;
