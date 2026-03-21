@@ -27,7 +27,7 @@ export interface ReportViewProps {
   onTransportCostPlnChange: (value: number) => void;
   customElementsCostPln: number;
   onCustomElementsCostPlnChange: (value: number) => void;
-  onSaveFinancials: (params: { transportCostPln: number; customElementsCostPln: number; discountPln: number; discountPercent: number }) => void;
+  onSaveFinancials: (params: { transportCostPln: number; customElementsCostPln: number; discountPln: number; discountPercent: number; clientPriceAfterDiscount: number }) => void;
   onBackToConfig: () => void;
   onOpenContract: () => void;
 }
@@ -95,12 +95,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     if (parsed === null) {
       onDiscountPlnChange(0);
       setDiscountInput('0');
-      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: 0, discountPercent });
+      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: 0, discountPercent, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
       return;
     }
     onDiscountPlnChange(parsed);
     setDiscountInput(String(parsed));
-    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: parsed, discountPercent });
+    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: parsed, discountPercent, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
   }
 
   function commitDiscountPercentInput() {
@@ -108,12 +108,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     if (parsed === null) {
       onDiscountPercentChange(0);
       setDiscountPercentInput('0');
-      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: 0 });
+      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: 0, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
       return;
     }
     onDiscountPercentChange(parsed);
     setDiscountPercentInput(String(parsed));
-    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: parsed });
+    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: parsed, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
   }
 
   const selectedHandle = useMemo(
@@ -236,7 +236,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
                 onTransportCostPlnChange(safe);
                 setTransportInput(String(safe));
-                onSaveFinancials({ transportCostPln: safe, customElementsCostPln, discountPln, discountPercent });
+                onSaveFinancials({ transportCostPln: safe, customElementsCostPln, discountPln, discountPercent, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
               }}
               customElementsInput={customElementsInput}
               onCustomElementsInput={(value) => {
@@ -250,7 +250,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
                 const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
                 onCustomElementsCostPlnChange(safe);
                 setCustomElementsInput(String(safe));
-                onSaveFinancials({ transportCostPln, customElementsCostPln: safe, discountPln, discountPercent });
+                onSaveFinancials({ transportCostPln, customElementsCostPln: safe, discountPln, discountPercent, clientPriceAfterDiscount: pricingSummary.clientPriceAfterDiscount });
               }}
             />
           )}

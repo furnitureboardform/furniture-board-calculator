@@ -45,6 +45,7 @@ export interface Parameters {
   outerMaskingRightFullCover: boolean;
   boxPartitions: number[][];
   boxShelvesMm: number[][];
+  doorEdgeWidthReductionMm?: number;
 }
 
 /** Wymiary szafy po odjęciu blendów. */

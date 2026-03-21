@@ -238,6 +238,35 @@ export function useFormState() {
     []
   );
 
+  const resetForm = useCallback(() => {
+    setStep(1);
+    setNicheWidthMm(3070);
+    setNicheHeightMm(2700);
+    setCabinetDepthMm(600);
+    setHasSideNiches(false);
+    setHasTopBottomNiches(false);
+    setLeftBlendMm(0);
+    setRightBlendMm(0);
+    setTopBlendMm(0);
+    setBottomBlendMm(100);
+    setLeftNicheHeightMm(0);
+    setRightNicheHeightMm(0);
+    setTopNicheWidthMm(0);
+    setBottomNicheWidthMm(0);
+    setNumberOfBoxes(2);
+    setBoxes(INITIAL_BOXES);
+    setOuterMaskingLeft(true);
+    setOuterMaskingRight(true);
+    setOuterMaskingLeftFullCover(false);
+    setOuterMaskingRightFullCover(false);
+    setBoardFinish({ type: 'laminat', optionId: 'U156' });
+    setDoorHandle({ optionId: 'UZ_NYXA_320' });
+    setDiscountPlnState(0);
+    setDiscountPercentState(0);
+    setTransportCostPln(0);
+    setCustomElementsCostPln(0);
+  }, []);
+
   return {
     step,
     setStep,
@@ -285,5 +314,6 @@ export function useFormState() {
     setTransportCostPln,
     customElementsCostPln,
     setCustomElementsCostPln,
+    resetForm,
   };
 }

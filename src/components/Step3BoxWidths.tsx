@@ -120,7 +120,7 @@ export default function Step3BoxWidths({
         initialPlacedItems={initialPlacedItems}
         onPlacedItemsChange={onPlacedItemsChange}
       />
-      <button type="button" className="btn btn-outline" onClick={() => onGoToStep(2)}>
+      <button type="button" className="btn btn-outline mt1" onClick={() => onGoToStep(2)}>
         ← Wróć
       </button>
       <button type="button" className="btn" onClick={() => onGoToStep(4)} disabled={!validationValid}>

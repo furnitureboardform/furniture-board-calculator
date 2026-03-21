@@ -4,6 +4,7 @@ import {
   addDoc,
   getDocs,
   updateDoc,
+  deleteDoc,
   doc,
   orderBy,
   query,
@@ -16,13 +17,15 @@ interface Project {
   id: string;
   name: string;
   createdAt: Timestamp | null;
+  clientPriceAfterDiscount?: number;
 }
 
 interface ProjectsPageProps {
   readonly onSelectProject: (projectId: string) => void;
+  readonly onCreateProject: (projectId: string) => void;
 }
 
-export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
+export function ProjectsPage({ onSelectProject, onCreateProject }: ProjectsPageProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -30,6 +33,18 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [visiblePriceIds, setVisiblePriceIds] = useState<Set<string>>(new Set());
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const togglePriceVisibility = (id: string) => {
+    setVisiblePriceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -39,6 +54,7 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
         id: d.id,
         name: d.data().name as string,
         createdAt: d.data().createdAt as Timestamp | null,
+        clientPriceAfterDiscount: d.data().clientPriceAfterDiscount as number | undefined,
       }));
       setProjects(docs);
       setLoading(false);
@@ -54,7 +70,7 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
       createdAt: serverTimestamp(),
     });
     setCreating(false);
-    onSelectProject(docRef.id);
+    onCreateProject(docRef.id);
   };
 
   const handleRenameConfirm = async (id: string) => {
@@ -65,6 +81,15 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
       prev.map((p) => (p.id === id ? { ...p, name } : p))
     );
     setEditingId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmDeleteId) return;
+    setDeleting(true);
+    await deleteDoc(doc(db, 'projects', confirmDeleteId));
+    setProjects((prev) => prev.filter((p) => p.id !== confirmDeleteId));
+    setDeleting(false);
+    setConfirmDeleteId(null);
   };
 
   const formatDate = (ts: Timestamp | null): string => {
@@ -81,6 +106,33 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
   return (
     <div style={styles.page}>
       <h1 style={styles.heading}>Projekty</h1>
+
+      {confirmDeleteId !== null && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <p style={styles.modalText}>
+              Czy na pewno chcesz usunąć projekt
+              {' '}„<strong>{projects.find((p) => p.id === confirmDeleteId)?.name}</strong>”?
+            </p>
+            <div style={styles.modalButtons}>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                style={styles.deleteConfirmBtn}
+              >
+                {deleting ? 'Usuwanie…' : 'Usuń'}
+              </button>
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                disabled={deleting}
+                style={styles.cancelBtn}
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showCreateForm ? (
         <div style={styles.createForm}>
@@ -145,17 +197,46 @@ export function ProjectsPage({ onSelectProject }: ProjectsPageProps) {
                 </button>
               )}
               {editingId !== project.id && (
-                <button
-                  style={styles.editBtn}
-                  title="Zmień nazwę"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingId(project.id);
-                    setEditingName(project.name);
-                  }}
-                >
-                  ✏️
-                </button>
+                <>
+                  <button
+                    style={styles.editBtn}
+                    title="Zmień nazwę"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingId(project.id);
+                      setEditingName(project.name);
+                    }}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    style={styles.deleteBtn}
+                    title="Usuń projekt"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmDeleteId(project.id);
+                    }}
+                  >
+                    🗑️
+                  </button>
+                  {project.clientPriceAfterDiscount != null && (
+                    <button
+                      style={styles.priceEyeBtn}
+                      title={visiblePriceIds.has(project.id) ? 'Ukryj cenę' : 'Pokaż cenę'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePriceVisibility(project.id);
+                      }}
+                    >
+                      {visiblePriceIds.has(project.id) ? '🙈' : '👁️'}
+                    </button>
+                  )}
+                  {visiblePriceIds.has(project.id) && project.clientPriceAfterDiscount != null && (
+                    <div style={styles.priceTag}>
+                      {project.clientPriceAfterDiscount.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} zł
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ))}
@@ -264,17 +345,18 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     width: '100%',
     height: '100px',
     background: '#fff',
     border: '1px solid #e0e0e0',
     borderRadius: '10px',
-    padding: '16px',
+    padding: '12px 16px 14px',
     cursor: 'pointer',
     boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
     textAlign: 'left',
     transition: 'box-shadow 0.15s',
+    gap: '4px',
   },
   editForm: {
     display: 'flex',
@@ -296,6 +378,39 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '2px 4px',
     lineHeight: 1,
   },
+  deleteBtn: {
+    position: 'absolute',
+    top: '8px',
+    right: '32px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+    padding: '2px 4px',
+    lineHeight: 1,
+  },
+  priceEyeBtn: {
+    position: 'absolute',
+    top: '8px',
+    right: '56px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+    padding: '2px 4px',
+    lineHeight: 1,
+  },
+  priceTag: {
+    position: 'absolute',
+    bottom: '8px',
+    right: '8px',
+    fontSize: '0.8rem',
+    fontWeight: 700,
+    color: '#1a1a2e',
+    background: '#e8f4e8',
+    borderRadius: '4px',
+    padding: '2px 7px',
+  },
   projectName: {
     fontSize: '0.9rem',
     fontWeight: 600,
@@ -310,5 +425,42 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#888',
     fontSize: '0.9rem',
     marginTop: '8px',
+  },
+  modalOverlay: {
+    position: 'fixed' as const,
+    inset: 0,
+    background: 'rgba(0,0,0,0.45)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    background: '#fff',
+    borderRadius: '10px',
+    padding: '28px 24px',
+    width: '320px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+  },
+  modalText: {
+    fontSize: '0.95rem',
+    color: '#1a1a2e',
+    marginBottom: '20px',
+    lineHeight: 1.5,
+  },
+  modalButtons: {
+    display: 'flex',
+    gap: '8px',
+  },
+  deleteConfirmBtn: {
+    flex: 1,
+    padding: '8px',
+    background: '#c62828',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 600,
+    fontSize: '0.9rem',
   },
 };

@@ -141,6 +141,7 @@ export default function App() {
 
   function handleSubmit() {
     if (!validation.validationValid) return;
+    const selectedHandle = ALL_HANDLE_OPTIONS.get(form.doorHandle.optionId);
     const parameters = buildParameters({
       boxes: form.boxes,
       numberOfBoxes: form.numberOfBoxes,
@@ -160,10 +161,10 @@ export default function App() {
       outerMaskingRight: form.outerMaskingRight,
       outerMaskingLeftFullCover: form.outerMaskingLeftFullCover,
       outerMaskingRightFullCover: form.outerMaskingRightFullCover,
+      doorEdgeWidthReductionMm: selectedHandle?.isEdge ? (selectedHandle.edgeWidthMm ?? 0) : 0,
     });
     const { parametersData, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
     const selectedFinish = ALL_FINISH_OPTIONS.get(form.boardFinish.optionId);
-    const selectedHandle = ALL_HANDLE_OPTIONS.get(form.doorHandle.optionId);
     const enrichedParametersData = {
       ...parametersData,
       groups: [
@@ -208,7 +209,7 @@ export default function App() {
   if (showReport) {
     return (
       <>
-        <Header />
+        <Header onGoToProjects={() => { setShowReport(false); form.setStep(1); setCurrentProjectId(null); }} />
         <main>
           {finalView === 'report' ? (
             <ReportView
@@ -227,8 +228,8 @@ export default function App() {
               onTransportCostPlnChange={form.setTransportCostPln}
               customElementsCostPln={form.customElementsCostPln}
               onCustomElementsCostPlnChange={form.setCustomElementsCostPln}
-              onSaveFinancials={({ transportCostPln, customElementsCostPln, discountPln, discountPercent }) => {
-                saveStep4(form.boardFinish, form.doorHandle, transportCostPln, customElementsCostPln, discountPln, discountPercent);
+              onSaveFinancials={({ transportCostPln, customElementsCostPln, discountPln, discountPercent, clientPriceAfterDiscount }) => {
+                saveStep4(form.boardFinish, form.doorHandle, transportCostPln, customElementsCostPln, discountPln, discountPercent, clientPriceAfterDiscount);
               }}
               onBackToConfig={handleBackToConfig}
               onOpenContract={handleOpenContract}
@@ -270,12 +271,23 @@ export default function App() {
   }
 
   if (!currentProjectId) {
-    return <ProjectsPage onSelectProject={(id) => setCurrentProjectId(id)} />;
+    return <ProjectsPage
+      onSelectProject={(id) => {
+        form.setStep(1);
+        setWardrobePlacedItems({});
+        setCurrentProjectId(id);
+      }}
+      onCreateProject={(id) => {
+        form.resetForm();
+        setWardrobePlacedItems({});
+        setCurrentProjectId(id);
+      }}
+    />;
   }
 
   return (
     <>
-      <Header />
+      <Header onGoToProjects={() => setCurrentProjectId(null)} />
       <main>
         <div className="steps-indicator">
           <span className={form.step >= 1 ? 'done' : ''} />

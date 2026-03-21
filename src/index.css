@@ -13,7 +13,48 @@ body {
 header {
   background: #1a1a2e;
   color: #fff;
-  padding: 24px 40px;
+  padding: 16px 24px;
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header__projects-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.header__projects-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.header__projects-btn-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 header h1 {
@@ -40,6 +81,10 @@ main {
 
 .step.active {
   display: block;
+}
+
+.mt1 {
+  margin-top: 16px;
 }
 
 .card {
@@ -307,19 +352,28 @@ main {
   gap: 0;
   border-bottom: 2px solid #2d2d5e;
   margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.report-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .report-tab {
-  padding: 10px 22px;
+  padding: 10px 16px;
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.45);
   transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .report-tab:hover {
@@ -527,6 +581,7 @@ main {
   position: relative;
   display: block;
   line-height: 0;
+  padding-bottom: 10px;
 }
 
 .schematic-drop-zone {
@@ -575,6 +630,29 @@ main {
   text-transform: uppercase;
 }
 
+.boards-summary-section__header--with-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: opacity 0.15s;
+}
+
+.summary-toggle-btn:hover {
+  opacity: 1;
+}
+
 .boards-summary-section__header--cover {
   background: rgba(255, 213, 79, 0.12);
   color: #ffd54f;
@@ -607,7 +685,7 @@ main {
 
 .costs-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
   padding: 16px;
 }
@@ -634,6 +712,16 @@ main {
 .costs-summary-card--client-price {
   border-color: rgba(239, 83, 80, 0.4);
   background: rgba(239, 83, 80, 0.08);
+}
+
+.costs-summary-totals-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+}
+
+.costs-summary-totals-row .costs-summary-card {
+  flex: 1;
 }
 
 .costs-summary-card__label {
@@ -1257,6 +1345,48 @@ main {
   .contract-price-card {
     width: 100%;
     text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .header__projects-btn-label {
+    display: none;
+  }
+
+  .header__projects-btn {
+    padding: 7px 10px;
+  }
+
+  .report-tab {
+    padding: 9px 12px;
+    font-size: 0.78rem;
+  }
+
+  .boards-summary-table {
+    font-size: 0.75rem;
+  }
+
+  .boards-summary-table th,
+  .boards-summary-table td {
+    padding: 6px 8px;
+  }
+
+  .costs-summary-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .costs-summary-card__value {
+    font-size: 1rem;
+  }
+
+  .costs-summary-card--client-price .costs-summary-card__value {
+    font-size: 1.15rem;
+  }
+
+  .costs-summary-card__input {
+    font-size: 1rem;
   }
 }
 

@@ -4,6 +4,8 @@ export interface HandleOption {
   readonly brand: string;
   readonly pricePln: number;
   readonly imageUrl: string;
+  readonly isEdge?: boolean;
+  readonly edgeWidthMm?: number;
 }
 
 export const HANDLE_OPTIONS: readonly HandleOption[] = [
@@ -12,7 +14,16 @@ export const HANDLE_OPTIONS: readonly HandleOption[] = [
     label: 'UZ NYXA 320',
     brand: 'GTV',
     pricePln: 25,
-    imageUrl: '/finishes/handle/UZ_NYXA_320.jpg',
+    imageUrl: `${import.meta.env.BASE_URL}finishes/handle/UZ_NYXA_320.jpg`,
+  },
+   {
+    id: 'REJS_LENTIS_700_800',
+    label: 'REJS LENTIS 700/800',
+    brand: 'REJS',
+    pricePln: 28,
+    isEdge: true,
+    edgeWidthMm: 1,
+    imageUrl: `${import.meta.env.BASE_URL}finishes/handle/REJS_LENTIS_700_800.jpg`,
   },
 ];
 

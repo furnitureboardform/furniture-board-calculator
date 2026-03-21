@@ -19,6 +19,7 @@ export interface FormStateForParameters {
   outerMaskingRight: boolean;
   outerMaskingLeftFullCover: boolean;
   outerMaskingRightFullCover: boolean;
+  doorEdgeWidthReductionMm?: number;
 }
 
 /** Buduje obiekt Parameters do raportu z aktualnego stanu formularza. */
@@ -60,5 +61,6 @@ export function buildParameters(state: FormStateForParameters): Parameters {
     outerMaskingRightFullCover: state.outerMaskingRightFullCover,
     boxPartitions: boxes.map((b) => b.partitions ?? []),
     boxShelvesMm: boxes.map((b) => b.shelvesMm ?? []),
+    doorEdgeWidthReductionMm: state.doorEdgeWidthReductionMm ?? 0,
   };
 }

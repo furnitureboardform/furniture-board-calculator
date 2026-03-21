@@ -109,9 +109,10 @@ export function calculateDoorRequirements(parameters: Parameters): DoorRequireme
   const doors: DoorInfo[] = boxWidths.map((boxInteriorWidthMm, index) => {
     const doubleDoor = boxDoubleDoors[index] ?? false;
     const totalWidthMm = boxInteriorWidthMm + 2 * sidePanelThicknessMm;
-    const fullWidthMm = totalWidthMm - leftClearanceMm - rightClearanceMm;
+    const edgeReductionMm = parameters.doorEdgeWidthReductionMm ?? 0;
+    const fullWidthMm = totalWidthMm - leftClearanceMm - rightClearanceMm - edgeReductionMm;
     // For double doors: divide the full opening first, then subtract clearances per panel
-    const doublePanelWidthMm = Math.floor(totalWidthMm / 2) - leftClearanceMm - rightClearanceMm;
+    const doublePanelWidthMm = Math.floor(totalWidthMm / 2) - leftClearanceMm - rightClearanceMm - edgeReductionMm;
     return {
       boxNumber: index + 1,
       doubleDoor,

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { HardwareSummary } from '../../lib/report';
 import type { HandleOption } from '../../lib/handleOptions';
 import type { PricingSummary } from '../../lib/pricing';
@@ -96,6 +97,7 @@ export function CostsTab({
   const totalCost = pricingSummary.totalCost || roundUpToCents(rawTotalCost);
   const materialsDeposit = pricingSummary.materialsDeposit || roundUpToHundreds(totalCost);
   const clientPrice = pricingSummary.clientPriceAfterDiscount;
+  const [totalsVisible, setTotalsVisible] = useState(false);
 
   const colGroup = (
     <colgroup>
@@ -283,7 +285,21 @@ export function CostsTab({
         </table>
       </div>
       <div className="boards-summary-section">
-        <div className="boards-summary-section__header boards-summary-section__header--podsumowanie">Podsumowanie finansowe</div>
+        <div className="boards-summary-section__header boards-summary-section__header--podsumowanie boards-summary-section__header--with-action">
+          Podsumowanie finansowe
+          <button
+            type="button"
+            className="summary-toggle-btn"
+            onClick={() => setTotalsVisible((v) => !v)}
+            aria-label={totalsVisible ? 'Ukryj sumy' : 'Pokaż sumy'}
+          >
+            {totalsVisible ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            )}
+          </button>
+        </div>
         <div className="costs-summary-grid">
           <div className="costs-summary-card costs-summary-card--editable">
             <span className="costs-summary-card__label">Transport</span>
@@ -312,14 +328,6 @@ export function CostsTab({
               onKeyDown={(e) => { if (e.key === 'Enter') onCommitCustomElements(); }}
             />
             <span className="costs-summary-card__unit">zł</span>
-          </div>
-          <div className="costs-summary-card costs-summary-card--total">
-            <span className="costs-summary-card__label">Suma całkowita (koszt własny)</span>
-            <span className="costs-summary-card__value">{totalCost.toFixed(2)} zł</span>
-          </div>
-          <div className="costs-summary-card">
-            <span className="costs-summary-card__label">Zaliczka</span>
-            <span className="costs-summary-card__value">{materialsDeposit} zł</span>
           </div>
           <div className="costs-summary-card costs-summary-card--editable">
             <span className="costs-summary-card__label">Rabat %</span>
@@ -352,10 +360,22 @@ export function CostsTab({
             />
             <span className="costs-summary-card__unit">zł</span>
           </div>
-          <div className="costs-summary-card costs-summary-card--client-price">
-            <span className="costs-summary-card__label">Cena dla klienta</span>
-            <span className="costs-summary-card__value">{clientPrice} zł</span>
-          </div>
+          {totalsVisible && (
+            <div className="costs-summary-totals-row">
+              <div className="costs-summary-card costs-summary-card--total">
+                <span className="costs-summary-card__label">Suma całkowita (koszt własny)</span>
+                <span className="costs-summary-card__value">{totalCost.toFixed(2)} zł</span>
+              </div>
+              <div className="costs-summary-card costs-summary-card--client-price">
+                <span className="costs-summary-card__label">Cena dla klienta</span>
+                <span className="costs-summary-card__value">{clientPrice} zł</span>
+              </div>
+              <div className="costs-summary-card">
+                <span className="costs-summary-card__label">Zaliczka</span>
+                <span className="costs-summary-card__value">{materialsDeposit} zł</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

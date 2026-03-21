@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { BoardFinish, DoorHandleSelection } from '../lib/types';
 
@@ -10,6 +10,7 @@ interface Step4Data {
   customElementsCostPln: number;
   discountPln: number;
   discountPercent: number;
+  clientPriceAfterDiscount?: number;
 }
 
 interface UseStep4FirestoreParams {
@@ -57,10 +58,19 @@ export function useStep4Firestore({
     customElementsCostPln: number,
     discountPln: number,
     discountPercent: number,
+    clientPriceAfterDiscount?: number,
   ) => {
     if (!projectId) return;
-    const ref = doc(db, 'projects', projectId, 'steps', 'step4');
-    await setDoc(ref, { boardFinish, doorHandle, transportCostPln, customElementsCostPln, discountPln, discountPercent });
+    const stepRef = doc(db, 'projects', projectId, 'steps', 'step4');
+    const stepData: Step4Data = { boardFinish, doorHandle, transportCostPln, customElementsCostPln, discountPln, discountPercent };
+    if (clientPriceAfterDiscount != null) {
+      stepData.clientPriceAfterDiscount = clientPriceAfterDiscount;
+    }
+    await setDoc(stepRef, stepData);
+    if (clientPriceAfterDiscount != null) {
+      const projectRef = doc(db, 'projects', projectId);
+      await updateDoc(projectRef, { clientPriceAfterDiscount });
+    }
   };
 
   return { saveStep4 };
