@@ -73,4 +73,6 @@ export interface WardrobeSchematicProps {
   boxes: BoxForm[];
   numberOfBoxes: number;
   onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean | number[]) => void;
+  initialPlacedItems?: Record<number, PositionedItem[]>;
+  onPlacedItemsChange?: (items: Record<number, PositionedItem[]>) => void;
 }

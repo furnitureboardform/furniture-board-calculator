@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { BoxForm } from '../../lib/types';
 import type { ItemType, PositionedItem, TooltipState, DragHoverPos, WardrobeSegment, BoxSeg } from './types';
 import { PALETTE, PANEL_MM, SVG_W, SVG_H, ML, MT, MR, MB } from './constants';
@@ -17,6 +17,8 @@ interface UseWardrobeSchematicParams {
   boxes: BoxForm[];
   numberOfBoxes: number;
   onBoxChange: (index: number, field: keyof BoxForm, value: number | string | boolean | number[]) => void;
+  initialPlacedItems?: Record<number, PositionedItem[]>;
+  onPlacedItemsChange?: (items: Record<number, PositionedItem[]>) => void;
 }
 
 export function useWardrobeSchematic({
@@ -32,12 +34,18 @@ export function useWardrobeSchematic({
   boxes,
   numberOfBoxes,
   onBoxChange,
+  initialPlacedItems,
+  onPlacedItemsChange,
 }: UseWardrobeSchematicParams) {
   const [draggingType, setDraggingType] = useState<ItemType | null>(null);
   const [dragOverBox, setDragOverBox]   = useState<number | null>(null);
   const [dragHoverPos, setDragHoverPos] = useState<DragHoverPos | null>(null);
-  const [placedItems, setPlacedItems]   = useState<Record<number, PositionedItem[]>>({});
+  const [placedItems, setPlacedItems]   = useState<Record<number, PositionedItem[]>>(() => initialPlacedItems ?? {});
   const [tooltip, setTooltip]           = useState<TooltipState | null>(null);
+
+  useEffect(() => {
+    onPlacedItemsChange?.(placedItems);
+  }, [placedItems]);
 
   const mainH = nicheHeightMm - topBlendMm - bottomBlendMm;
 

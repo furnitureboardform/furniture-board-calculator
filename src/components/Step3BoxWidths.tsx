@@ -1,4 +1,5 @@
 import type { BoxForm } from '../lib/types';
+import type { PositionedItem } from './WardrobeSchematic/types';
 import WardrobeSchematic from './WardrobeSchematic';
 
 export interface Step3BoxWidthsProps {
@@ -23,7 +24,8 @@ export interface Step3BoxWidthsProps {
   rightNicheHeightMm: number;
   topBlendMm: number;
   bottomBlendMm: number;
-  // onBoxChange is already in the interface above — WardrobeSchematic receives it directly
+  initialPlacedItems?: Record<number, PositionedItem[]>;
+  onPlacedItemsChange?: (items: Record<number, PositionedItem[]>) => void;
 }
 
 export default function Step3BoxWidths({
@@ -48,6 +50,8 @@ export default function Step3BoxWidths({
   rightNicheHeightMm,
   topBlendMm,
   bottomBlendMm,
+  initialPlacedItems,
+  onPlacedItemsChange,
 }: Step3BoxWidthsProps) {
   return (
     <div className={`step ${active ? 'active' : ''}`}>
@@ -113,6 +117,8 @@ export default function Step3BoxWidths({
         boxes={boxes}
         numberOfBoxes={numberOfBoxes}
         onBoxChange={onBoxChange}
+        initialPlacedItems={initialPlacedItems}
+        onPlacedItemsChange={onPlacedItemsChange}
       />
       <button type="button" className="btn btn-outline" onClick={() => onGoToStep(2)}>
         ← Wróć

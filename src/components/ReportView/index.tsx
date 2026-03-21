@@ -23,18 +23,21 @@ export interface ReportViewProps {
   onDiscountPlnChange: (discountPln: number) => void;
   discountPercent: number;
   onDiscountPercentChange: (discountPercent: number) => void;
+  transportCostPln: number;
+  onTransportCostPlnChange: (value: number) => void;
+  customElementsCostPln: number;
+  onCustomElementsCostPlnChange: (value: number) => void;
+  onSaveFinancials: (params: { transportCostPln: number; customElementsCostPln: number; discountPln: number; discountPercent: number }) => void;
   onBackToConfig: () => void;
   onOpenContract: () => void;
 }
 
-export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, onDiscountPlnChange, discountPercent, onDiscountPercentChange, onBackToConfig, onOpenContract }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, onDiscountPlnChange, discountPercent, onDiscountPercentChange, transportCostPln, onTransportCostPlnChange, customElementsCostPln, onCustomElementsCostPlnChange, onSaveFinancials, onBackToConfig, onOpenContract }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
   const [discountInput, setDiscountInput] = useState<string>('0');
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('0');
-  const [transportCostPln, setTransportCostPln] = useState<number>(0);
-  const [transportInput, setTransportInput] = useState<string>('0');
-  const [customElementsCostPln, setCustomElementsCostPln] = useState<number>(0);
-  const [customElementsInput, setCustomElementsInput] = useState<string>('0');
+  const [transportInput, setTransportInput] = useState<string>(() => String(transportCostPln));
+  const [customElementsInput, setCustomElementsInput] = useState<string>(() => String(customElementsCostPln));
 
   const parsedDiscountPln = useMemo(() => {
     if (!Number.isFinite(discountPln)) return 0;
@@ -92,10 +95,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     if (parsed === null) {
       onDiscountPlnChange(0);
       setDiscountInput('0');
+      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: 0, discountPercent });
       return;
     }
     onDiscountPlnChange(parsed);
     setDiscountInput(String(parsed));
+    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln: parsed, discountPercent });
   }
 
   function commitDiscountPercentInput() {
@@ -103,10 +108,12 @@ export default function ReportView({ parametersData, reportText: _reportText, su
     if (parsed === null) {
       onDiscountPercentChange(0);
       setDiscountPercentInput('0');
+      onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: 0 });
       return;
     }
     onDiscountPercentChange(parsed);
     setDiscountPercentInput(String(parsed));
+    onSaveFinancials({ transportCostPln, customElementsCostPln, discountPln, discountPercent: parsed });
   }
 
   const selectedHandle = useMemo(
@@ -221,25 +228,29 @@ export default function ReportView({ parametersData, reportText: _reportText, su
               onTransportInput={(value) => {
                 setTransportInput(value);
                 const parsed = Number(value.trim().replace(',', '.'));
-                setTransportCostPln(Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0);
+                const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
+                onTransportCostPlnChange(safe);
               }}
               onCommitTransport={() => {
                 const parsed = Number(transportInput.trim().replace(',', '.'));
                 const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
-                setTransportCostPln(safe);
+                onTransportCostPlnChange(safe);
                 setTransportInput(String(safe));
+                onSaveFinancials({ transportCostPln: safe, customElementsCostPln, discountPln, discountPercent });
               }}
               customElementsInput={customElementsInput}
               onCustomElementsInput={(value) => {
                 setCustomElementsInput(value);
                 const parsed = Number(value.trim().replace(',', '.'));
-                setCustomElementsCostPln(Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0);
+                const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
+                onCustomElementsCostPlnChange(safe);
               }}
               onCommitCustomElements={() => {
                 const parsed = Number(customElementsInput.trim().replace(',', '.'));
                 const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) / 100 : 0;
-                setCustomElementsCostPln(safe);
+                onCustomElementsCostPlnChange(safe);
                 setCustomElementsInput(String(safe));
+                onSaveFinancials({ transportCostPln, customElementsCostPln: safe, discountPln, discountPercent });
               }}
             />
           )}

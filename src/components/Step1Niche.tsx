@@ -27,6 +27,7 @@ export interface Step1NicheProps {
   bottomNicheWidthMm: number;
   onNicheChange: (field: NicheFieldName, value: string) => void;
   onGoToStep: (step: number) => void;
+  onGoToProjects: () => void;
   wardrobePreview: ReactNode;
   active: boolean;
 }
@@ -57,6 +58,7 @@ export default function Step1Niche({
   bottomNicheWidthMm,
   onNicheChange,
   onGoToStep,
+  onGoToProjects,
   wardrobePreview,
   active,
 }: Step1NicheProps) {
@@ -266,6 +268,9 @@ export default function Step1Niche({
           <div className="preview-box">{wardrobePreview}</div>
         )}
       </div>
+      <button type="button" className="btn btn-outline" onClick={onGoToProjects}>
+        ← Projekty
+      </button>
       <button type="button" className="btn" onClick={() => onGoToStep(2)}>
         Dalej →
       </button>

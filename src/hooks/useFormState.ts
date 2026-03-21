@@ -42,6 +42,8 @@ export function useFormState() {
   const [doorHandle, setDoorHandle] = useState<DoorHandleSelection>({ optionId: 'UZ_NYXA_320' });
   const [discountPln, setDiscountPlnState] = useState<number>(0);
   const [discountPercent, setDiscountPercentState] = useState<number>(0);
+  const [transportCostPln, setTransportCostPln] = useState<number>(0);
+  const [customElementsCostPln, setCustomElementsCostPln] = useState<number>(0);
 
   const setDiscountPln = useCallback((value: number) => {
     if (!Number.isFinite(value)) {
@@ -279,5 +281,9 @@ export function useFormState() {
     setDiscountPln,
     discountPercent,
     setDiscountPercent,
+    transportCostPln,
+    setTransportCostPln,
+    customElementsCostPln,
+    setCustomElementsCostPln,
   };
 }
