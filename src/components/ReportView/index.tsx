@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { ElementsData, HardwareSummary, ParametersData } from '../../lib/report';
 import type { BoardFinish, DoorHandleSelection } from '../../lib/types';
-import { ALL_HANDLE_OPTIONS } from '../../lib/handleOptions';
+import type { FinishOption } from '../../lib/finishOptions';
+import type { HandleOption } from '../../lib/handleOptions';
 import { calculatePricingSummary } from '../../lib/pricing';
 import { groupBoards, getCoverBoards, getCarcassBoards } from './utils';
 import { ParametersTab } from './ParametersTab';
@@ -30,9 +31,11 @@ export interface ReportViewProps {
   onSaveFinancials: (params: { transportCostPln: number; customElementsCostPln: number; discountPln: number; discountPercent: number; clientPriceAfterDiscount: number }) => void;
   onBackToConfig: () => void;
   onOpenContract: () => void;
+  finishesMap: ReadonlyMap<string, FinishOption>;
+  handlesMap: ReadonlyMap<string, HandleOption>;
 }
 
-export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, onDiscountPlnChange, discountPercent, onDiscountPercentChange, transportCostPln, onTransportCostPlnChange, customElementsCostPln, onCustomElementsCostPlnChange, onSaveFinancials, onBackToConfig, onOpenContract }: ReportViewProps) {
+export default function ReportView({ parametersData, reportText: _reportText, summaryText: _summaryText, elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, onDiscountPlnChange, discountPercent, onDiscountPercentChange, transportCostPln, onTransportCostPlnChange, customElementsCostPln, onCustomElementsCostPlnChange, onSaveFinancials, onBackToConfig, onOpenContract, finishesMap, handlesMap }: ReportViewProps) {
   const [activeTab, setActiveTab] = useState<ReportTab>('parameters');
   const [discountInput, setDiscountInput] = useState<string>('0');
   const [discountPercentInput, setDiscountPercentInput] = useState<string>('0');
@@ -117,12 +120,16 @@ export default function ReportView({ parametersData, reportText: _reportText, su
   }
 
   const selectedHandle = useMemo(
-    () => ALL_HANDLE_OPTIONS.get(doorHandle.optionId),
-    [doorHandle.optionId]
+    () => handlesMap.get(doorHandle.optionId),
+    [handlesMap, doorHandle.optionId]
+  );
+  const selectedFinish = useMemo(
+    () => finishesMap.get(boardFinish.optionId),
+    [finishesMap, boardFinish.optionId]
   );
   const pricingSummary = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln),
-    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln, selectedFinish?.pricePerSqmPln, selectedHandle?.pricePln),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, parsedDiscountPln, parsedDiscountPercent, transportCostPln, customElementsCostPln, selectedFinish, selectedHandle]
   );
 
   const coverBoards = useMemo(
@@ -217,6 +224,7 @@ export default function ReportView({ parametersData, reportText: _reportText, su
               hardwareSummary={hardwareSummary}
               boardFinish={boardFinish}
               selectedHandle={selectedHandle}
+              selectedFinish={selectedFinish}
               pricingSummary={pricingSummary}
               discountInput={discountInput}
               discountPercentInput={discountPercentInput}

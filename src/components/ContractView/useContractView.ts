@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { ALL_FINISH_OPTIONS } from '../../lib/finishOptions';
-import { ALL_HANDLE_OPTIONS } from '../../lib/handleOptions';
+import type { FinishOption } from '../../lib/finishOptions';
+import type { HandleOption } from '../../lib/handleOptions';
 import { buildContractTemplate } from '../../lib/contractTemplate';
 import { calculatePricingSummary } from '../../lib/pricing';
 import type { ElementsData, HardwareSummary } from '../../lib/report';
@@ -19,6 +19,8 @@ interface UseContractViewParams {
   readonly nicheWidthMm: number;
   readonly nicheHeightMm: number;
   readonly cabinetDepthMm: number;
+  readonly selectedFinish: FinishOption | undefined;
+  readonly selectedHandle: HandleOption | undefined;
 }
 
 export function useContractView({
@@ -31,16 +33,15 @@ export function useContractView({
   nicheWidthMm,
   nicheHeightMm,
   cabinetDepthMm,
+  selectedFinish,
+  selectedHandle,
 }: UseContractViewParams) {
   const contractRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
-  const selectedHandle = ALL_HANDLE_OPTIONS.get(doorHandle.optionId);
-
   const pricing = useMemo(
-    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent),
-    [elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent]
+    () => calculatePricingSummary(elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent, 0, 0, selectedFinish?.pricePerSqmPln, selectedHandle?.pricePln),
+    [elementsData, hardwareSummary, boardFinish, doorHandle, discountPln, discountPercent, selectedFinish, selectedHandle]
   );
 
   const contractPages = buildContractTemplate({

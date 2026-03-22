@@ -23,9 +23,10 @@ interface Project {
 interface ProjectsPageProps {
   readonly onSelectProject: (projectId: string) => void;
   readonly onCreateProject: (projectId: string) => void;
+  readonly onDashboard: () => void;
 }
 
-export function ProjectsPage({ onSelectProject, onCreateProject }: ProjectsPageProps) {
+export function ProjectsPage({ onSelectProject, onCreateProject, onDashboard }: ProjectsPageProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -105,7 +106,10 @@ export function ProjectsPage({ onSelectProject, onCreateProject }: ProjectsPageP
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.heading}>Projekty</h1>
+      <div style={styles.pageHeader}>
+        <h1 style={styles.heading}>Projekty</h1>
+        <button onClick={onDashboard} style={styles.dashboardBtn}>Dashboard</button>
+      </div>
 
       {confirmDeleteId !== null && (
         <div style={styles.modalOverlay}>
@@ -257,11 +261,31 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
   },
+  pageHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '24px',
+    marginBottom: '0',
+    width: '100%',
+    maxWidth: '900px',
+    justifyContent: 'space-between',
+  },
   heading: {
     fontSize: '1.6rem',
     fontWeight: 700,
     color: '#1a1a2e',
     marginBottom: '32px',
+  },
+  dashboardBtn: {
+    marginBottom: '32px',
+    padding: '8px 20px',
+    background: '#1a1a2e',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: 600,
+    fontSize: '0.9rem',
   },
   createForm: {
     display: 'flex',

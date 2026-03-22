@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import type { HardwareSummary } from '../../lib/report';
 import type { HandleOption } from '../../lib/handleOptions';
+import type { FinishOption } from '../../lib/finishOptions';
 import type { PricingSummary } from '../../lib/pricing';
 import type { BoardFinish } from '../../lib/types';
-import { ALL_FINISH_OPTIONS } from '../../lib/finishOptions';
 import type { BoardEntry } from './utils';
 import { calcCuttingLengthM, calcEdgeBandingLengthM, roundUpToCents, roundUpToHundreds } from './utils';
 import {
@@ -30,6 +30,7 @@ interface CostsTabProps {
   hardwareSummary: HardwareSummary;
   boardFinish: BoardFinish;
   selectedHandle: HandleOption | undefined;
+  selectedFinish: FinishOption | undefined;
   pricingSummary: PricingSummary;
   discountInput: string;
   discountPercentInput: string;
@@ -53,6 +54,7 @@ export function CostsTab({
   hardwareSummary,
   boardFinish,
   selectedHandle,
+  selectedFinish,
   pricingSummary,
   discountInput,
   discountPercentInput,
@@ -78,7 +80,6 @@ export function CostsTab({
   const carcassAreaMm2 = carcassBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
   const carcassAreaSqm = Math.round(carcassAreaMm2 / 10000) / 100;
   const carcassBoardCost = Math.round(carcassAreaSqm * COST_PER_CARCASS_SQM_PLN * 100) / 100;
-  const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
   const coverAreaMm2 = coverBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0);
   const coverAreaSqm = Math.round(coverAreaMm2 / 10000) / 100;
   const coverPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_COVER_SQM_PLN;

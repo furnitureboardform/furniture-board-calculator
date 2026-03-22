@@ -9,11 +9,11 @@ import Step2Boxes from './components/Step2Boxes';
 import Step3BoxWidths from './components/Step3BoxWidths';
 import { Step4BoardColor } from './components/Step4BoardColor';
 import { ContractView } from './components/ContractView';
-import { ALL_FINISH_OPTIONS } from './lib/finishOptions';
-import { ALL_HANDLE_OPTIONS } from './lib/handleOptions';
+import { DashboardPage } from './components/DashboardPage';
 import ReportView from './components/ReportView';
 import { runReport } from './lib';
 import { useFormState, useBoxValidation, usePreviews } from './hooks';
+import { useFirestoreOptions } from './hooks/useFirestoreOptions';
 import { useStep1Firestore } from './hooks/useStep1Firestore';
 import { useStep2Firestore } from './hooks/useStep2Firestore';
 import { useStep3Firestore } from './hooks/useStep3Firestore';
@@ -26,6 +26,7 @@ type FinalView = 'report' | 'contract';
 export default function App() {
   const [authenticated, setAuthenticated] = useState(isAuthenticated);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [wardrobePlacedItems, setWardrobePlacedItems] = useState<Record<number, PositionedItem[]>>({});
 
   useEffect(() => {
@@ -81,6 +82,8 @@ export default function App() {
     setDiscountPln: form.setDiscountPln,
     setDiscountPercent: form.setDiscountPercent,
   });
+
+  const { finishes, handles, finishesMap, handlesMap, loading: optionsLoading } = useFirestoreOptions();
 
   const handleStep1Next = (step: number) => {
     saveStep1({
@@ -141,7 +144,7 @@ export default function App() {
 
   function handleSubmit() {
     if (!validation.validationValid) return;
-    const selectedHandle = ALL_HANDLE_OPTIONS.get(form.doorHandle.optionId);
+    const selectedHandle = handlesMap.get(form.doorHandle.optionId);
     const parameters = buildParameters({
       boxes: form.boxes,
       numberOfBoxes: form.numberOfBoxes,
@@ -164,7 +167,7 @@ export default function App() {
       doorEdgeWidthReductionMm: selectedHandle?.isEdge ? (selectedHandle.edgeWidthMm ?? 0) : 0,
     });
     const { parametersData, mainText, summaryText, elementsData, hardwareSummary } = runReport(parameters);
-    const selectedFinish = ALL_FINISH_OPTIONS.get(form.boardFinish.optionId);
+    const selectedFinish = finishesMap.get(form.boardFinish.optionId);
     const enrichedParametersData = {
       ...parametersData,
       groups: [
@@ -172,7 +175,7 @@ export default function App() {
         {
           title: 'Wykończenie',
           rows: [
-            { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Okleina laminat obicie' : form.boardFinish.type === 'akryl' ? 'Okleina akryl obicie' : 'Okleina laminat drewniana' },
+            { label: 'Typ', value: form.boardFinish.type === 'laminat' ? 'Laminat' : form.boardFinish.type === 'akryl' ? 'Akryl' : 'Okleina' },
             { label: 'Wybór', value: selectedFinish?.label ?? form.boardFinish.optionId },
             { label: 'Cena za m²', value: selectedFinish ? `${selectedFinish.pricePerSqmPln.toFixed(2)} zł/m²` : '—' },
             { label: 'Uchwyt', value: selectedHandle?.label ?? form.doorHandle.optionId },
@@ -233,6 +236,8 @@ export default function App() {
               }}
               onBackToConfig={handleBackToConfig}
               onOpenContract={handleOpenContract}
+              finishesMap={finishesMap}
+              handlesMap={handlesMap}
             />
           ) : (
             <ContractView
@@ -255,6 +260,8 @@ export default function App() {
               outerMaskingLeft={form.outerMaskingLeft}
               outerMaskingRight={form.outerMaskingRight}
               onBackToReport={handleBackToReport}
+              finishesMap={finishesMap}
+              handlesMap={handlesMap}
             />
           )}
         </main>
@@ -271,6 +278,9 @@ export default function App() {
   }
 
   if (!currentProjectId) {
+    if (showDashboard) {
+      return <DashboardPage onBack={() => setShowDashboard(false)} />;
+    }
     return <ProjectsPage
       onSelectProject={(id) => {
         form.setStep(1);
@@ -282,6 +292,7 @@ export default function App() {
         setWardrobePlacedItems({});
         setCurrentProjectId(id);
       }}
+      onDashboard={() => setShowDashboard(true)}
     />;
   }
 
@@ -368,6 +379,9 @@ export default function App() {
             saveStep4(form.boardFinish, form.doorHandle, form.transportCostPln, form.customElementsCostPln, form.discountPln, form.discountPercent);
             handleSubmit();
           }}
+          finishes={finishes}
+          handles={handles}
+          optionsLoading={optionsLoading}
         />
       </main>
     </>

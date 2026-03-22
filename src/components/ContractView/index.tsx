@@ -1,6 +1,8 @@
 import type { ElementsData, HardwareSummary } from '../../lib/report';
 import { CONTRACTOR_PARTY_DETAILS } from '../../lib/contractTemplate';
 import type { BoardFinish, BoxForm, DoorHandleSelection } from '../../lib/types';
+import type { FinishOption } from '../../lib/finishOptions';
+import type { HandleOption } from '../../lib/handleOptions';
 import { ContractWardrobePreview } from '../ContractWardrobePreview';
 import { useContractView } from './useContractView';
 
@@ -24,6 +26,8 @@ export interface ContractViewProps {
   readonly outerMaskingLeft: boolean;
   readonly outerMaskingRight: boolean;
   readonly onBackToReport: () => void;
+  readonly finishesMap: ReadonlyMap<string, FinishOption>;
+  readonly handlesMap: ReadonlyMap<string, HandleOption>;
 }
 
 export function ContractView({
@@ -46,12 +50,15 @@ export function ContractView({
   outerMaskingLeft,
   outerMaskingRight,
   onBackToReport,
+  finishesMap,
+  handlesMap,
 }: ContractViewProps) {
+  const selectedFinish = finishesMap.get(boardFinish.optionId);
+  const selectedHandle = handlesMap.get(doorHandle.optionId);
+
   const {
     contractRef,
     isGeneratingPdf,
-    selectedFinish,
-    selectedHandle,
     pricing,
     contractPages,
     handleGeneratePdf,
@@ -65,6 +72,8 @@ export function ContractView({
     nicheWidthMm,
     nicheHeightMm,
     cabinetDepthMm,
+    selectedFinish,
+    selectedHandle,
   });
 
   return (

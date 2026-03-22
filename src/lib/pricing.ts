@@ -1,7 +1,5 @@
 import type { ElementsData, HardwareSummary } from './report';
 import type { BoardFinish, DoorHandleSelection } from './types';
-import { ALL_FINISH_OPTIONS } from './finishOptions';
-import { ALL_HANDLE_OPTIONS } from './handleOptions';
 import {
   COST_PER_HINGE_PLN,
   COST_PER_GUIDE_SET_PLN,
@@ -225,7 +223,11 @@ export function calculatePricingSummary(
   discountPercent = 0,
   transportCostPln = 0,
   customElementsCostPln = 0,
+  finishPricePerSqm?: number,
+  handleUnitPricePln?: number,
 ): PricingSummary {
+  const handleUnitPrice = handleUnitPricePln ?? DEFAULT_HANDLE_PRICE_PLN;
+
   if (!elementsData || !hardwareSummary) {
     const safePercent = clampDiscountPercent(discountPercent);
     const discount = applyFixedDiscountToPln(0, discountPln);
@@ -239,12 +241,9 @@ export function calculatePricingSummary(
       discountFixedAmount: discount.discountAmount,
       discountAmount: discount.discountAmount,
       clientPriceAfterDiscount: discount.discountedAmount,
-      handleUnitPrice: ALL_HANDLE_OPTIONS.get(doorHandle.optionId)?.pricePln ?? DEFAULT_HANDLE_PRICE_PLN,
+      handleUnitPrice,
     };
   }
-
-  const selectedFinish = ALL_FINISH_OPTIONS.get(boardFinish.optionId);
-  const handleUnitPrice = ALL_HANDLE_OPTIONS.get(doorHandle.optionId)?.pricePln ?? DEFAULT_HANDLE_PRICE_PLN;
   const coverBoards = groupBoards(getCoverBoards(elementsData));
   const carcassBoards = groupBoards(getCarcassBoards(elementsData));
   const totalHinges = elementsData.boxes.reduce((sum, box) => sum + (box.door?.hinges ?? 0), 0);
@@ -260,7 +259,7 @@ export function calculatePricingSummary(
   const carcassAreaSqm = carcassBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
   const carcassBoardCost = Math.round(carcassAreaSqm * COST_PER_CARCASS_SQM_PLN * 100) / 100;
   const coverAreaSqm = coverBoards.reduce((sum, b) => sum + b.dim1 * b.dim2 * b.qty, 0) / 1_000_000;
-  const coverPricePerSqm = selectedFinish?.pricePerSqmPln ?? COST_PER_COVER_SQM_PLN;
+  const coverPricePerSqm = finishPricePerSqm ?? COST_PER_COVER_SQM_PLN;
   const coverBoardCost = Math.round(coverAreaSqm * coverPricePerSqm * 100) / 100;
   const cuttingLengthM = Math.round((calcCuttingLengthM(carcassBoards) + calcCuttingLengthM(coverBoards)) * 100) / 100;
   const cuttingCost = Math.round(cuttingLengthM * COST_PER_METER_CUTTING_PLN * 100) / 100;

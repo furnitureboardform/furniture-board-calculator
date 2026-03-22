@@ -38,8 +38,8 @@ export function useFormState() {
   const [outerMaskingRight, setOuterMaskingRight] = useState(true);
   const [outerMaskingLeftFullCover, setOuterMaskingLeftFullCover] = useState(false);
   const [outerMaskingRightFullCover, setOuterMaskingRightFullCover] = useState(false);
-  const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'laminat', optionId: 'U156' });
-  const [doorHandle, setDoorHandle] = useState<DoorHandleSelection>({ optionId: 'UZ_NYXA_320' });
+  const [boardFinish, setBoardFinish] = useState<BoardFinish>({ type: 'laminat', optionId: '' });
+  const [doorHandle, setDoorHandle] = useState<DoorHandleSelection>({ optionId: '' });
   const [discountPln, setDiscountPlnState] = useState<number>(0);
   const [discountPercent, setDiscountPercentState] = useState<number>(0);
   const [transportCostPln, setTransportCostPln] = useState<number>(0);

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BoardFinish, DoorHandleSelection, FinishType } from '../lib/types';
-import { COVER_OPTIONS, VENEER_OPTIONS, ACRYLIC_OPTIONS } from '../lib/finishOptions';
-import { HANDLE_OPTIONS } from '../lib/handleOptions';
+import type { FinishOption } from '../lib/finishOptions';
+import type { HandleOption } from '../lib/handleOptions';
 
 export interface Step4BoardColorProps {
   finish: BoardFinish;
@@ -11,6 +11,9 @@ export interface Step4BoardColorProps {
   onGoToStep: (step: number) => void;
   onSubmit: () => void;
   active: boolean;
+  finishes: FinishOption[];
+  handles: HandleOption[];
+  optionsLoading: boolean;
 }
 
 function Lightbox({ option, onClose }: { option: { label: string; imageUrl: string }; onClose: () => void }) {
@@ -61,13 +64,21 @@ function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option
   );
 }
 
-export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHandleChange, onGoToStep, onSubmit, active }: Step4BoardColorProps) {
+export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHandleChange, onGoToStep, onSubmit, active, finishes, handles, optionsLoading }: Step4BoardColorProps) {
   const [zoomedOption, setZoomedOption] = useState<{ label: string; imageUrl: string } | null>(null);
-  const options = finish.type === 'laminat' ? COVER_OPTIONS : finish.type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS;
+  const typeOptions = finishes.filter((f) => f.type === finish.type);
+
+  useEffect(() => {
+    if (optionsLoading) return;
+    const currentExists = typeOptions.some((f) => f.id === finish.optionId);
+    if (!currentExists && typeOptions.length > 0) {
+      onFinishChange({ ...finish, optionId: typeOptions[0]!.id });
+    }
+  }, [finish.type, optionsLoading]);
 
   function handleTypeChange(type: FinishType) {
-    const defaultOption = (type === 'laminat' ? COVER_OPTIONS : type === 'akryl' ? ACRYLIC_OPTIONS : VENEER_OPTIONS)[0]!;
-    onFinishChange({ type, optionId: defaultOption.id });
+    const first = finishes.find((f) => f.type === type);
+    onFinishChange({ type, optionId: first?.id ?? '' });
   }
 
   return (
@@ -82,13 +93,18 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
             value={finish.type}
             onChange={(e) => handleTypeChange(e.target.value as FinishType)}
           >
-            <option value="laminat">Okleina laminat obicie</option>
-            <option value="okleina">Okleina laminat drewniana</option>
-            <option value="akryl">Okleina akryl obicie</option>
+            <option value="laminat">Laminat</option>
+            <option value="akryl">Akryl</option>
+            <option value="lakier">Lakier</option>
           </select>
         </div>
+        {optionsLoading ? (
+          <p style={{ color: '#888', fontSize: '0.95em' }}>Ładowanie okładzin…</p>
+        ) : typeOptions.length === 0 ? (
+          <p style={{ color: '#888', fontSize: '0.95em' }}>Brak okładzin tego typu. Dodaj je w panelu Dashboard.</p>
+        ) : (
         <div className="finish-cards">
-          {options.map((opt) => (
+          {typeOptions.map((opt) => (
             <OptionCard
               key={opt.id}
               option={opt}
@@ -99,21 +115,28 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
             />
           ))}
         </div>
+        )}
       </div>
       <div className="card">
         <h2>Uchwyt</h2>
+        {optionsLoading ? (
+          <p style={{ color: '#888', fontSize: '0.95em' }}>Ładowanie uchwytów…</p>
+        ) : handles.length === 0 ? (
+          <p style={{ color: '#888', fontSize: '0.95em' }}>Brak uchwytów. Dodaj je w panelu Dashboard.</p>
+        ) : (
         <div className="finish-cards">
-          {HANDLE_OPTIONS.map((handle) => (
+          {handles.map((handle) => (
             <OptionCard
               key={handle.id}
               option={handle}
               selected={handleSelection.optionId === handle.id}
               onSelect={() => onHandleChange({ optionId: handle.id })}
-              onZoom={() => setZoomedOption({ label: handle.label, imageUrl: handle.imageUrl })}
+              onZoom={handle.imageUrl ? () => setZoomedOption({ label: handle.label, imageUrl: handle.imageUrl! }) : undefined}
               priceLabel={`${handle.pricePln} zł/szt.`}
             />
           ))}
         </div>
+        )}
       </div>
       {zoomedOption?.imageUrl && (
         <Lightbox option={zoomedOption} onClose={() => setZoomedOption(null)} />
