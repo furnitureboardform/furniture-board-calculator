@@ -10,6 +10,10 @@ body {
   color: #333;
 }
 
+button:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 header {
   background: #1a1a2e;
   color: #fff;
@@ -44,7 +48,7 @@ header {
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
 }
 
@@ -76,11 +80,27 @@ header {
 .icon-btn:hover {
   background: rgba(0, 0, 0, 0.06);
   color: #1a1a2e;
+  box-shadow: none;
 }
 
 .icon-btn--danger:hover {
   background: rgba(198, 40, 40, 0.08);
   color: #c62828;
+  box-shadow: none;
+}
+
+.project-card-wrapper:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+}
+
+.create-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s;
+}
+
+.create-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 header h1 {
@@ -190,7 +210,7 @@ main {
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.5px;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.15s;
 }
 
 .btn:hover {
@@ -677,6 +697,7 @@ main {
 
 .summary-toggle-btn:hover {
   opacity: 1;
+  box-shadow: none;
 }
 
 .boards-summary-section__header--cover {

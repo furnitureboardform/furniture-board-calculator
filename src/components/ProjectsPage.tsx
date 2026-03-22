@@ -185,6 +185,7 @@ export function ProjectsPage({ onSelectProject, onCreateProject, onDashboard }: 
       ) : (
         <button
           onClick={() => setShowCreateForm(true)}
+          className="create-card"
           style={styles.createCard}
         >
           <span style={styles.plus}>+</span>
@@ -197,7 +198,7 @@ export function ProjectsPage({ onSelectProject, onCreateProject, onDashboard }: 
       ) : projects.length > 0 ? (
         <div style={styles.list}>
           {projects.map((project) => (
-            <div key={project.id} style={styles.projectCardWrapper}>
+            <div key={project.id} className="project-card-wrapper" style={styles.projectCardWrapper}>
               {editingId === project.id ? (
                 <div style={styles.editForm}>
                   <input
@@ -281,7 +282,8 @@ export function ProjectsPage({ onSelectProject, onCreateProject, onDashboard }: 
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    minHeight: '100vh',
+    height: '100vh',
+    overflow: 'hidden',
     background: '#f0f2f5',
     padding: '48px 24px',
     display: 'flex',
@@ -365,8 +367,6 @@ const styles: Record<string, React.CSSProperties> = {
     border: '2px dashed #1a1a2e',
     borderRadius: '10px',
     cursor: 'pointer',
-    transition: 'box-shadow 0.15s',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
     marginBottom: '40px',
   },
   plus: {
@@ -387,6 +387,10 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     width: '100%',
     maxWidth: '900px',
+    overflowY: 'auto',
+    flex: 1,
+    alignContent: 'flex-start',
+    paddingBottom: '24px',
   },
   projectCardWrapper: {
     position: 'relative',

@@ -1,4 +1,17 @@
 import { useState, useEffect } from 'react';
+
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+  </svg>
+);
+
+const DeleteIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+  </svg>
+);
+
 import {
   collection,
   getDocs,
@@ -123,6 +136,7 @@ export function DashboardPage({ onBack }: DashboardPageProps) {
   const [confirmDeleteFinish, setConfirmDeleteFinish] = useState<string | null>(null);
   const [confirmDeleteHandle, setConfirmDeleteHandle] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'finishes' | 'handles'>('finishes');
 
   useEffect(() => {
     const q = query(collection(db, 'finishes'), orderBy('createdAt', 'desc'));
@@ -312,8 +326,23 @@ export function DashboardPage({ onBack }: DashboardPageProps) {
       )}
 
       <div style={styles.sectionsWrapper}>
+        <div style={styles.tabBar}>
+          <button
+            style={{ ...styles.tabBtn, ...(activeTab === 'finishes' ? styles.tabBtnActive : {}) }}
+            onClick={() => setActiveTab('finishes')}
+          >
+            Okleiny
+          </button>
+          <button
+            style={{ ...styles.tabBtn, ...(activeTab === 'handles' ? styles.tabBtnActive : {}) }}
+            onClick={() => setActiveTab('handles')}
+          >
+            Uchwyty
+          </button>
+        </div>
+
         {/* Finishes section */}
-        <section style={styles.section}>
+        <section style={{ ...styles.section, display: activeTab === 'finishes' ? 'block' : 'none' }}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>Okleiny</h2>
             {!showFinishForm && (
@@ -438,21 +467,21 @@ export function DashboardPage({ onBack }: DashboardPageProps) {
                       <td style={styles.td}>{f.pricePerSqmPln.toFixed(2)}</td>
                       <td style={styles.td}>
                         <button
-                          style={styles.editRowBtn}
+                          className="icon-btn"
                           onClick={() => {
                             setEditingFinishDocId(f.docId);
                             setEditFinishForm({ label: f.label, brand: f.brand, type: f.type, pricePerSqmPln: f.pricePerSqmPln, imageBase64: '' });
                           }}
                           title="Edytuj"
                         >
-                          ✏️
+                          <EditIcon />
                         </button>
                         <button
-                          style={styles.deleteRowBtn}
+                          className="icon-btn icon-btn--danger"
                           onClick={() => setConfirmDeleteFinish(f.docId)}
                           title="Usuń"
                         >
-                          🗑️
+                          <DeleteIcon />
                         </button>
                       </td>
                     </tr>
@@ -513,7 +542,7 @@ export function DashboardPage({ onBack }: DashboardPageProps) {
         </section>
 
         {/* Handles section */}
-        <section style={styles.section}>
+        <section style={{ ...styles.section, display: activeTab === 'handles' ? 'block' : 'none' }}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>Uchwyty</h2>
             {!showHandleForm && (
@@ -649,21 +678,21 @@ export function DashboardPage({ onBack }: DashboardPageProps) {
                       <td style={styles.td}>{h.isEdge && h.edgeWidthMm !== null ? h.edgeWidthMm : '—'}</td>
                       <td style={styles.td}>
                         <button
-                          style={styles.editRowBtn}
+                          className="icon-btn"
                           onClick={() => {
                             setEditingHandleDocId(h.docId);
                             setEditHandleForm({ label: h.label, brand: h.brand, pricePln: h.pricePln, imageBase64: '', isEdge: h.isEdge, edgeWidthMm: h.edgeWidthMm });
                           }}
                           title="Edytuj"
                         >
-                          ✏️
+                          <EditIcon />
                         </button>
                         <button
-                          style={styles.deleteRowBtn}
+                          className="icon-btn icon-btn--danger"
                           onClick={() => setConfirmDeleteHandle(h.docId)}
                           title="Usuń"
                         >
-                          🗑️
+                          <DeleteIcon />
                         </button>
                       </td>
                     </tr>
@@ -763,13 +792,32 @@ const styles: Record<string, React.CSSProperties> = {
   sectionsWrapper: {
     maxWidth: '1100px',
     margin: '0 auto',
+  },
+  tabBar: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: '48px',
+    gap: '0',
+    marginBottom: '0',
+    borderBottom: '2px solid #e0e0e0',
+  },
+  tabBtn: {
+    padding: '10px 28px',
+    background: 'transparent',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    marginBottom: '-2px',
+    cursor: 'pointer',
+    fontSize: '0.95rem',
+    fontWeight: 600,
+    color: '#888',
+    transition: 'color 0.15s, border-color 0.15s',
+  },
+  tabBtnActive: {
+    color: '#1a1a2e',
+    borderBottom: '2px solid #1a1a2e',
   },
   section: {
     background: '#fff',
-    borderRadius: '12px',
+    borderRadius: '0 0 12px 12px',
     padding: '28px 32px',
     boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
   },
@@ -871,6 +919,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   tableWrapper: {
     overflowX: 'auto' as const,
+    overflowY: 'auto' as const,
+    maxHeight: '310px',
   },
   table: {
     width: '100%',
@@ -884,6 +934,10 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#555',
     fontWeight: 600,
     whiteSpace: 'nowrap' as const,
+    position: 'sticky' as const,
+    top: 0,
+    background: '#fff',
+    zIndex: 1,
   },
   tr: {
     borderBottom: '1px solid #f0f0f0',

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { BoardFinish, DoorHandleSelection, FinishType } from '../lib/types';
 import type { FinishOption } from '../lib/finishOptions';
 import type { HandleOption } from '../lib/handleOptions';
@@ -66,7 +66,14 @@ function OptionCard({ option, selected, onSelect, onZoom, priceLabel }: { option
 
 export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHandleChange, onGoToStep, onSubmit, active, finishes, handles, optionsLoading }: Step4BoardColorProps) {
   const [zoomedOption, setZoomedOption] = useState<{ label: string; imageUrl: string } | null>(null);
+  const typeSelectionsRef = useRef<Partial<Record<FinishType, string>>>({});
   const typeOptions = finishes.filter((f) => f.type === finish.type);
+
+  useEffect(() => {
+    if (finish.optionId) {
+      typeSelectionsRef.current[finish.type] = finish.optionId;
+    }
+  }, [finish.type, finish.optionId]);
 
   useEffect(() => {
     if (optionsLoading) return;
@@ -77,8 +84,10 @@ export function Step4BoardColor({ finish, onFinishChange, handleSelection, onHan
   }, [finish.type, optionsLoading]);
 
   function handleTypeChange(type: FinishType) {
+    const rememberedId = typeSelectionsRef.current[type];
+    const remembered = rememberedId ? finishes.find((f) => f.id === rememberedId && f.type === type) : undefined;
     const first = finishes.find((f) => f.type === type);
-    onFinishChange({ type, optionId: first?.id ?? '' });
+    onFinishChange({ type, optionId: remembered?.id ?? first?.id ?? '' });
   }
 
   return (
