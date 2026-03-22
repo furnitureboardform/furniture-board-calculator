@@ -57,6 +57,32 @@ header {
   line-height: 1;
 }
 
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  color: #757575;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1a2e;
+}
+
+.icon-btn--danger:hover {
+  background: rgba(198, 40, 40, 0.08);
+  color: #c62828;
+}
+
 header h1 {
   font-size: 1.4rem;
   font-weight: 600;
